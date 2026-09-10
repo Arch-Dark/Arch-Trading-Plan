@@ -1,3 +1,4 @@
+```javascript
 const TRADES_KEY = "tradingTrades";
 const CAPITAL_KEY = "tradingActiveCapital";
 const ARCHIVES_KEY = "tradingCapitalArchives";
@@ -26,7 +27,6 @@ function parseNumber(value) {
 
 function money(value) {
     const number = Number(value) || 0;
-
     return "$" + number.toFixed(2);
 }
 
@@ -111,18 +111,29 @@ function loadData() {
         }
 
         // Ancien trade sans lot
-        if (trade.lot === undefined || trade.lot === null || trade.lot === "") {
+        if (
+            trade.lot === undefined ||
+            trade.lot === null ||
+            trade.lot === ""
+        ) {
             trade.lot = 0;
             changed = true;
         }
 
-        // Compatibilité avec anciennes données
-        if (trade.pnl === undefined && trade.profit !== undefined) {
+        // Compatibilité ancienne propriété profit
+        if (
+            trade.pnl === undefined &&
+            trade.profit !== undefined
+        ) {
             trade.pnl = parseNumber(trade.profit);
             changed = true;
         }
 
-        if (trade.position === undefined && trade.direction !== undefined) {
+        // Compatibilité ancienne propriété direction
+        if (
+            trade.position === undefined &&
+            trade.direction !== undefined
+        ) {
             trade.position = trade.direction;
             changed = true;
         }
@@ -139,12 +150,21 @@ function loadData() {
 // ============================================================
 
 function getCurrentCapitalTrades() {
+    if (!activeCapital) {
+        return [];
+    }
+
     return trades.filter(
         trade => trade.capitalId === activeCapital.id
     );
 }
 
 function calculateCurrentBalance() {
+
+    if (!activeCapital) {
+        return 0;
+    }
+
     const currentTrades = getCurrentCapitalTrades();
 
     const profit = currentTrades.reduce(
@@ -156,6 +176,7 @@ function calculateCurrentBalance() {
 }
 
 function calculateProfit(tradeList) {
+
     return tradeList.reduce(
         (sum, trade) => sum + (Number(trade.pnl) || 0),
         0
@@ -168,6 +189,7 @@ function calculateProfit(tradeList) {
 // ============================================================
 
 function isSameDay(date) {
+
     const tradeDate = new Date(date + "T00:00:00");
     const today = new Date();
 
@@ -179,24 +201,30 @@ function isSameDay(date) {
 }
 
 function isThisWeek(date) {
+
     const tradeDate = new Date(date + "T00:00:00");
     const today = new Date();
 
     const day = today.getDay();
-
     const diffToMonday = day === 0 ? 6 : day - 1;
 
     const monday = new Date(today);
+
     monday.setHours(0, 0, 0, 0);
     monday.setDate(today.getDate() - diffToMonday);
 
     const nextMonday = new Date(monday);
+
     nextMonday.setDate(monday.getDate() + 7);
 
-    return tradeDate >= monday && tradeDate < nextMonday;
+    return (
+        tradeDate >= monday &&
+        tradeDate < nextMonday
+    );
 }
 
 function isThisMonth(date) {
+
     const tradeDate = new Date(date + "T00:00:00");
     const today = new Date();
 
@@ -207,6 +235,7 @@ function isThisMonth(date) {
 }
 
 function isThisYear(date) {
+
     const tradeDate = new Date(date + "T00:00:00");
     const today = new Date();
 
@@ -271,7 +300,9 @@ function calculateAverageRR(tradeList) {
 
     const validRR = tradeList
         .map(trade => Number(trade.rr))
-        .filter(rr => Number.isFinite(rr) && rr > 0);
+        .filter(
+            rr => Number.isFinite(rr) && rr > 0
+        );
 
     if (validRR.length === 0) {
         return 0;
@@ -300,6 +331,7 @@ function findBestSetup(tradeList) {
         }
 
         if (!setupStats[trade.setup]) {
+
             setupStats[trade.setup] = {
                 trades: 0,
                 winners: 0
@@ -349,23 +381,49 @@ function findBestSetup(tradeList) {
 
 function updateCapitalDisplay() {
 
-    document.getElementById("activeCapitalName").textContent =
-        activeCapital.name;
+    if (!activeCapital) {
+        return;
+    }
 
-    document.getElementById("initialCapital").textContent =
-        money(activeCapital.initialCapital);
+    const nameElement =
+        document.getElementById("activeCapitalName");
 
-    const balance = calculateCurrentBalance();
+    const initialElement =
+        document.getElementById("initialCapital");
 
-    document.getElementById("currentBalance").textContent =
-        money(balance);
+    const balanceElement =
+        document.getElementById("currentBalance");
 
-    const currentTrades = getCurrentCapitalTrades();
+    const profitElement =
+        document.getElementById("totalProfit");
 
-    const totalProfit = calculateProfit(currentTrades);
+    if (nameElement) {
+        nameElement.textContent = activeCapital.name;
+    }
 
-    document.getElementById("totalProfit").textContent =
-        money(totalProfit);
+    if (initialElement) {
+        initialElement.textContent =
+            money(activeCapital.initialCapital);
+    }
+
+    const balance =
+        calculateCurrentBalance();
+
+    if (balanceElement) {
+        balanceElement.textContent =
+            money(balance);
+    }
+
+    const currentTrades =
+        getCurrentCapitalTrades();
+
+    const totalProfit =
+        calculateProfit(currentTrades);
+
+    if (profitElement) {
+        profitElement.textContent =
+            money(totalProfit);
+    }
 }
 
 
@@ -375,32 +433,71 @@ function updateCapitalDisplay() {
 
 function updateStats() {
 
-    const currentTrades = getCurrentCapitalTrades();
+    const currentTrades =
+        getCurrentCapitalTrades();
 
-    const periodTrades = filterByPeriod(currentTrades);
+    const periodTrades =
+        filterByPeriod(currentTrades);
 
-    const profit = calculateProfit(periodTrades);
-    const winrate = calculateWinrate(periodTrades);
-    const averageRR = calculateAverageRR(periodTrades);
-    const bestSetup = findBestSetup(periodTrades);
+    const profit =
+        calculateProfit(periodTrades);
 
-    document.getElementById("statBalance").textContent =
-        money(calculateCurrentBalance());
+    const winrate =
+        calculateWinrate(periodTrades);
 
-    document.getElementById("statProfit").textContent =
-        money(profit);
+    const averageRR =
+        calculateAverageRR(periodTrades);
 
-    document.getElementById("statWinrate").textContent =
-        winrate.toFixed(1) + "%";
+    const bestSetup =
+        findBestSetup(periodTrades);
 
-    document.getElementById("statAverageRR").textContent =
-        averageRR.toFixed(2);
+    const statBalance =
+        document.getElementById("statBalance");
 
-    document.getElementById("statTrades").textContent =
-        periodTrades.length;
+    const statProfit =
+        document.getElementById("statProfit");
 
-    document.getElementById("statBestSetup").textContent =
-        bestSetup;
+    const statWinrate =
+        document.getElementById("statWinrate");
+
+    const statAverageRR =
+        document.getElementById("statAverageRR");
+
+    const statTrades =
+        document.getElementById("statTrades");
+
+    const statBestSetup =
+        document.getElementById("statBestSetup");
+
+    if (statBalance) {
+        statBalance.textContent =
+            money(calculateCurrentBalance());
+    }
+
+    if (statProfit) {
+        statProfit.textContent =
+            money(profit);
+    }
+
+    if (statWinrate) {
+        statWinrate.textContent =
+            winrate.toFixed(1) + "%";
+    }
+
+    if (statAverageRR) {
+        statAverageRR.textContent =
+            averageRR.toFixed(2);
+    }
+
+    if (statTrades) {
+        statTrades.textContent =
+            periodTrades.length;
+    }
+
+    if (statBestSetup) {
+        statBestSetup.textContent =
+            bestSetup;
+    }
 }
 
 
@@ -410,12 +507,20 @@ function updateStats() {
 
 function updateSetupTable() {
 
-    const tbody = document.getElementById("setupTableBody");
+    const tbody =
+        document.getElementById("setupTableBody");
+
+    if (!tbody) {
+        return;
+    }
 
     tbody.innerHTML = "";
 
-    const currentTrades = getCurrentCapitalTrades();
-    const periodTrades = filterByPeriod(currentTrades);
+    const currentTrades =
+        getCurrentCapitalTrades();
+
+    const periodTrades =
+        filterByPeriod(currentTrades);
 
     const setupNames = [
         "LDP+QML",
@@ -433,22 +538,26 @@ function updateSetupTable() {
 
     setupNames.forEach(setup => {
 
-        const setupTrades = periodTrades.filter(
-            trade => trade.setup === setup
-        );
+        const setupTrades =
+            periodTrades.filter(
+                trade => trade.setup === setup
+            );
 
-        const winners = setupTrades.filter(
-            trade => trade.result === "TP"
-        ).length;
+        const winners =
+            setupTrades.filter(
+                trade => trade.result === "TP"
+            ).length;
 
         const winrate =
             setupTrades.length > 0
                 ? (winners / setupTrades.length) * 100
                 : 0;
 
-        const profit = calculateProfit(setupTrades);
+        const profit =
+            calculateProfit(setupTrades);
 
-        const row = document.createElement("tr");
+        const row =
+            document.createElement("tr");
 
         row.innerHTML = `
             <td>${escapeHtml(setup)}</td>
@@ -469,21 +578,29 @@ function updateSetupTable() {
 
 function renderHistory() {
 
-    const tbody = document.getElementById("historyBody");
+    const tbody =
+        document.getElementById("historyBody");
+
+    if (!tbody) {
+        return;
+    }
 
     tbody.innerHTML = "";
 
-    const currentTrades = getCurrentCapitalTrades();
+    const currentTrades =
+        getCurrentCapitalTrades();
 
-    const sortedTrades = [...currentTrades].sort(
-        (a, b) => {
-            return new Date(b.date) - new Date(a.date);
-        }
-    );
+    const sortedTrades =
+        [...currentTrades].sort(
+            (a, b) =>
+                new Date(b.date) -
+                new Date(a.date)
+        );
 
     if (sortedTrades.length === 0) {
 
-        const row = document.createElement("tr");
+        const row =
+            document.createElement("tr");
 
         row.innerHTML = `
             <td colspan="12" class="empty-table">
@@ -498,7 +615,8 @@ function renderHistory() {
 
     sortedTrades.forEach(trade => {
 
-        const row = document.createElement("tr");
+        const row =
+            document.createElement("tr");
 
         const position =
             trade.position === "SELL"
@@ -530,7 +648,8 @@ function renderHistory() {
                 ? Number(trade.rr).toFixed(2)
                 : "0.00";
 
-        const pnl = Number(trade.pnl) || 0;
+        const pnl =
+            Number(trade.pnl) || 0;
 
         let pnlClass = "";
 
@@ -538,7 +657,14 @@ function renderHistory() {
             pnlClass = "profit-positive";
         } else if (pnl < 0) {
             pnlClass = "profit-negative";
+        } else {
+            pnlClass = "profit-be";
         }
+
+        const positionClass =
+            trade.position === "SELL"
+                ? "sell"
+                : "buy";
 
         row.innerHTML = `
             <td>${escapeHtml(trade.date || "-")}</td>
@@ -546,7 +672,7 @@ function renderHistory() {
             <td>${escapeHtml(trade.asset || "-")}</td>
 
             <td>
-                <span class="position-badge ${trade.position === "SELL" ? "sell" : "buy"}">
+                <span class="position-badge ${positionClass}">
                     ${position}
                 </span>
             </td>
@@ -574,7 +700,7 @@ function renderHistory() {
             <td>
                 <button
                     class="delete-trade-btn"
-                    data-id="${trade.id}"
+                    data-id="${escapeHtml(trade.id)}"
                     title="Supprimer ce trade"
                 >
                     🗑️
@@ -585,15 +711,19 @@ function renderHistory() {
         tbody.appendChild(row);
     });
 
-    document.querySelectorAll(".delete-trade-btn")
+    document
+        .querySelectorAll(".delete-trade-btn")
         .forEach(button => {
 
-            button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                const id = button.dataset.id;
-
-                deleteTrade(id);
-            });
+                    deleteTrade(
+                        button.dataset.id
+                    );
+                }
+            );
         });
 }
 
@@ -604,25 +734,28 @@ function renderHistory() {
 
 function deleteTrade(id) {
 
-    const trade = trades.find(
-        item => item.id === id
-    );
+    const trade =
+        trades.find(
+            item => item.id === id
+        );
 
     if (!trade) {
         return;
     }
 
-    const confirmed = confirm(
-        "Voulez-vous vraiment supprimer ce trade ?"
-    );
+    const confirmed =
+        confirm(
+            "Voulez-vous vraiment supprimer ce trade ?"
+        );
 
     if (!confirmed) {
         return;
     }
 
-    trades = trades.filter(
-        item => item.id !== id
-    );
+    trades =
+        trades.filter(
+            item => item.id !== id
+        );
 
     saveTrades();
 
@@ -636,20 +769,42 @@ function deleteTrade(id) {
 
 function calculateRR() {
 
-    const direction =
-        document.getElementById("direction").value;
+    const directionElement =
+        document.getElementById("direction");
 
-    const entry =
-        parseNumber(document.getElementById("entry").value);
+    const entryElement =
+        document.getElementById("entry");
 
-    const sl =
-        parseNumber(document.getElementById("sl").value);
+    const slElement =
+        document.getElementById("sl");
 
-    const tp =
-        parseNumber(document.getElementById("tp").value);
+    const tpElement =
+        document.getElementById("tp");
 
     const rrInput =
         document.getElementById("calculatedRR");
+
+    if (
+        !directionElement ||
+        !entryElement ||
+        !slElement ||
+        !tpElement ||
+        !rrInput
+    ) {
+        return;
+    }
+
+    const direction =
+        directionElement.value;
+
+    const entry =
+        parseNumber(entryElement.value);
+
+    const sl =
+        parseNumber(slElement.value);
+
+    const tp =
+        parseNumber(tpElement.value);
 
     if (
         !Number.isFinite(entry) ||
@@ -674,16 +829,19 @@ function calculateRR() {
         reward = entry - tp;
     }
 
-    if (risk <= 0 || reward <= 0) {
-
+    if (
+        risk <= 0 ||
+        reward <= 0
+    ) {
         rrInput.value = "0.00";
-
         return;
     }
 
-    const rr = reward / risk;
+    const rr =
+        reward / risk;
 
-    rrInput.value = rr.toFixed(2);
+    rrInput.value =
+        rr.toFixed(2);
 }
 
 
@@ -699,7 +857,11 @@ function validateTrade(
 ) {
 
     if (!Number.isFinite(entry)) {
-        alert("Veuillez entrer un prix d'entrée valide.");
+
+        alert(
+            "Veuillez entrer un prix d'entrée valide."
+        );
+
         return false;
     }
 
@@ -709,6 +871,7 @@ function validateTrade(
             Number.isFinite(sl) &&
             sl >= entry
         ) {
+
             alert(
                 "Pour un Buy, le Stop Loss doit être inférieur à l'Entry."
             );
@@ -720,6 +883,7 @@ function validateTrade(
             Number.isFinite(tp) &&
             tp <= entry
         ) {
+
             alert(
                 "Pour un Buy, le Take Profit doit être supérieur à l'Entry."
             );
@@ -733,6 +897,7 @@ function validateTrade(
             Number.isFinite(sl) &&
             sl <= entry
         ) {
+
             alert(
                 "Pour un Sell, le Stop Loss doit être supérieur à l'Entry."
             );
@@ -744,6 +909,7 @@ function validateTrade(
             Number.isFinite(tp) &&
             tp >= entry
         ) {
+
             alert(
                 "Pour un Sell, le Take Profit doit être inférieur à l'Entry."
             );
@@ -777,16 +943,24 @@ function addTrade(event) {
         document.getElementById("orderType").value;
 
     const lot =
-        parseNumber(document.getElementById("lot").value);
+        parseNumber(
+            document.getElementById("lot").value
+        );
 
     const entry =
-        parseNumber(document.getElementById("entry").value);
+        parseNumber(
+            document.getElementById("entry").value
+        );
 
     const sl =
-        parseNumber(document.getElementById("sl").value);
+        parseNumber(
+            document.getElementById("sl").value
+        );
 
     const tp =
-        parseNumber(document.getElementById("tp").value);
+        parseNumber(
+            document.getElementById("tp").value
+        );
 
     const setup =
         document.getElementById("setup").value;
@@ -795,22 +969,27 @@ function addTrade(event) {
         document.getElementById("result").value;
 
     const pnl =
-        parseNumber(document.getElementById("profit").value);
+        parseNumber(
+            document.getElementById("profit").value
+        );
 
     const comment =
         document.getElementById("comment").value.trim();
+
 
     // Vérification lot
     if (
         !Number.isFinite(lot) ||
         lot <= 0
     ) {
+
         alert(
             "Veuillez entrer un lot valide. Exemple : 0.01"
         );
 
         return;
     }
+
 
     // Vérification P/L
     if (!Number.isFinite(pnl)) {
@@ -822,7 +1001,8 @@ function addTrade(event) {
         return;
     }
 
-    // Vérification des prix
+
+    // Vérification prix
     if (
         !validateTrade(
             direction,
@@ -833,6 +1013,7 @@ function addTrade(event) {
     ) {
         return;
     }
+
 
     // Calcul RR
     let rr = 0;
@@ -865,68 +1046,99 @@ function addTrade(event) {
         }
     }
 
+
     const trade = {
 
         id: generateId(),
 
-        capitalId: activeCapital.id,
+        capitalId:
+            activeCapital.id,
 
-        date: date,
+        date:
+            date,
 
-        asset: asset,
+        asset:
+            asset,
 
-        position: direction,
+        position:
+            direction,
 
-        orderType: orderType,
+        orderType:
+            orderType,
 
-        // NOUVEAU
-        lot: lot,
+        lot:
+            lot,
 
-        entry: entry,
+        entry:
+            entry,
 
-        sl: Number.isFinite(sl)
-            ? sl
-            : null,
+        sl:
+            Number.isFinite(sl)
+                ? sl
+                : null,
 
-        tp: Number.isFinite(tp)
-            ? tp
-            : null,
+        tp:
+            Number.isFinite(tp)
+                ? tp
+                : null,
 
-        rr: rr,
+        rr:
+            rr,
 
-        setup: setup,
+        setup:
+            setup,
 
-        result: result,
+        result:
+            result,
 
-        pnl: pnl,
+        pnl:
+            pnl,
 
-        comment: comment
+        comment:
+            comment
     };
+
 
     trades.push(trade);
 
     saveTrades();
 
-    document.getElementById("tradeForm").reset();
 
-    document.getElementById("date").value =
+    document
+        .getElementById("tradeForm")
+        .reset();
+
+    document
+        .getElementById("date")
+        .value =
         getTodayDate();
 
-    document.getElementById("direction").value =
+    document
+        .getElementById("direction")
+        .value =
         "BUY";
 
-    document.getElementById("orderType").value =
+    document
+        .getElementById("orderType")
+        .value =
         "Market";
 
-    document.getElementById("result").value =
+    document
+        .getElementById("result")
+        .value =
         "TP";
 
-    document.getElementById("calculatedRR").value =
+    document
+        .getElementById("calculatedRR")
+        .value =
         "0.00";
+
 
     refreshAll();
 
-    alert("Trade enregistré avec succès !");
+    alert(
+        "Trade enregistré avec succès !"
+    );
 }
 
 
@@ -936,30 +1148,34 @@ function addTrade(event) {
 
 function getTodayDate() {
 
-    const today = new Date();
+    const today =
+        new Date();
 
     const year =
         today.getFullYear();
 
     const month =
-        String(today.getMonth() + 1)
-            .padStart(2, "0");
+        String(
+            today.getMonth() + 1
+        ).padStart(2, "0");
 
     const day =
-        String(today.getDate())
-            .padStart(2, "0");
+        String(
+            today.getDate()
+        ).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
 }
 
 
 // ============================================================
-// GRAPHIQUE
+// ECHELLE GRAPHIQUE
 // ============================================================
 
 function calculateChartScale(values) {
 
     if (values.length === 0) {
+
         return {
             min: 0,
             max: 100,
@@ -967,16 +1183,16 @@ function calculateChartScale(values) {
         };
     }
 
-    let minValue =
+    const minValue =
         Math.min(...values);
 
-    let maxValue =
+    const maxValue =
         Math.max(...values);
-
-    let step = 5;
 
     const range =
         maxValue - minValue;
+
+    let step = 5;
 
     if (maxValue > 1000) {
         step = 100;
@@ -986,8 +1202,6 @@ function calculateChartScale(values) {
         step = 25;
     } else if (maxValue > 100) {
         step = 10;
-    } else {
-        step = 5;
     }
 
     if (range > 500) {
@@ -999,10 +1213,14 @@ function calculateChartScale(values) {
     }
 
     let min =
-        Math.floor(minValue / step) * step;
+        Math.floor(
+            minValue / step
+        ) * step;
 
     let max =
-        Math.ceil(maxValue / step) * step;
+        Math.ceil(
+            maxValue / step
+        ) * step;
 
     if (minValue >= 0) {
         min = Math.max(0, min);
@@ -1020,13 +1238,21 @@ function calculateChartScale(values) {
 }
 
 
+// ============================================================
+// DESSIN GRAPHIQUE CAPITAL
+// ============================================================
+
 function drawCapitalChart() {
 
     const canvas =
-        document.getElementById("capitalChart");
+        document.getElementById(
+            "capitalChart"
+        );
 
     const emptyMessage =
-        document.getElementById("emptyChartMessage");
+        document.getElementById(
+            "emptyChartMessage"
+        );
 
     if (!canvas) {
         return;
@@ -1044,16 +1270,24 @@ function drawCapitalChart() {
 
     if (sortedTrades.length === 0) {
 
-        canvas.style.display = "none";
+        canvas.style.display =
+            "none";
 
-        emptyMessage.style.display = "flex";
+        if (emptyMessage) {
+            emptyMessage.style.display =
+                "flex";
+        }
 
         return;
     }
 
-    canvas.style.display = "block";
+    canvas.style.display =
+        "block";
 
-    emptyMessage.style.display = "none";
+    if (emptyMessage) {
+        emptyMessage.style.display =
+            "none";
+    }
 
     const ctx =
         canvas.getContext("2d");
@@ -1086,15 +1320,20 @@ function drawCapitalChart() {
     );
 
     const values = [
-        Number(activeCapital.initialCapital) || 0
+        Number(
+            activeCapital.initialCapital
+        ) || 0
     ];
 
     let balance =
-        Number(activeCapital.initialCapital) || 0;
+        Number(
+            activeCapital.initialCapital
+        ) || 0;
 
     sortedTrades.forEach(trade => {
 
-        balance += Number(trade.pnl) || 0;
+        balance +=
+            Number(trade.pnl) || 0;
 
         values.push(balance);
     });
@@ -1117,7 +1356,6 @@ function drawCapitalChart() {
         paddingTop -
         paddingBottom;
 
-    // Fond
     ctx.clearRect(
         0,
         0,
@@ -1125,10 +1363,16 @@ function drawCapitalChart() {
         height
     );
 
-    // Grille horizontale
-    ctx.font = "12px Arial";
-    ctx.textAlign = "right";
-    ctx.textBaseline = "middle";
+
+    // Grille
+    ctx.font =
+        "12px Arial";
+
+    ctx.textAlign =
+        "right";
+
+    ctx.textBaseline =
+        "middle";
 
     for (
         let value = scale.min;
@@ -1174,7 +1418,8 @@ function drawCapitalChart() {
         );
     }
 
-    // Axe
+
+    // Axes
     ctx.beginPath();
 
     ctx.moveTo(
@@ -1197,6 +1442,7 @@ function drawCapitalChart() {
 
     ctx.stroke();
 
+
     // Points
     const points = [];
 
@@ -1207,7 +1453,10 @@ function drawCapitalChart() {
                 paddingLeft +
                 (
                     index /
-                    Math.max(values.length - 1, 1)
+                    Math.max(
+                        values.length - 1,
+                        1
+                    )
                 ) *
                 chartWidth;
 
@@ -1228,7 +1477,8 @@ function drawCapitalChart() {
         }
     );
 
-    // Segments colorés
+
+    // Segments
     for (
         let i = 0;
         i < points.length - 1;
@@ -1267,10 +1517,12 @@ function drawCapitalChart() {
 
         ctx.lineWidth = 3;
 
-        ctx.lineCap = "round";
+        ctx.lineCap =
+            "round";
 
         ctx.stroke();
     }
+
 
     // Points
     points.forEach(
@@ -1283,13 +1535,17 @@ function drawCapitalChart() {
 
                 const pnl =
                     Number(
-                        sortedTrades[index - 1].pnl
+                        sortedTrades[
+                            index - 1
+                        ].pnl
                     ) || 0;
 
                 if (pnl > 0) {
-                    pointColor = "#16a34a";
+                    pointColor =
+                        "#16a34a";
                 } else if (pnl < 0) {
-                    pointColor = "#dc2626";
+                    pointColor =
+                        "#dc2626";
                 }
             }
 
@@ -1317,9 +1573,13 @@ function drawCapitalChart() {
         }
     );
 
+
     // Labels X
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
+    ctx.textAlign =
+        "center";
+
+    ctx.textBaseline =
+        "top";
 
     points.forEach(
         (point, index) => {
@@ -1341,7 +1601,9 @@ function drawCapitalChart() {
                         ? "Départ"
                         : "#" + index,
                     point.x,
-                    height - paddingBottom + 10
+                    height -
+                        paddingBottom +
+                        10
                 );
             }
         }
@@ -1350,13 +1612,15 @@ function drawCapitalChart() {
 
 
 // ============================================================
-// GRAPHIQUE ARCHIVE
+// DESSIN GRAPHIQUE ARCHIVE
 // ============================================================
 
 function drawArchiveChart(archive) {
 
     const canvas =
-        document.getElementById("archiveChart");
+        document.getElementById(
+            "archiveChart"
+        );
 
     if (!canvas) {
         return;
@@ -1405,15 +1669,19 @@ function drawArchiveChart(archive) {
     );
 
     const initial =
-        Number(archive.initialCapital) || 0;
+        Number(
+            archive.initialCapital
+        ) || 0;
 
     const values = [initial];
 
-    let balance = initial;
+    let balance =
+        initial;
 
     sortedTrades.forEach(trade => {
 
-        balance += Number(trade.pnl) || 0;
+        balance +=
+            Number(trade.pnl) || 0;
 
         values.push(balance);
     });
@@ -1443,9 +1711,16 @@ function drawArchiveChart(archive) {
         height
     );
 
-    ctx.font = "12px Arial";
-    ctx.textAlign = "right";
-    ctx.textBaseline = "middle";
+
+    // Grille
+    ctx.font =
+        "12px Arial";
+
+    ctx.textAlign =
+        "right";
+
+    ctx.textBaseline =
+        "middle";
 
     for (
         let value = scale.min;
@@ -1491,6 +1766,8 @@ function drawArchiveChart(archive) {
         );
     }
 
+
+    // Axes
     ctx.beginPath();
 
     ctx.moveTo(
@@ -1513,6 +1790,8 @@ function drawArchiveChart(archive) {
 
     ctx.stroke();
 
+
+    // Points
     const points = [];
 
     values.forEach(
@@ -1522,7 +1801,10 @@ function drawArchiveChart(archive) {
                 paddingLeft +
                 (
                     index /
-                    Math.max(values.length - 1, 1)
+                    Math.max(
+                        values.length - 1,
+                        1
+                    )
                 ) *
                 chartWidth;
 
@@ -1543,6 +1825,8 @@ function drawArchiveChart(archive) {
         }
     );
 
+
+    // Segments
     for (
         let i = 0;
         i < points.length - 1;
@@ -1559,9 +1843,11 @@ function drawArchiveChart(archive) {
             "#64748b";
 
         if (pnl > 0) {
-            lineColor = "#16a34a";
+            lineColor =
+                "#16a34a";
         } else if (pnl < 0) {
-            lineColor = "#dc2626";
+            lineColor =
+                "#dc2626";
         }
 
         ctx.beginPath();
@@ -1581,11 +1867,14 @@ function drawArchiveChart(archive) {
 
         ctx.lineWidth = 3;
 
-        ctx.lineCap = "round";
+        ctx.lineCap =
+            "round";
 
         ctx.stroke();
     }
 
+
+    // Points
     points.forEach(
         (point, index) => {
 
@@ -1596,13 +1885,17 @@ function drawArchiveChart(archive) {
 
                 const pnl =
                     Number(
-                        sortedTrades[index - 1].pnl
+                        sortedTrades[
+                            index - 1
+                        ].pnl
                     ) || 0;
 
                 if (pnl > 0) {
-                    pointColor = "#16a34a";
+                    pointColor =
+                        "#16a34a";
                 } else if (pnl < 0) {
-                    pointColor = "#dc2626";
+                    pointColor =
+                        "#dc2626";
                 }
             }
 
@@ -1630,8 +1923,13 @@ function drawArchiveChart(archive) {
         }
     );
 
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
+
+    // Labels X
+    ctx.textAlign =
+        "center";
+
+    ctx.textBaseline =
+        "top";
 
     points.forEach(
         (point, index) => {
@@ -1653,7 +1951,9 @@ function drawArchiveChart(archive) {
                         ? "Départ"
                         : "#" + index,
                     point.x,
-                    height - paddingBottom + 10
+                    height -
+                        paddingBottom +
+                        10
                 );
             }
         }
@@ -1668,7 +1968,13 @@ function drawArchiveChart(archive) {
 function renderArchives() {
 
     const container =
-        document.getElementById("archivesList");
+        document.getElementById(
+            "archivesList"
+        );
+
+    if (!container) {
+        return;
+    }
 
     container.innerHTML = "";
 
@@ -1707,14 +2013,14 @@ function renderArchives() {
                         ${escapeHtml(archive.name)}
                     </h3>
 
-                    <small>
+                    <div class="archive-date">
                         Archivé le
                         ${escapeHtml(
                             formatDateTime(
                                 archive.archivedAt
                             )
                         )}
-                    </small>
+                    </div>
                 </div>
 
             </div>
@@ -1722,38 +2028,55 @@ function renderArchives() {
 
             <div class="archive-stats">
 
-                <div>
+                <div class="archive-stat">
                     <span>Initial</span>
+
                     <strong>
-                        ${money(archive.initialCapital)}
+                        ${money(
+                            archive.initialCapital
+                        )}
                     </strong>
                 </div>
 
-                <div>
+
+                <div class="archive-stat">
                     <span>Final</span>
+
                     <strong>
-                        ${money(archive.finalBalance)}
+                        ${money(
+                            archive.finalBalance
+                        )}
                     </strong>
                 </div>
 
-                <div>
+
+                <div class="archive-stat">
                     <span>Profit</span>
+
                     <strong>
-                        ${money(archive.totalProfit)}
+                        ${money(
+                            archive.totalProfit
+                        )}
                     </strong>
                 </div>
 
-                <div>
+
+                <div class="archive-stat">
                     <span>Trades</span>
+
                     <strong>
                         ${archive.totalTrades}
                     </strong>
                 </div>
 
-                <div>
+
+                <div class="archive-stat">
                     <span>Winrate</span>
+
                     <strong>
-                        ${Number(archive.winrate || 0).toFixed(1)}%
+                        ${Number(
+                            archive.winrate || 0
+                        ).toFixed(1)}%
                     </strong>
                 </div>
 
@@ -1764,14 +2087,14 @@ function renderArchives() {
 
                 <button
                     class="secondary-btn view-archive-chart"
-                    data-id="${archive.id}"
+                    data-id="${escapeHtml(archive.id)}"
                 >
                     📈 Voir le graphique
                 </button>
 
                 <button
                     class="danger-btn delete-archive"
-                    data-id="${archive.id}"
+                    data-id="${escapeHtml(archive.id)}"
                 >
                     🗑️ Supprimer
                 </button>
@@ -1782,7 +2105,9 @@ function renderArchives() {
         container.appendChild(card);
     });
 
-    document.querySelectorAll(".view-archive-chart")
+
+    document
+        .querySelectorAll(".view-archive-chart")
         .forEach(button => {
 
             button.addEventListener(
@@ -1803,7 +2128,9 @@ function renderArchives() {
             );
         });
 
-    document.querySelectorAll(".delete-archive")
+
+    document
+        .querySelectorAll(".delete-archive")
         .forEach(button => {
 
             button.addEventListener(
@@ -1828,7 +2155,11 @@ function formatDateTime(dateString) {
     const date =
         new Date(dateString);
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
         return "-";
     }
 
@@ -1858,12 +2189,16 @@ function createArchiveFromCurrentCapital() {
 
     const archive = {
 
-        id: generateId(),
+        id:
+            generateId(),
 
-        name: activeCapital.name,
+        name:
+            activeCapital.name,
 
         initialCapital:
-            Number(activeCapital.initialCapital) || 0,
+            Number(
+                activeCapital.initialCapital
+            ) || 0,
 
         finalBalance:
             finalBalance,
@@ -1883,10 +2218,12 @@ function createArchiveFromCurrentCapital() {
         archivedAt:
             new Date().toISOString(),
 
-        // Copie indépendante
+        // Copie totalement indépendante
         trades:
             JSON.parse(
-                JSON.stringify(currentTrades)
+                JSON.stringify(
+                    currentTrades
+                )
             )
     };
 
@@ -1904,26 +2241,26 @@ function createArchiveFromCurrentCapital() {
 
 function createNewCapital() {
 
-    const currentTrades =
-        getCurrentCapitalTrades();
-
-    if (currentTrades.length > 0) {
-
-        createArchiveFromCurrentCapital();
-    }
-
     const name =
-        document.getElementById(
-            "capitalNameInput"
-        ).value.trim();
+        document
+            .getElementById(
+                "capitalNameInput"
+            )
+            .value
+            .trim();
 
     const amount =
         parseNumber(
-            document.getElementById(
-                "capitalAmountInput"
-            ).value
+            document
+                .getElementById(
+                    "capitalAmountInput"
+                )
+                .value
         );
 
+
+    // IMPORTANT :
+    // On valide d'abord avant d'archiver.
     if (!name) {
 
         alert(
@@ -1945,13 +2282,26 @@ function createNewCapital() {
         return;
     }
 
+
+    const currentTrades =
+        getCurrentCapitalTrades();
+
+
+    if (currentTrades.length > 0) {
+        createArchiveFromCurrentCapital();
+    }
+
+
     activeCapital = {
 
-        id: generateId(),
+        id:
+            generateId(),
 
-        name: name,
+        name:
+            name,
 
-        initialCapital: amount,
+        initialCapital:
+            amount,
 
         createdAt:
             new Date().toISOString()
@@ -1972,16 +2322,22 @@ function createNewCapital() {
 function saveCapitalModification() {
 
     const name =
-        document.getElementById(
-            "capitalNameInput"
-        ).value.trim();
+        document
+            .getElementById(
+                "capitalNameInput"
+            )
+            .value
+            .trim();
 
     const amount =
         parseNumber(
-            document.getElementById(
-                "capitalAmountInput"
-            ).value
+            document
+                .getElementById(
+                    "capitalAmountInput"
+                )
+                .value
         );
+
 
     if (!name) {
 
@@ -2004,34 +2360,44 @@ function saveCapitalModification() {
         return;
     }
 
+
     const currentTrades =
         getCurrentCapitalTrades();
 
-    // Si le capital change réellement,
-    // on archive l'ancien capital.
-    if (
-        amount !==
-        Number(activeCapital.initialCapital)
-    ) {
+    const oldAmount =
+        Number(
+            activeCapital.initialCapital
+        ) || 0;
+
+
+    // Si le montant change :
+    // ancien capital -> archive
+    // nouveau capital -> propre historique
+    if (amount !== oldAmount) {
 
         if (currentTrades.length > 0) {
             createArchiveFromCurrentCapital();
         }
 
-        // Supprimer les anciens trades du capital actif
-        trades = trades.filter(
-            trade =>
-                trade.capitalId !==
-                activeCapital.id
-        );
+
+        trades =
+            trades.filter(
+                trade =>
+                    trade.capitalId !==
+                    activeCapital.id
+            );
+
 
         activeCapital = {
 
-            id: generateId(),
+            id:
+                generateId(),
 
-            name: name,
+            name:
+                name,
 
-            initialCapital: amount,
+            initialCapital:
+                amount,
 
             createdAt:
                 new Date().toISOString()
@@ -2039,10 +2405,14 @@ function saveCapitalModification() {
 
     } else {
 
-        activeCapital.name = name;
+        // Seulement le nom change
+        activeCapital.name =
+            name;
     }
 
+
     saveTrades();
+
     saveActiveCapital();
 
     closeCapitalModal();
@@ -2069,19 +2439,24 @@ function archiveCurrentCapital() {
         return;
     }
 
+
+    // Même sans trade, on conserve une archive
+    // si l'utilisateur demande explicitement l'archivage.
     createArchiveFromCurrentCapital();
 
-    // Supprimer les trades du capital actif
-    trades = trades.filter(
-        trade =>
-            trade.capitalId !==
-            activeCapital.id
-    );
 
-    // Nouveau capital vide
+    trades =
+        trades.filter(
+            trade =>
+                trade.capitalId !==
+                activeCapital.id
+        );
+
+
     activeCapital = {
 
-        id: generateId(),
+        id:
+            generateId(),
 
         name:
             "Capital " +
@@ -2089,13 +2464,16 @@ function archiveCurrentCapital() {
                 archives.length + 1
             ),
 
-        initialCapital: 0,
+        initialCapital:
+            0,
 
         createdAt:
             new Date().toISOString()
     };
 
+
     saveTrades();
+
     saveActiveCapital();
 
     refreshAll();
@@ -2155,6 +2533,16 @@ function openCapitalModal(mode = "new") {
             "capitalAmountInput"
         );
 
+    if (
+        !modal ||
+        !title ||
+        !nameInput ||
+        !amountInput
+    ) {
+        return;
+    }
+
+
     if (mode === "edit") {
 
         title.textContent =
@@ -2177,17 +2565,25 @@ function openCapitalModal(mode = "new") {
                 archives.length + 1
             );
 
-        amountInput.value = "";
+        amountInput.value =
+            "";
     }
+
 
     modal.classList.add("show");
 }
 
+
 function closeCapitalModal() {
 
-    document
-        .getElementById("capitalModal")
-        .classList.remove("show");
+    const modal =
+        document.getElementById(
+            "capitalModal"
+        );
+
+    if (modal) {
+        modal.classList.remove("show");
+    }
 }
 
 
@@ -2202,53 +2598,75 @@ function openArchiveChart(archive) {
             "archiveChartModal"
         );
 
+    if (!modal) {
+        return;
+    }
+
+
     document.getElementById(
         "archiveChartTitle"
     ).textContent =
         archive.name;
+
 
     document.getElementById(
         "archiveChartSubtitle"
     ).textContent =
         "Évolution du capital archivé";
 
+
     document.getElementById(
         "archiveChartInitial"
     ).textContent =
-        money(archive.initialCapital);
+        money(
+            archive.initialCapital
+        );
+
 
     document.getElementById(
         "archiveChartFinal"
     ).textContent =
-        money(archive.finalBalance);
+        money(
+            archive.finalBalance
+        );
+
 
     document.getElementById(
         "archiveChartProfit"
     ).textContent =
-        money(archive.totalProfit);
+        money(
+            archive.totalProfit
+        );
+
 
     modal.classList.add("show");
 
+
     // Attendre que la modal soit visible
-    setTimeout(() => {
-
-        drawArchiveChart(archive);
-
-    }, 50);
+    setTimeout(
+        () => {
+            drawArchiveChart(archive);
+        },
+        50
+    );
 }
+
 
 function closeArchiveChart() {
 
-    document
-        .getElementById(
+    const modal =
+        document.getElementById(
             "archiveChartModal"
-        )
-        .classList.remove("show");
+        );
+
+    if (modal) {
+        modal.classList.remove("show");
+    }
 }
 
 
 // ============================================================
-// EFFACER LES TRADES DU CAPITAL ACTIF
+// EFFACER TRADES DU CAPITAL ACTIF
 // ============================================================
 
 function clearCurrentTrades() {
@@ -2265,6 +2683,7 @@ function clearCurrentTrades() {
         return;
     }
 
+
     const confirmed =
         confirm(
             "Voulez-vous vraiment supprimer tous les trades du capital actif ?"
@@ -2274,11 +2693,13 @@ function clearCurrentTrades() {
         return;
     }
 
-    trades = trades.filter(
-        trade =>
-            trade.capitalId !==
-            activeCapital.id
-    );
+
+    trades =
+        trades.filter(
+            trade =>
+                trade.capitalId !==
+                activeCapital.id
+        );
 
     saveTrades();
 
@@ -2313,6 +2734,7 @@ function loadTheme() {
     updateThemeButton();
 }
 
+
 function toggleTheme() {
 
     document.body.classList.toggle(
@@ -2333,6 +2755,7 @@ function toggleTheme() {
 
     updateThemeButton();
 }
+
 
 function updateThemeButton() {
 
@@ -2384,12 +2807,19 @@ function refreshAll() {
 function setupEvents() {
 
     // Trade
-    document
-        .getElementById("tradeForm")
-        .addEventListener(
+    const tradeForm =
+        document.getElementById(
+            "tradeForm"
+        );
+
+    if (tradeForm) {
+
+        tradeForm.addEventListener(
             "submit",
             addTrade
         );
+    }
+
 
     // Calcul RR
     [
@@ -2419,7 +2849,9 @@ function setupEvents() {
 
     // Périodes
     document
-        .querySelectorAll(".period-btn")
+        .querySelectorAll(
+            ".period-btn"
+        )
         .forEach(button => {
 
             button.addEventListener(
@@ -2452,48 +2884,63 @@ function setupEvents() {
 
 
     // Modifier capital
-    document
-        .getElementById(
+    const changeCapitalBtn =
+        document.getElementById(
             "changeCapitalBtn"
-        )
-        .addEventListener(
+        );
+
+    if (changeCapitalBtn) {
+
+        changeCapitalBtn.addEventListener(
             "click",
             () => {
                 openCapitalModal("edit");
             }
         );
+    }
 
 
     // Nouveau capital
-    document
-        .getElementById(
+    const newCapitalBtn =
+        document.getElementById(
             "newCapitalBtn"
-        )
-        .addEventListener(
+        );
+
+    if (newCapitalBtn) {
+
+        newCapitalBtn.addEventListener(
             "click",
             () => {
                 openCapitalModal("new");
             }
         );
+    }
 
 
     // Archiver
-    document
-        .getElementById(
+    const archiveCapitalBtn =
+        document.getElementById(
             "archiveCapitalBtn"
-        )
-        .addEventListener(
+        );
+
+    if (archiveCapitalBtn) {
+
+        archiveCapitalBtn.addEventListener(
             "click",
             archiveCurrentCapital
         );
+    }
 
 
     // Sauvegarder capital
-    document
-        .getElementById(
+    const saveCapitalBtn =
+        document.getElementById(
             "saveCapitalBtn"
-        )
-        .addEventListener(
+        );
+
+    if (saveCapitalBtn) {
+
+        saveCapitalBtn.addEventListener(
             "click",
             () => {
 
@@ -2503,7 +2950,9 @@ function setupEvents() {
                     ).textContent;
 
                 if (
-                    title.includes("Modifier")
+                    title.includes(
+                        "Modifier"
+                    )
                 ) {
 
                     saveCapitalModification();
@@ -2514,68 +2963,92 @@ function setupEvents() {
                 }
             }
         );
+    }
 
 
     // Annuler modal
-    document
-        .getElementById(
+    const cancelCapitalBtn =
+        document.getElementById(
             "cancelCapitalBtn"
-        )
-        .addEventListener(
+        );
+
+    if (cancelCapitalBtn) {
+
+        cancelCapitalBtn.addEventListener(
             "click",
             closeCapitalModal
         );
+    }
 
 
-    document
-        .getElementById(
+    const cancelCapitalBtn2 =
+        document.getElementById(
             "cancelCapitalBtn2"
-        )
-        .addEventListener(
+        );
+
+    if (cancelCapitalBtn2) {
+
+        cancelCapitalBtn2.addEventListener(
             "click",
             closeCapitalModal
         );
+    }
 
 
     // Fermer graphique archive
-    document
-        .getElementById(
+    const closeArchiveChartBtn =
+        document.getElementById(
             "closeArchiveChartBtn"
-        )
-        .addEventListener(
+        );
+
+    if (closeArchiveChartBtn) {
+
+        closeArchiveChartBtn.addEventListener(
             "click",
             closeArchiveChart
         );
+    }
 
 
     // Effacer trades
-    document
-        .getElementById(
+    const clearBtn =
+        document.getElementById(
             "clearBtn"
-        )
-        .addEventListener(
+        );
+
+    if (clearBtn) {
+
+        clearBtn.addEventListener(
             "click",
             clearCurrentTrades
         );
+    }
 
 
     // Theme
-    document
-        .getElementById(
+    const themeToggle =
+        document.getElementById(
             "themeToggle"
-        )
-        .addEventListener(
+        );
+
+    if (themeToggle) {
+
+        themeToggle.addEventListener(
             "click",
             toggleTheme
         );
+    }
 
 
-    // Fermer modal en cliquant dehors
-    document
-        .getElementById(
+    // Fermer modal Capital en cliquant dehors
+    const capitalModal =
+        document.getElementById(
             "capitalModal"
-        )
-        .addEventListener(
+        );
+
+    if (capitalModal) {
+
+        capitalModal.addEventListener(
             "click",
             event => {
 
@@ -2587,13 +3060,18 @@ function setupEvents() {
                 }
             }
         );
+    }
 
 
-    document
-        .getElementById(
+    // Fermer modal graphique archive en cliquant dehors
+    const archiveChartModal =
+        document.getElementById(
             "archiveChartModal"
-        )
-        .addEventListener(
+        );
+
+    if (archiveChartModal) {
+
+        archiveChartModal.addEventListener(
             "click",
             event => {
 
@@ -2605,6 +3083,7 @@ function setupEvents() {
                 }
             }
         );
+    }
 
 
     // Escape
@@ -2612,7 +3091,10 @@ function setupEvents() {
         "keydown",
         event => {
 
-            if (event.key === "Escape") {
+            if (
+                event.key ===
+                "Escape"
+            ) {
 
                 closeCapitalModal();
 
@@ -2622,7 +3104,7 @@ function setupEvents() {
     );
 
 
-    // Redimensionnement graphique
+    // Redimensionnement
     window.addEventListener(
         "resize",
         () => {
@@ -2643,16 +3125,21 @@ function init() {
 
     loadTheme();
 
+
     const dateInput =
-        document.getElementById("date");
+        document.getElementById(
+            "date"
+        );
 
     if (
         dateInput &&
         !dateInput.value
     ) {
+
         dateInput.value =
             getTodayDate();
     }
+
 
     setupEvents();
 
@@ -2664,3 +3151,4 @@ document.addEventListener(
     "DOMContentLoaded",
     init
 );
+```
