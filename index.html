@@ -1,1 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
+<body>
+
+<header>
+    <div>
+        <h1>📊 Trading Dashboard</h1>
+        <p>Mon plan de bord de trading</p>
+    </div>
+    <button id="themeBtn">🌙</button>
+</header>
+
+<main>
+
+    <!-- STATISTIQUES -->
+    <section class="stats">
+
+        <div class="card">
+            <span>💰 Profit total</span>
+            <strong id="totalProfit">$0.00</strong>
+        </div>
+
+        <div class="card">
+            <span>📊 Trades</span>
+            <strong id="totalTrades">0</strong>
+        </div>
+
+        <div class="card">
+            <span>🟢 Winrate</span>
+            <strong id="winrate">0%</strong>
+        </div>
+
+        <div class="card">
+            <span>⚖️ Break-even</span>
+            <strong id="breakEven">0</strong>
+        </div>
+
+    </section>
+
+    <!-- AJOUTER UN TRADE -->
+    <section class="panel">
+
+        <h2>➕ Ajouter un trade</h2>
+
+        <form id="tradeForm">
+
+            <div class="form-grid">
+
+                <div>
+                    <label>Actif</label>
+                    <input type="text" id="asset" placeholder="XAUUSD" required>
+                </div>
+
+                <div>
+                    <label>Date</label>
+                    <input type="date" id="date" required>
+                </div>
+
+                <div>
+                    <label>Direction</label>
+                    <select id="direction">
+                        <option value="BUY">BUY</option>
+                        <option value="SELL">SELL</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Type d'ordre</label>
+                    <select id="orderType">
+                        <option value="Market">Immédiat</option>
+                        <option value="Buy Limit">Buy Limit</option>
+                        <option value="Sell Limit">Sell Limit</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Entry</label>
+                    <input type="number" step="any" id="entry" placeholder="4450.00" required>
+                </div>
+
+                <div>
+                    <label>Stop Loss</label>
+                    <input type="number" step="any" id="sl" placeholder="4445.00">
+                </div>
+
+                <div>
+                    <label>Take Profit</label>
+                    <input type="number" step="any" id="tp" placeholder="4460.00">
+                </div>
+
+                <div>
+                    <label>Résultat</label>
+                    <select id="result">
+                        <option value="TP">🟢 TP</option>
+                        <option value="SL">🔴 SL</option>
+                        <option value="BE">⚖️ BE</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Setup</label>
+                    <select id="setup">
+                        <option>LDP + QML</option>
+                        <option>LDP + Fibonacci</option>
+                        <option>QML</option>
+                        <option>OB</option>
+                        <option>BB</option>
+                        <option>ZS</option>
+                        <option>OA</option>
+                        <option>SSM1</option>
+                        <option>SSM2</option>
+                        <option>SSM3</option>
+                        <option>SBM1</option>
+                        <option>SBM2</option>
+                        <option>SBM3</option>
+                        <option>Autre</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Gain / Perte ($)</label>
+                    <input type="number" step="any" id="profit" placeholder="20 ou -10" required>
+                </div>
+
+            </div>
+
+            <div>
+                <label>Commentaire</label>
+                <textarea id="comment" placeholder="Commentaire sur le trade..."></textarea>
+            </div>
+
+            <button class="primary" type="submit">
+                💾 Enregistrer le trade
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- HISTORIQUE -->
+    <section class="panel">
+
+        <div class="history-header">
+            <h2>📜 Historique des trades</h2>
+
+            <button id="clearBtn" class="danger">
+                🗑️ Tout supprimer
+            </button>
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Actif</th>
+                        <th>Direction</th>
+                        <th>Entry</th>
+                        <th>SL</th>
+                        <th>TP</th>
+                        <th>Setup</th>
+                        <th>Résultat</th>
+                        <th>P/L</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody id="tradeList"></tbody>
+
+            </table>
+
+        </div>
+
+        <div id="emptyMessage">
+            Aucun trade enregistré.
+        </div>
+
+    </section>
+
+</main>
+
+<script src="app.js"></script>
+
+</body>
+</html>
