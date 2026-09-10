@@ -20,12 +20,25 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     background: var(--bg);
     color: var(--text);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
 }
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
     padding: 22px 5%;
     background: var(--panel);
     border-bottom: 1px solid var(--border);
@@ -49,6 +62,12 @@ header button {
     padding: 10px 14px;
     font-size: 20px;
     cursor: pointer;
+    transition: 0.2s ease;
+}
+
+header button:hover {
+    border-color: var(--blue);
+    transform: translateY(-1px);
 }
 
 main {
@@ -117,10 +136,12 @@ main {
     padding: 14px;
     font-weight: bold;
     cursor: pointer;
+    transition: 0.2s ease;
 }
 
 .secondary:hover {
     border-color: var(--blue);
+    transform: translateY(-1px);
 }
 
 .archive-btn {
@@ -131,10 +152,12 @@ main {
     padding: 14px;
     font-weight: bold;
     cursor: pointer;
+    transition: 0.2s ease;
 }
 
 .archive-btn:hover {
     background: #78350f;
+    transform: translateY(-1px);
 }
 
 
@@ -150,6 +173,7 @@ main {
 }
 
 .chart-header h2 {
+    margin-top: 0;
     margin-bottom: 5px;
 }
 
@@ -168,17 +192,23 @@ main {
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #080e18;
+    overflow: hidden;
 }
 
 .chart-container canvas {
+    display: block;
     width: 100% !important;
     height: 100% !important;
 }
 
 .empty-chart-message {
+    display: none;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     color: var(--muted);
     padding: 30px 10px;
+    min-height: 100%;
 }
 
 
@@ -201,6 +231,7 @@ main {
     color: var(--muted);
     cursor: pointer;
     font-weight: bold;
+    transition: 0.2s ease;
 }
 
 .period-btn:hover {
@@ -232,6 +263,12 @@ main {
     border-radius: 14px;
     padding: 20px;
     min-height: 125px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+    border-color: #34445d;
+    transform: translateY(-1px);
 }
 
 .card span {
@@ -302,6 +339,7 @@ textarea {
     border-radius: 8px;
     padding: 12px;
     outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 input:focus,
@@ -332,10 +370,12 @@ textarea {
     font-weight: bold;
     font-size: 15px;
     cursor: pointer;
+    transition: 0.2s ease;
 }
 
 .primary:hover {
     opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 
@@ -345,6 +385,7 @@ textarea {
 
 .table-container {
     overflow-x: auto;
+    border-radius: 8px;
 }
 
 table {
@@ -370,17 +411,24 @@ td {
     font-size: 14px;
 }
 
-.profit {
+tr:last-child td {
+    border-bottom: none;
+}
+
+.profit,
+.profit-positive {
     color: var(--green);
     font-weight: bold;
 }
 
-.loss {
+.loss,
+.profit-negative {
     color: var(--red);
     font-weight: bold;
 }
 
-.be {
+.be,
+.profit-be {
     color: var(--orange);
     font-weight: bold;
 }
@@ -397,16 +445,20 @@ td {
     gap: 15px;
 }
 
-.danger {
+.danger,
+.danger-btn {
     background: #551b1b;
     border: 1px solid #7f1d1d;
     color: white;
     border-radius: 8px;
     padding: 10px 14px;
     cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s ease;
 }
 
-.danger:hover {
+.danger:hover,
+.danger-btn:hover {
     background: #7f1d1d;
 }
 
@@ -417,6 +469,7 @@ td {
     border-radius: 6px;
     padding: 6px 9px;
     cursor: pointer;
+    transition: 0.2s ease;
 }
 
 .delete-btn:hover {
@@ -444,6 +497,11 @@ td {
     background: var(--panel-2);
     border-radius: 12px;
     padding: 18px;
+    transition: border-color 0.2s ease;
+}
+
+.archive-card:hover {
+    border-color: #34445d;
 }
 
 .archive-card-header {
@@ -495,11 +553,13 @@ td {
 }
 
 .archive-view-btn,
-.archive-delete-btn {
+.archive-delete-btn,
+.secondary-btn {
     border-radius: 8px;
     padding: 10px 14px;
     cursor: pointer;
     font-weight: bold;
+    transition: 0.2s ease;
 }
 
 .archive-view-btn {
@@ -508,10 +568,29 @@ td {
     color: white;
 }
 
+.archive-view-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
 .archive-delete-btn {
     background: #551b1b;
     border: 1px solid #7f1d1d;
     color: white;
+}
+
+.archive-delete-btn:hover {
+    background: #7f1d1d;
+}
+
+.secondary-btn {
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+}
+
+.secondary-btn:hover {
+    border-color: var(--blue);
 }
 
 .empty-archives {
@@ -527,9 +606,9 @@ td {
 
 /*
    IMPORTANT :
-   Les modales sont cachées par défaut.
-   Le JavaScript ajoute la classe "show"
-   uniquement lorsqu'on veut les ouvrir.
+   Toutes les modales sont cachées par défaut.
+   Le JavaScript ajoute .show lorsqu'une
+   modale doit être affichée.
 */
 
 .modal {
@@ -537,19 +616,16 @@ td {
     inset: 0;
     z-index: 1000;
 
-    /* CACHÉ PAR DÉFAUT */
     display: none;
 
     align-items: center;
     justify-content: center;
 
     padding: 20px;
+
     background: rgba(0, 0, 0, 0.75);
 }
 
-/*
-   AFFICHAGE UNIQUEMENT QUAND JS AJOUTE .show
-*/
 .modal.show {
     display: flex;
 }
@@ -564,10 +640,14 @@ td {
 .modal-content {
     width: 100%;
     max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 22px;
+
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
@@ -592,6 +672,13 @@ td {
     height: 36px;
     cursor: pointer;
     font-size: 18px;
+    flex-shrink: 0;
+    transition: 0.2s ease;
+}
+
+.modal-close:hover {
+    border-color: var(--red);
+    color: var(--red);
 }
 
 .modal-body {
@@ -647,11 +734,6 @@ td {
 /* MODE CLAIR */
 /* ========================= */
 
-/*
-   Le JavaScript utilise "light-theme".
-   On utilise donc le même nom ici.
-*/
-
 body.light-theme {
     --bg: #f3f6fa;
     --panel: #ffffff;
@@ -672,6 +754,10 @@ body.light-theme .chart-container {
     background: #f8fafc;
 }
 
+body.light-theme .secondary-btn {
+    background: #eef2f7;
+}
+
 
 /* ========================= */
 /* MOBILE */
@@ -686,6 +772,10 @@ body.light-theme .chart-container {
     .archive-stats {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .archive-chart-container {
+        height: 360px;
+    }
 }
 
 
@@ -693,15 +783,25 @@ body.light-theme .chart-container {
 
     header {
         padding: 18px 4%;
+        align-items: flex-start;
     }
 
     header h1 {
         font-size: 21px;
     }
 
+    header p {
+        font-size: 13px;
+    }
+
     main {
         width: 94%;
         margin-top: 20px;
+    }
+
+    .capital-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     .stats {
@@ -763,7 +863,16 @@ body.light-theme .chart-container {
         grid-template-columns: 1fr;
     }
 
+    .modal {
+        padding: 12px;
+    }
+
     .modal-content {
         padding: 17px;
+        max-height: 94vh;
+    }
+
+    .modal-actions {
+        flex-direction: column;
     }
 }
