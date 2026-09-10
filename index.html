@@ -19,7 +19,7 @@
         <p>Mon plan de bord de trading</p>
     </div>
 
-    <button id="themeBtn" type="button">🌙</button>
+    <button id="themeBtn">🌙</button>
 
 </header>
 
@@ -30,42 +30,23 @@
     <!-- CAPITAL ACTIF -->
     <!-- ========================= -->
 
-    <section class="capital-panel">
+    <section class="panel capital-panel">
 
-        <div class="capital-info">
+        <div class="capital-header">
 
             <div>
-                <span class="section-label">💼 Capital actif</span>
+
+                <span class="section-label">
+                    💰 Capital actif
+                </span>
 
                 <h2 id="activeCapitalName">
                     Capital 1
                 </h2>
 
                 <p id="activeCapitalPeriod">
-                    Aucun trade enregistré
+                    Capital initial : 0.00 $ • Solde actuel : 0.00 $ • 0 trade(s)
                 </p>
-            </div>
-
-
-            <div class="capital-actions">
-
-                <button
-                    id="newCapitalBtn"
-                    class="secondary"
-                    type="button">
-
-                    ➕ Nouveau capital
-
-                </button>
-
-                <button
-                    id="archiveCapitalBtn"
-                    class="archive-btn"
-                    type="button">
-
-                    📦 Archiver
-
-                </button>
 
             </div>
 
@@ -83,7 +64,7 @@
                 <input
                     type="text"
                     id="capitalName"
-                    placeholder="Ex : Capital 100$">
+                    placeholder="Ex : Capital Trading 2026">
 
             </div>
 
@@ -103,14 +84,76 @@
             </div>
 
 
-            <button
-                id="saveCapitalBtn"
-                class="primary small-primary"
-                type="button">
+            <div class="capital-buttons">
 
-                💾 Enregistrer le capital
+                <button
+                    id="saveCapitalBtn"
+                    class="primary">
 
-            </button>
+                    💾 Enregistrer le capital
+
+                </button>
+
+
+                <button
+                    id="newCapitalBtn"
+                    class="secondary">
+
+                    ➕ Nouveau capital
+
+                </button>
+
+
+                <button
+                    id="archiveCapitalBtn"
+                    class="archive-btn">
+
+                    📦 Archiver le capital
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- GRAPHIQUE CAPITAL ACTIF -->
+    <!-- ========================= -->
+
+    <section class="panel">
+
+        <div class="chart-header">
+
+            <div>
+
+                <h2>
+                    📈 Évolution du capital
+                </h2>
+
+                <p class="chart-subtitle">
+                    Évolution du solde après chaque trade
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-container">
+
+            <canvas id="capitalChart"></canvas>
+
+        </div>
+
+
+        <div
+            id="emptyChartMessage"
+            class="empty-chart-message">
+
+            Pas encore assez de données pour afficher le graphique.
 
         </div>
 
@@ -125,8 +168,7 @@
 
         <button
             class="period-btn active"
-            data-period="today"
-            type="button">
+            data-period="today">
 
             Aujourd'hui
 
@@ -134,8 +176,7 @@
 
         <button
             class="period-btn"
-            data-period="week"
-            type="button">
+            data-period="week">
 
             Cette semaine
 
@@ -143,8 +184,7 @@
 
         <button
             class="period-btn"
-            data-period="month"
-            type="button">
+            data-period="month">
 
             Ce mois
 
@@ -152,8 +192,7 @@
 
         <button
             class="period-btn"
-            data-period="year"
-            type="button">
+            data-period="year">
 
             Cette année
 
@@ -161,8 +200,7 @@
 
         <button
             class="period-btn"
-            data-period="all"
-            type="button">
+            data-period="all">
 
             Tout l'historique
 
@@ -179,7 +217,9 @@
 
         <div class="card">
 
-            <span>💰 Capital / Solde</span>
+            <span>
+                💰 Capital / Solde
+            </span>
 
             <strong id="balance">
                 0.00 $
@@ -190,7 +230,9 @@
 
         <div class="card">
 
-            <span>📈 Profit total</span>
+            <span>
+                📈 Profit total
+            </span>
 
             <strong id="totalProfit">
                 0.00 $
@@ -201,7 +243,9 @@
 
         <div class="card">
 
-            <span>🎯 Winrate</span>
+            <span>
+                🎯 Winrate
+            </span>
 
             <strong id="winrate">
                 0%
@@ -212,7 +256,9 @@
 
         <div class="card">
 
-            <span>⚖️ RR moyen</span>
+            <span>
+                ⚖️ RR moyen
+            </span>
 
             <strong id="averageRR">
                 0.00
@@ -223,7 +269,9 @@
 
         <div class="card">
 
-            <span>📊 Nombre de trades</span>
+            <span>
+                📊 Nombre de trades
+            </span>
 
             <strong id="totalTrades">
                 0
@@ -234,7 +282,9 @@
 
         <div class="card best-setup">
 
-            <span>🏆 Meilleur setup</span>
+            <span>
+                🏆 Meilleur setup
+            </span>
 
             <strong id="bestSetup">
                 -
@@ -255,7 +305,9 @@
 
     <section class="panel">
 
-        <h2>➕ Ajouter un trade</h2>
+        <h2>
+            ➕ Ajouter un trade
+        </h2>
 
         <form id="tradeForm">
 
@@ -264,7 +316,7 @@
 
                 <div>
 
-                    <label for="asset">
+                    <label>
                         Actif
                     </label>
 
@@ -279,7 +331,7 @@
 
                 <div>
 
-                    <label for="date">
+                    <label>
                         Date
                     </label>
 
@@ -293,17 +345,17 @@
 
                 <div>
 
-                    <label for="direction">
+                    <label>
                         Position
                     </label>
 
                     <select id="direction">
 
-                        <option value="Buy">
+                        <option value="BUY">
                             Buy
                         </option>
 
-                        <option value="Sell">
+                        <option value="SELL">
                             Sell
                         </option>
 
@@ -314,14 +366,14 @@
 
                 <div>
 
-                    <label for="orderType">
+                    <label>
                         Type d'ordre
                     </label>
 
                     <select id="orderType">
 
                         <option value="Market">
-                            Immédiat
+                            Immediat
                         </option>
 
                         <option value="Buy Limit">
@@ -339,7 +391,7 @@
 
                 <div>
 
-                    <label for="entry">
+                    <label>
                         Entry
                     </label>
 
@@ -355,7 +407,7 @@
 
                 <div>
 
-                    <label for="sl">
+                    <label>
                         Stop Loss
                     </label>
 
@@ -363,15 +415,14 @@
                         type="number"
                         step="any"
                         id="sl"
-                        placeholder="4445.00"
-                        required>
+                        placeholder="4445.00">
 
                 </div>
 
 
                 <div>
 
-                    <label for="tp">
+                    <label>
                         Take Profit
                     </label>
 
@@ -379,15 +430,14 @@
                         type="number"
                         step="any"
                         id="tp"
-                        placeholder="4460.00"
-                        required>
+                        placeholder="4460.00">
 
                 </div>
 
 
                 <div>
 
-                    <label for="calculatedRR">
+                    <label>
                         RR calculé
                     </label>
 
@@ -402,7 +452,7 @@
 
                 <div>
 
-                    <label for="result">
+                    <label>
                         Résultat
                     </label>
 
@@ -427,53 +477,53 @@
 
                 <div>
 
-                    <label for="setup">
+                    <label>
                         Setup
                     </label>
 
                     <select id="setup">
 
-                        <option value="LDP+QML">
+                        <option>
                             LDP+QML
                         </option>
 
-                        <option value="LDP+FIBO 50">
+                        <option>
                             LDP+FIBO 50
                         </option>
 
-                        <option value="OB">
+                        <option>
                             OB
                         </option>
 
-                        <option value="BB">
+                        <option>
                             BB
                         </option>
 
-                        <option value="ZS OA">
+                        <option>
                             ZS OA
                         </option>
 
-                        <option value="SSM1">
+                        <option>
                             SSM1
                         </option>
 
-                        <option value="SSM2">
+                        <option>
                             SSM2
                         </option>
 
-                        <option value="SSM3">
+                        <option>
                             SSM3
                         </option>
 
-                        <option value="SBM1">
+                        <option>
                             SBM1
                         </option>
 
-                        <option value="SBM2">
+                        <option>
                             SBM2
                         </option>
 
-                        <option value="SBM3">
+                        <option>
                             SBM3
                         </option>
 
@@ -484,7 +534,7 @@
 
                 <div>
 
-                    <label for="profit">
+                    <label>
                         Gain / Perte ($)
                     </label>
 
@@ -502,7 +552,7 @@
 
             <div>
 
-                <label for="comment">
+                <label>
                     Commentaire
                 </label>
 
@@ -527,12 +577,14 @@
 
 
     <!-- ========================= -->
-    <!-- PERFORMANCE DES SETUPS -->
+    <!-- MEILLEURS SETUPS -->
     <!-- ========================= -->
 
     <section class="panel">
 
-        <h2>🏆 Performance des setups</h2>
+        <h2>
+            🏆 Performance des setups
+        </h2>
 
         <div class="table-container">
 
@@ -542,15 +594,25 @@
 
                     <tr>
 
-                        <th>Setup</th>
+                        <th>
+                            Setup
+                        </th>
 
-                        <th>Trades</th>
+                        <th>
+                            Trades
+                        </th>
 
-                        <th>Gagnants</th>
+                        <th>
+                            Gagnants
+                        </th>
 
-                        <th>Winrate</th>
+                        <th>
+                            Winrate
+                        </th>
 
-                        <th>Profit</th>
+                        <th>
+                            Profit
+                        </th>
 
                     </tr>
 
@@ -579,8 +641,7 @@
 
             <button
                 id="clearBtn"
-                class="danger"
-                type="button">
+                class="danger">
 
                 🗑️ Tout supprimer
 
@@ -597,25 +658,45 @@
 
                     <tr>
 
-                        <th>Date</th>
+                        <th>
+                            Date
+                        </th>
 
-                        <th>Actif</th>
+                        <th>
+                            Actif
+                        </th>
 
-                        <th>Position</th>
+                        <th>
+                            Position
+                        </th>
 
-                        <th>Entry</th>
+                        <th>
+                            Entry
+                        </th>
 
-                        <th>SL</th>
+                        <th>
+                            SL
+                        </th>
 
-                        <th>TP</th>
+                        <th>
+                            TP
+                        </th>
 
-                        <th>RR</th>
+                        <th>
+                            RR
+                        </th>
 
-                        <th>Setup</th>
+                        <th>
+                            Setup
+                        </th>
 
-                        <th>Résultat</th>
+                        <th>
+                            Résultat
+                        </th>
 
-                        <th>P/L</th>
+                        <th>
+                            P/L
+                        </th>
 
                         <th></th>
 
@@ -641,10 +722,10 @@
 
 
     <!-- ========================= -->
-    <!-- ARCHIVES -->
+    <!-- ARCHIVES DES CAPITAUX -->
     <!-- ========================= -->
 
-    <section class="panel archives-panel">
+    <section class="panel">
 
         <div class="history-header">
 
@@ -654,8 +735,8 @@
                     📦 Archives des capitaux
                 </h2>
 
-                <p class="panel-description">
-                    Chaque capital archivé conserve son propre historique et ses statistiques.
+                <p class="chart-subtitle">
+                    Chaque capital conserve ses propres statistiques et son propre graphique.
                 </p>
 
             </div>
@@ -666,7 +747,6 @@
         <div
             id="archivesList"
             class="archives-list">
-
         </div>
 
 
@@ -674,11 +754,12 @@
             id="emptyArchives"
             class="empty-archives">
 
-            Aucun capital archivé.
+            Aucune archive pour le moment.
 
         </div>
 
     </section>
+
 
 </main>
 
@@ -693,37 +774,52 @@
 
     <div class="modal-content">
 
-        <h2>➕ Nouveau capital</h2>
+        <div class="modal-header">
 
-        <p>
-            Le capital actuel sera conservé. Tu pourras ensuite commencer un nouvel historique.
-        </p>
+            <h2>
+                ➕ Nouveau capital
+            </h2>
 
-        <div>
+            <button
+                id="cancelCapitalBtn"
+                class="modal-close">
 
-            <label for="newCapitalName">
-                Nom du nouveau capital
-            </label>
+                ✕
 
-            <input
-                type="text"
-                id="newCapitalName"
-                placeholder="Ex : Capital 500$">
+            </button>
 
         </div>
 
 
-        <div>
+        <div class="modal-body">
 
-            <label for="newInitialCapital">
-                Capital initial ($)
-            </label>
+            <div>
 
-            <input
-                type="number"
-                step="any"
-                id="newInitialCapital"
-                placeholder="500">
+                <label>
+                    Nom du nouveau capital
+                </label>
+
+                <input
+                    type="text"
+                    id="newCapitalName"
+                    placeholder="Ex : Capital 2">
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Capital initial ($)
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="newInitialCapital"
+                    placeholder="500">
+
+            </div>
 
         </div>
 
@@ -731,9 +827,8 @@
         <div class="modal-actions">
 
             <button
-                id="cancelCapitalBtn"
-                class="secondary"
-                type="button">
+                id="cancelCapitalBtn2"
+                class="secondary">
 
                 Annuler
 
@@ -741,12 +836,85 @@
 
             <button
                 id="confirmCapitalBtn"
-                class="primary modal-primary"
-                type="button">
+                class="primary">
 
-                Créer le capital
+                🚀 Créer le capital
 
             </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MODALE GRAPHIQUE ARCHIVE -->
+<!-- ========================= -->
+
+<div
+    id="archiveChartModal"
+    class="modal hidden">
+
+    <div class="modal-content archive-chart-modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="archiveChartTitle">
+                    📈 Graphique du capital
+                </h2>
+
+                <p
+                    id="archiveChartSubtitle"
+                    class="chart-subtitle">
+                </p>
+
+            </div>
+
+
+            <button
+                id="closeArchiveChartBtn"
+                class="modal-close">
+
+                ✕
+
+            </button>
+
+        </div>
+
+
+        <div class="archive-chart-info">
+
+            <div>
+                <span>Capital initial</span>
+                <strong id="archiveChartInitial">
+                    0.00 $
+                </strong>
+            </div>
+
+            <div>
+                <span>Solde final</span>
+                <strong id="archiveChartFinal">
+                    0.00 $
+                </strong>
+            </div>
+
+            <div>
+                <span>Profit</span>
+                <strong id="archiveChartProfit">
+                    0.00 $
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="chart-container archive-chart-container">
+
+            <canvas id="archiveChart"></canvas>
 
         </div>
 
