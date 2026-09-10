@@ -57,6 +57,7 @@ main {
     margin: 30px auto;
 }
 
+
 /* ========================= */
 /* CAPITAL ACTIF */
 /* ========================= */
@@ -136,6 +137,7 @@ main {
     background: #78350f;
 }
 
+
 /* ========================= */
 /* GRAPHIQUES */
 /* ========================= */
@@ -179,6 +181,7 @@ main {
     padding: 30px 10px;
 }
 
+
 /* ========================= */
 /* PERIODES */
 /* ========================= */
@@ -210,6 +213,7 @@ main {
     border-color: var(--blue);
     color: white;
 }
+
 
 /* ========================= */
 /* STATISTIQUES */
@@ -252,6 +256,7 @@ main {
     font-size: 21px;
 }
 
+
 /* ========================= */
 /* PANELS */
 /* ========================= */
@@ -268,6 +273,7 @@ main {
     margin-top: 0;
     margin-bottom: 20px;
 }
+
 
 /* ========================= */
 /* FORMULAIRE */
@@ -332,6 +338,7 @@ textarea {
     opacity: 0.9;
 }
 
+
 /* ========================= */
 /* TABLEAUX */
 /* ========================= */
@@ -378,6 +385,7 @@ td {
     font-weight: bold;
 }
 
+
 /* ========================= */
 /* HISTORIQUE */
 /* ========================= */
@@ -420,6 +428,7 @@ td {
     padding: 30px;
     color: var(--muted);
 }
+
 
 /* ========================= */
 /* ARCHIVES */
@@ -511,21 +520,43 @@ td {
     padding: 30px;
 }
 
+
 /* ========================= */
 /* MODALES */
 /* ========================= */
+
+/*
+   IMPORTANT :
+   Les modales sont cachées par défaut.
+   Le JavaScript ajoute la classe "show"
+   uniquement lorsqu'on veut les ouvrir.
+*/
 
 .modal {
     position: fixed;
     inset: 0;
     z-index: 1000;
-    display: flex;
+
+    /* CACHÉ PAR DÉFAUT */
+    display: none;
+
     align-items: center;
     justify-content: center;
+
     padding: 20px;
     background: rgba(0, 0, 0, 0.75);
 }
 
+/*
+   AFFICHAGE UNIQUEMENT QUAND JS AJOUTE .show
+*/
+.modal.show {
+    display: flex;
+}
+
+/*
+   Compatibilité avec l'ancien système .hidden
+*/
 .modal.hidden {
     display: none;
 }
@@ -611,11 +642,17 @@ td {
     margin-top: 0;
 }
 
+
 /* ========================= */
 /* MODE CLAIR */
 /* ========================= */
 
-body.light {
+/*
+   Le JavaScript utilise "light-theme".
+   On utilise donc le même nom ici.
+*/
+
+body.light-theme {
     --bg: #f3f6fa;
     --panel: #ffffff;
     --panel-2: #eef2f7;
@@ -624,16 +661,17 @@ body.light {
     --muted: #64748b;
 }
 
-body.light input,
-body.light select,
-body.light textarea {
+body.light-theme input,
+body.light-theme select,
+body.light-theme textarea {
     background: #f8fafc;
     color: #172033;
 }
 
-body.light .chart-container {
+body.light-theme .chart-container {
     background: #f8fafc;
 }
+
 
 /* ========================= */
 /* MOBILE */
@@ -648,8 +686,8 @@ body.light .chart-container {
     .archive-stats {
         grid-template-columns: repeat(2, 1fr);
     }
-
 }
+
 
 @media (max-width: 600px) {
 
@@ -728,5 +766,4 @@ body.light .chart-container {
     .modal-content {
         padding: 17px;
     }
-
 }
