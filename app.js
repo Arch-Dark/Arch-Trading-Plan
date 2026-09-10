@@ -1,103 +1,421 @@
 // ==========================================
-// TRADING DASHBOARD V2
+// TRADING DASHBOARD - APP.JS V2.1
 // ==========================================
 
 let trades = JSON.parse(localStorage.getItem("tradingTrades")) || [];
-
 let currentPeriod = "today";
 
+// ==========================================
+// ELEMENTS HTML
+// ==========================================
+
 const form = document.getElementById("tradeForm");
+const assetInput = document.getElementById("asset");
+const dateInput = document.getElementById("date");
+const directionInput = document.getElementById("direction");
+const orderTypeInput = document.getElementById("orderType");
+const entryInput = document.getElementById("entry");
+const slInput = document.getElementById("sl");
+const tpInput = document.getElementById("tp");
+const rrInput = document.getElementById("calculatedRR");
+const resultInput = document.getElementById("result");
+const setupInput = document.getElementById("setup");
+const profitInput = document.getElementById("profit");
+const commentInput = document.getElementById("comment");
+
+const balanceElement = document.getElementById("balance");
+const totalProfitElement = document.getElementById("totalProfit");
+const winrateElement = document.getElementById("winrate");
+const averageRRElement = document.getElementById("averageRR");
+const totalTradesElement = document.getElementById("totalTrades");
+const bestSetupElement = document.getElementById("bestSetup");
+const bestSetupDetailsElement = document.getElementById("bestSetupDetails");
+
 const tradeList = document.getElementById("tradeList");
-const setupList = document.getElementById("setupList");
 const emptyMessage = document.getElementById("emptyMessage");
-
+const clearBtn = document.getElementById("clearBtn");
+const setupList = document.getElementById("setupList");
 
 // ==========================================
-// SAUVEGARDE
+// DATE PAR DEFAUT
 // ==========================================
 
-function saveTrades() {
-
-    localStorage.setItem(
-        "tradingTrades",
-        JSON.stringify(trades)
-    );
-
-    refreshDashboard();
+if (dateInput) {
+    dateInput.value = new Date().toISOString().split("T")[0];
 }
-
 
 // ==========================================
 // CALCUL DU RR
 // ==========================================
 
 function calculateRR() {
+    const entry = parseFloat(entryInput.value);
+    const sl = parseFloat(slInput.value);
+    const tp = parseFloat(tpInput.value);
 
-    const entry = Number(document.getElementById("entry").value);
-    const sl = Number(document.getElementById("sl").value);
-    const tp = Number(document.getElementById("tp").value);
-
-    const rrField = document.getElementById("calculatedRR");
-
-    if (!entry || !sl || !tp) {
-
-        rrField.value = "0.00";
-
+    if (
+        Number.isNaN(entry) ||
+        Number.isNaN(sl) ||
+        Number.isNaN(tp)
+    ) {
+        rrInput.value = "";
         return;
     }
 
     const risk = Math.abs(entry - sl);
     const reward = Math.abs(tp - entry);
 
-    if (risk === 0) {
-
-        rrField.value = "0.00";
-
+    if (risk <= 0) {
+        rrInput.value = "";
         return;
     }
 
     const rr = reward / risk;
 
-    rrField.value = `1:${rr.toFixed(2)}`;
+    rrInput.value = `1:${rr.toFixed(2)}`;
 }
 
+entryInput?.addEventListener("input", calculateRR);
+slInput?.addEventListener("input", calculateRR);
+tpInput?.addEventListener("input", calculateRR);
 
-// Écoute des changements Entry / SL / TP
+// ==========================================
+// SAUVEGARDE
+// ==========================================
 
-document.getElementById("entry")
-    .addEventListener("input", calculateRR);
+function saveTrades() {
+    localStorage.setItem("tradingTrades", JSON.stringify(trades));
+}
 
-document.getElementById("sl")
-    .addEventListener("input", calculateRR);
+// ==========================================
+// FORMATAGE
+// ==========================================
 
-document.getElementById("tp")
-    .addEventListener("input", calculateRR);
+function formatMoney(value) {
+    const number = Number(value) || 0;
 
+    if (number > 0) {
+        return `+${number.toFixed(2)} $`;
+    }
+
+    if (number < 0) {
+        return `${number.toFixed(2)} $`;
+    }
+
+    return `0.00 $`;
+}
+
+function formatRR(value) {
+    const rr = Number(value) || 0;
+
+    if (rr <= 0) {
+        return "-";
+    }
+
+    return `1:${rr.toFixed(2)}`;
+}
+
+// ==========================================
+// FILTRE DES PERIODES
+// ==========================================
+
+function getFilteredTrades() {
+    const now = new Date();
+
+    return trades.filter(trade => {
+        if (!trade.date) return false;
+
+        const tradeDate = new Date(`${trade.date}T00:00:00`);
+
+        if (currentPeriod === "all") {
+            return true;
+        }
+
+        if (currentPeriod === "today") {
+            return (
+                tradeDate.getFullYear() === now.getFullYear() &&
+                tradeDate.getMonth() === now.getMonth() &&
+                tradeDate.getDate() === now.getDate()
+            );
+        }
+
+        if (currentPeriod === "week") {
+            const currentDay = now.getDay();
+            const mondayOffset = currentDay === 0 ? 6 : currentDay - 1;
+
+            const monday = new Date(now);
+            monday.setHours(0, 0, 0, 0);
+            monday.setDate(now.getDate() - mondayOffset);
+
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+
+            return tradeDate >= monday && tradeDate <= sunday;
+        }
+
+        if (currentPeriod === "month") {
+            return (
+                tradeDate.getFullYear() === now.getFullYear() &&
+                tradeDate.getMonth() === now.getMonth()
+            );
+        }
+
+        if (currentPeriod === "year") {
+            return tradeDate.getFullYear() === now.getFullYear();
+        }
+
+        return true;
+    });
+}
+
+// ==========================================
+// CALCUL DES STATISTIQUES
+// ==========================================
+
+function updateDashboard() {
+    const filteredTrades = getFilteredTrades();
+
+    const totalTrades = filteredTrades.length;
+
+    const totalProfit = filteredTrades.reduce(
+        (sum, trade) => sum + (Number(trade.profit) || 0),
+        0
+    );
+
+    const winningTrades = filteredTrades.filter(
+        trade => trade.result === "TP"
+    ).length;
+
+    const breakEvenTrades = filteredTrades.filter(
+        trade => trade.result === "BE"
+    ).length;
+
+    const winrate =
+        totalTrades > 0
+            ? (winningTrades / totalTrades) * 100
+            : 0;
+
+    const validRR = filteredTrades
+        .map(trade => Number(trade.rr))
+        .filter(rr => rr > 0);
+
+    const averageRR =
+        validRR.length > 0
+            ? validRR.reduce((sum, rr) => sum + rr, 0) / validRR.length
+            : 0;
+
+    balanceElement.textContent = formatMoney(totalProfit);
+    totalProfitElement.textContent = formatMoney(totalProfit);
+    winrateElement.textContent = `${winrate.toFixed(1)}%`;
+    averageRRElement.textContent = formatRR(averageRR);
+    totalTradesElement.textContent = totalTrades;
+
+    updateBestSetup(filteredTrades);
+    updateSetupTable(filteredTrades);
+}
+
+// ==========================================
+// MEILLEUR SETUP
+// ==========================================
+
+function updateBestSetup(filteredTrades) {
+    if (filteredTrades.length === 0) {
+        bestSetupElement.textContent = "-";
+        bestSetupDetailsElement.textContent = "Aucun trade";
+        return;
+    }
+
+    const setups = {};
+
+    filteredTrades.forEach(trade => {
+        const setup = trade.setup || "Non défini";
+
+        if (!setups[setup]) {
+            setups[setup] = {
+                total: 0,
+                wins: 0
+            };
+        }
+
+        setups[setup].total++;
+
+        if (trade.result === "TP") {
+            setups[setup].wins++;
+        }
+    });
+
+    const ranking = Object.entries(setups)
+        .map(([name, data]) => ({
+            name,
+            total: data.total,
+            wins: data.wins,
+            winrate:
+                data.total > 0
+                    ? (data.wins / data.total) * 100
+                    : 0
+        }))
+        .sort((a, b) => {
+            if (b.winrate !== a.winrate) {
+                return b.winrate - a.winrate;
+            }
+
+            return b.total - a.total;
+        });
+
+    const best = ranking[0];
+
+    if (!best) {
+        bestSetupElement.textContent = "-";
+        bestSetupDetailsElement.textContent = "Aucun setup";
+        return;
+    }
+
+    bestSetupElement.textContent = best.name;
+    bestSetupDetailsElement.textContent =
+        `${best.winrate.toFixed(1)}% de winrate • ${best.total} trade(s)`;
+}
+
+// ==========================================
+// TABLEAU DES SETUPS
+// ==========================================
+
+function updateSetupTable(filteredTrades) {
+    if (!setupList) return;
+
+    setupList.innerHTML = "";
+
+    const setups = {};
+
+    filteredTrades.forEach(trade => {
+        const setup = trade.setup || "Non défini";
+
+        if (!setups[setup]) {
+            setups[setup] = {
+                total: 0,
+                wins: 0,
+                profit: 0
+            };
+        }
+
+        setups[setup].total++;
+
+        if (trade.result === "TP") {
+            setups[setup].wins++;
+        }
+
+        setups[setup].profit += Number(trade.profit) || 0;
+    });
+
+    const sortedSetups = Object.entries(setups)
+        .map(([name, data]) => ({
+            name,
+            total: data.total,
+            wins: data.wins,
+            profit: data.profit,
+            winrate:
+                data.total > 0
+                    ? (data.wins / data.total) * 100
+                    : 0
+        }))
+        .sort((a, b) => b.winrate - a.winrate);
+
+    if (sortedSetups.length === 0) {
+        setupList.innerHTML = `
+            <tr>
+                <td colspan="4">Aucun setup utilisé</td>
+            </tr>
+        `;
+        return;
+    }
+
+    sortedSetups.forEach(setup => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${setup.name}</td>
+            <td>${setup.total}</td>
+            <td>${setup.winrate.toFixed(1)}%</td>
+            <td>${formatMoney(setup.profit)}</td>
+        `;
+
+        setupList.appendChild(row);
+    });
+}
+
+// ==========================================
+// AFFICHAGE DE L'HISTORIQUE
+// ==========================================
+
+function renderTrades() {
+    const filteredTrades = getFilteredTrades();
+
+    tradeList.innerHTML = "";
+
+    if (filteredTrades.length === 0) {
+        emptyMessage.style.display = "block";
+        return;
+    }
+
+    emptyMessage.style.display = "none";
+
+    filteredTrades
+        .slice()
+        .reverse()
+        .forEach(trade => {
+            const row = document.createElement("tr");
+
+            const resultClass =
+                trade.result === "TP"
+                    ? "win"
+                    : trade.result === "SL"
+                    ? "loss"
+                    : "be";
+
+            row.innerHTML = `
+                <td>${trade.date || "-"}</td>
+                <td>${trade.asset || "-"}</td>
+                <td>${trade.direction || "-"}</td>
+                <td>${trade.entry ?? "-"}</td>
+                <td>${trade.sl ?? "-"}</td>
+                <td>${trade.tp ?? "-"}</td>
+                <td>${formatRR(trade.rr)}</td>
+                <td>${trade.setup || "-"}</td>
+                <td class="${resultClass}">${trade.result || "-"}</td>
+                <td>${formatMoney(trade.profit)}</td>
+                <td>
+                    <button
+                        class="delete-btn"
+                        onclick="deleteTrade('${trade.id}')"
+                        title="Supprimer"
+                    >
+                        🗑️
+                    </button>
+                </td>
+            `;
+
+            tradeList.appendChild(row);
+        });
+}
 
 // ==========================================
 // AJOUT D'UN TRADE
 // ==========================================
 
-form.addEventListener("submit", function(event) {
-
+form?.addEventListener("submit", function(event) {
     event.preventDefault();
 
-    const entry = Number(
-        document.getElementById("entry").value
-    );
-
-    const sl = Number(
-        document.getElementById("sl").value
-    );
-
-    const tp = Number(
-        document.getElementById("tp").value
-    );
+    const entry = parseFloat(entryInput.value);
+    const sl = parseFloat(slInput.value);
+    const tp = parseFloat(tpInput.value);
 
     let rr = 0;
 
-    if (entry && sl && tp) {
-
+    if (
+        !Number.isNaN(entry) &&
+        !Number.isNaN(sl) &&
+        !Number.isNaN(tp)
+    ) {
         const risk = Math.abs(entry - sl);
         const reward = Math.abs(tp - entry);
 
@@ -106,16 +424,16 @@ form.addEventListener("submit", function(event) {
         }
     }
 
-
     const trade = {
+        id: Date.now().toString(),
 
-        asset: document.getElementById("asset").value.trim(),
+        date: dateInput.value,
 
-        date: document.getElementById("date").value,
+        asset: assetInput.value.trim(),
 
-        direction: document.getElementById("direction").value,
+        direction: directionInput.value,
 
-        orderType: document.getElementById("orderType").value,
+        orderType: orderTypeInput.value,
 
         entry: entry,
 
@@ -125,659 +443,127 @@ form.addEventListener("submit", function(event) {
 
         rr: rr,
 
-        result: document.getElementById("result").value,
+        setup: setupInput.value,
 
-        setup: document.getElementById("setup").value,
+        result: resultInput.value,
 
-        profit: Number(
-            document.getElementById("profit").value
-        ) || 0,
+        profit: parseFloat(profitInput.value) || 0,
 
-        comment: document.getElementById("comment").value.trim()
-
+        comment: commentInput.value.trim()
     };
 
-
-    trades.unshift(trade);
+    trades.push(trade);
 
     saveTrades();
 
     form.reset();
 
-    setToday();
-
-    calculateRR();
-
-    alert("✅ Trade enregistré !");
-
-});
-
-
-// ==========================================
-// FILTRAGE DES DATES
-// ==========================================
-
-function getFilteredTrades() {
-
-    if (currentPeriod === "all") {
-        return [...trades];
-    }
-
-    const now = new Date();
-
-    return trades.filter(trade => {
-
-        if (!trade.date) {
-            return false;
-        }
-
-        const date = new Date(
-            trade.date + "T00:00:00"
-        );
-
-        // Aujourd'hui
-
-        if (currentPeriod === "today") {
-
-            return (
-                date.getFullYear() === now.getFullYear() &&
-                date.getMonth() === now.getMonth() &&
-                date.getDate() === now.getDate()
-            );
-        }
-
-
-        // Cette semaine
-
-        if (currentPeriod === "week") {
-
-            const startOfWeek = new Date(now);
-
-            const day = startOfWeek.getDay();
-
-            const difference =
-                day === 0 ? 6 : day - 1;
-
-            startOfWeek.setDate(
-                startOfWeek.getDate() - difference
-            );
-
-            startOfWeek.setHours(0, 0, 0, 0);
-
-            return date >= startOfWeek;
-        }
-
-
-        // Ce mois
-
-        if (currentPeriod === "month") {
-
-            return (
-                date.getFullYear() === now.getFullYear() &&
-                date.getMonth() === now.getMonth()
-            );
-        }
-
-
-        // Cette année
-
-        if (currentPeriod === "year") {
-
-            return (
-                date.getFullYear() === now.getFullYear()
-            );
-        }
-
-        return false;
-    });
-}
-
-
-// ==========================================
-// DASHBOARD
-// ==========================================
-
-function updateDashboard() {
-
-    const filteredTrades = getFilteredTrades();
-
-    let totalProfit = 0;
-
-    let wins = 0;
-
-    let rrTotal = 0;
-
-    let rrCount = 0;
-
-
-    filteredTrades.forEach(trade => {
-
-        totalProfit += Number(trade.profit) || 0;
-
-
-        if (trade.result === "TP") {
-            wins++;
-        }
-
-
-        if (Number(trade.rr) > 0) {
-
-            rrTotal += Number(trade.rr);
-
-            rrCount++;
-        }
-
-    });
-
-
-    const totalTrades =
-        filteredTrades.length;
-
-
-    const winrate =
-        totalTrades > 0
-            ? (wins / totalTrades) * 100
-            : 0;
-
-
-    const averageRR =
-        rrCount > 0
-            ? rrTotal / rrCount
-            : 0;
-
-
-    // ======================================
-    // CAPITAL
-    // ======================================
-
-    /*
-       Le capital initial sera défini plus tard
-       dans les paramètres.
-       
-       Pour l'instant :
-       capital = profit de la période.
-    */
-
-    const balance = totalProfit;
-
-
-    document.getElementById("balance").textContent =
-        `${balance.toFixed(2)} $`;
-
-
-    document.getElementById("totalProfit").textContent =
-        `${totalProfit.toFixed(2)} $`;
-
-
-    document.getElementById("totalTrades").textContent =
-        totalTrades;
-
-
-    document.getElementById("winrate").textContent =
-        `${winrate.toFixed(1)}%`;
-
-
-    document.getElementById("averageRR").textContent =
-        `1:${averageRR.toFixed(2)}`;
-
-
-    updateBestSetup(filteredTrades);
-
-    updateSetupTable(filteredTrades);
-
-    displayTrades(filteredTrades);
-}
-
-
-// ==========================================
-// MEILLEUR SETUP
-// ==========================================
-
-function updateBestSetup(filteredTrades) {
-
-    const setupStats = {};
-
-
-    filteredTrades.forEach(trade => {
-
-        const setup = trade.setup || "Autre";
-
-
-        if (!setupStats[setup]) {
-
-            setupStats[setup] = {
-
-                trades: 0,
-
-                wins: 0,
-
-                profit: 0
-            };
-        }
-
-
-        setupStats[setup].trades++;
-
-        setupStats[setup].profit +=
-            Number(trade.profit) || 0;
-
-
-        if (trade.result === "TP") {
-            setupStats[setup].wins++;
-        }
-
-    });
-
-
-    const setups = Object.entries(setupStats);
-
-
-    if (setups.length === 0) {
-
-        document.getElementById("bestSetup").textContent =
-            "-";
-
-        document.getElementById("bestSetupDetails").textContent =
-            "Aucun trade";
-
-        return;
-    }
-
-
-    /*
-       Le meilleur setup est déterminé
-       principalement par le winrate.
-
-       En cas d'égalité :
-       le setup avec le plus de trades gagne.
-    */
-
-    setups.sort((a, b) => {
-
-        const statsA = a[1];
-
-        const statsB = b[1];
-
-
-        const winrateA =
-            statsA.wins / statsA.trades;
-
-
-        const winrateB =
-            statsB.wins / statsB.trades;
-
-
-        if (winrateB !== winrateA) {
-
-            return winrateB - winrateA;
-        }
-
-
-        return statsB.trades - statsA.trades;
-    });
-
-
-    const bestName = setups[0][0];
-
-    const best = setups[0][1];
-
-
-    const bestWinrate =
-        (best.wins / best.trades) * 100;
-
-
-    document.getElementById("bestSetup").textContent =
-        bestName;
-
-
-    document.getElementById("bestSetupDetails").textContent =
-        `${best.trades} trade(s) • ${bestWinrate.toFixed(1)}% winrate`;
-
-}
-
-
-// ==========================================
-// TABLEAU DES SETUPS
-// ==========================================
-
-function updateSetupTable(filteredTrades) {
-
-    setupList.innerHTML = "";
-
-
-    const stats = {};
-
-
-    filteredTrades.forEach(trade => {
-
-        const setup = trade.setup || "Autre";
-
-
-        if (!stats[setup]) {
-
-            stats[setup] = {
-
-                trades: 0,
-
-                wins: 0,
-
-                profit: 0
-            };
-        }
-
-
-        stats[setup].trades++;
-
-        stats[setup].profit +=
-            Number(trade.profit) || 0;
-
-
-        if (trade.result === "TP") {
-            stats[setup].wins++;
-        }
-
-    });
-
-
-    const sorted = Object.entries(stats)
-        .sort((a, b) =>
-            b[1].trades - a[1].trades
-        );
-
-
-    sorted.forEach(([setup, data]) => {
-
-        const winrate =
-            (data.wins / data.trades) * 100;
-
-
-        const row =
-            document.createElement("tr");
-
-
-        const profitClass =
-            data.profit > 0
-                ? "profit"
-                : data.profit < 0
-                    ? "loss"
-                    : "be";
-
-
-        row.innerHTML = `
-
-            <td>${setup}</td>
-
-            <td>${data.trades}</td>
-
-            <td>${data.wins}</td>
-
-            <td>${winrate.toFixed(1)}%</td>
-
-            <td class="${profitClass}">
-                ${data.profit.toFixed(2)} $
-            </td>
-
-        `;
-
-
-        setupList.appendChild(row);
-    });
-
-}
-
-
-// ==========================================
-// HISTORIQUE
-// ==========================================
-
-function displayTrades(filteredTrades) {
-
-    tradeList.innerHTML = "";
-
-
-    if (filteredTrades.length === 0) {
-
-        emptyMessage.style.display = "block";
-
-        return;
-    }
-
-
-    emptyMessage.style.display = "none";
-
-
-    filteredTrades.forEach(trade => {
-
-        const originalIndex =
-            trades.indexOf(trade);
-
-
-        const row =
-            document.createElement("tr");
-
-
-        let resultClass = "be";
-
-
-        if (trade.result === "TP") {
-            resultClass = "profit";
-        }
-
-        if (trade.result === "SL") {
-            resultClass = "loss";
-        }
-
-
-        const profit =
-            Number(trade.profit) || 0;
-
-
-        const profitClass =
-            profit > 0
-                ? "profit"
-                : profit < 0
-                    ? "loss"
-                    : "be";
-
-
-        const rr =
-            Number(trade.rr) || 0;
-
-
-        row.innerHTML = `
-
-            <td>${trade.date}</td>
-
-            <td>${trade.asset}</td>
-
-            <td>${trade.direction}</td>
-
-            <td>${trade.entry}</td>
-
-            <td>${trade.sl || "-"}</td>
-
-            <td>${trade.tp || "-"}</td>
-
-            <td>
-                ${rr > 0 ? `1:${rr.toFixed(2)}` : "-"}
-            </td>
-
-            <td>${trade.setup}</td>
-
-            <td class="${resultClass}">
-                ${trade.result}
-            </td>
-
-            <td class="${profitClass}">
-                ${profit.toFixed(2)} $
-            </td>
-
-            <td>
-
-                <button
-                    class="delete-btn"
-                    onclick="deleteTrade(${originalIndex})">
-
-                    ✕
-
-                </button>
-
-            </td>
-        `;
-
-
-        tradeList.appendChild(row);
-
-    });
-
-}
-
-
-// ==========================================
-// SUPPRIMER UN TRADE
-// ==========================================
-
-function deleteTrade(index) {
-
-    if (!confirm("Supprimer ce trade ?")) {
-        return;
-    }
-
-
-    trades.splice(index, 1);
-
-    saveTrades();
-}
-
-
-// ==========================================
-// SUPPRIMER TOUS LES TRADES
-// ==========================================
-
-document.getElementById("clearBtn")
-    .addEventListener("click", function() {
-
-        if (trades.length === 0) {
-            return;
-        }
-
-
-        if (!confirm(
-            "⚠️ Supprimer TOUS les trades ?"
-        )) {
-            return;
-        }
-
-
-        trades = [];
-
-        saveTrades();
-
-    });
-
-
-// ==========================================
-// CHANGEMENT DE PÉRIODE
-// ==========================================
-
-document.querySelectorAll(".period-btn")
-    .forEach(button => {
-
-        button.addEventListener("click", function() {
-
-            document
-                .querySelectorAll(".period-btn")
-                .forEach(btn =>
-                    btn.classList.remove("active")
-                );
-
-
-            this.classList.add("active");
-
-
-            currentPeriod =
-                this.dataset.period;
-
-
-            refreshDashboard();
-
-        });
-
-    });
-
-
-// ==========================================
-// DATE DU JOUR
-// ==========================================
-
-function setToday() {
-
-    const today = new Date();
-
-
-    const year =
-        today.getFullYear();
-
-
-    const month =
-        String(
-            today.getMonth() + 1
-        ).padStart(2, "0");
-
-
-    const day =
-        String(
-            today.getDate()
-        ).padStart(2, "0");
-
-
-    document.getElementById("date").value =
-        `${year}-${month}-${day}`;
-}
-
-
-// ==========================================
-// MODE CLAIR / SOMBRE
-// ==========================================
-
-document.getElementById("themeBtn")
-    .addEventListener("click", function() {
-
-        document.body.classList.toggle("light");
-
-
-        if (
-            document.body.classList.contains("light")
-        ) {
-
-            this.textContent = "☀️";
-
-        } else {
-
-            this.textContent = "🌙";
-
-        }
-
-    });
-
-
-// ==========================================
-// REFRESH GLOBAL
-// ==========================================
-
-function refreshDashboard() {
+    dateInput.value = new Date()
+        .toISOString()
+        .split("T")[0];
+
+    rrInput.value = "";
 
     updateDashboard();
+    renderTrades();
+});
 
+// ==========================================
+// SUPPRESSION D'UN TRADE
+// ==========================================
+
+function deleteTrade(id) {
+    const confirmation = confirm(
+        "Voulez-vous vraiment supprimer ce trade ?"
+    );
+
+    if (!confirmation) return;
+
+    trades = trades.filter(trade => trade.id !== id);
+
+    saveTrades();
+
+    updateDashboard();
+    renderTrades();
 }
 
+// ==========================================
+// SUPPRESSION DE TOUS LES TRADES
+// ==========================================
+
+clearBtn?.addEventListener("click", function() {
+    if (trades.length === 0) {
+        alert("Il n'y a aucun trade à supprimer.");
+        return;
+    }
+
+    const confirmation = confirm(
+        "ATTENTION : voulez-vous supprimer tout l'historique ?"
+    );
+
+    if (!confirmation) return;
+
+    trades = [];
+
+    saveTrades();
+
+    updateDashboard();
+    renderTrades();
+});
+
+// ==========================================
+// BOUTONS DE PERIODE
+// ==========================================
+
+const periodButtons = document.querySelectorAll(
+    "[data-period]"
+);
+
+periodButtons.forEach(button => {
+    button.addEventListener("click", function() {
+        periodButtons.forEach(btn =>
+            btn.classList.remove("active")
+        );
+
+        this.classList.add("active");
+
+        currentPeriod = this.dataset.period;
+
+        updateDashboard();
+        renderTrades();
+    });
+});
+
+// ==========================================
+// MODE SOMBRE / CLAIR
+// ==========================================
+
+const themeToggle = document.getElementById("themeToggle");
+
+themeToggle?.addEventListener("click", function() {
+    document.body.classList.toggle("light-mode");
+
+    const isLight =
+        document.body.classList.contains("light-mode");
+
+    localStorage.setItem(
+        "tradingDashboardTheme",
+        isLight ? "light" : "dark"
+    );
+});
+
+const savedTheme =
+    localStorage.getItem("tradingDashboardTheme");
+
+if (savedTheme === "light") {
+    document.body.classList.add("light-mode");
+}
 
 // ==========================================
 // INITIALISATION
 // ==========================================
 
-setToday();
+updateDashboard();
+renderTrades();
 
-calculateRR();
-
-refreshDashboard();
+console.log("Trading Dashboard V2.1 chargé avec succès.");
