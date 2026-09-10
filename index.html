@@ -19,7 +19,7 @@
         <p>Mon plan de bord de trading</p>
     </div>
 
-    <button id="themeBtn">🌙</button>
+    <button id="themeBtn" type="button">🌙</button>
 
 </header>
 
@@ -27,29 +27,145 @@
 <main>
 
     <!-- ========================= -->
+    <!-- CAPITAL ACTIF -->
+    <!-- ========================= -->
+
+    <section class="capital-panel">
+
+        <div class="capital-info">
+
+            <div>
+                <span class="section-label">💼 Capital actif</span>
+
+                <h2 id="activeCapitalName">
+                    Capital 1
+                </h2>
+
+                <p id="activeCapitalPeriod">
+                    Aucun trade enregistré
+                </p>
+            </div>
+
+
+            <div class="capital-actions">
+
+                <button
+                    id="newCapitalBtn"
+                    class="secondary"
+                    type="button">
+
+                    ➕ Nouveau capital
+
+                </button>
+
+                <button
+                    id="archiveCapitalBtn"
+                    class="archive-btn"
+                    type="button">
+
+                    📦 Archiver
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="capital-settings">
+
+            <div>
+
+                <label for="capitalName">
+                    Nom du capital
+                </label>
+
+                <input
+                    type="text"
+                    id="capitalName"
+                    placeholder="Ex : Capital 100$">
+
+            </div>
+
+
+            <div>
+
+                <label for="initialCapital">
+                    Capital initial ($)
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="initialCapital"
+                    placeholder="100">
+
+            </div>
+
+
+            <button
+                id="saveCapitalBtn"
+                class="primary small-primary"
+                type="button">
+
+                💾 Enregistrer le capital
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
     <!-- FILTRE DE PÉRIODE -->
     <!-- ========================= -->
 
     <section class="period-selector">
 
-        <button class="period-btn active" data-period="today">
+        <button
+            class="period-btn active"
+            data-period="today"
+            type="button">
+
             Aujourd'hui
+
         </button>
 
-        <button class="period-btn" data-period="week">
+        <button
+            class="period-btn"
+            data-period="week"
+            type="button">
+
             Cette semaine
+
         </button>
 
-        <button class="period-btn" data-period="month">
+        <button
+            class="period-btn"
+            data-period="month"
+            type="button">
+
             Ce mois
+
         </button>
 
-        <button class="period-btn" data-period="year">
+        <button
+            class="period-btn"
+            data-period="year"
+            type="button">
+
             Cette année
+
         </button>
 
-        <button class="period-btn" data-period="all">
+        <button
+            class="period-btn"
+            data-period="all"
+            type="button">
+
             Tout l'historique
+
         </button>
 
     </section>
@@ -66,7 +182,7 @@
             <span>💰 Capital / Solde</span>
 
             <strong id="balance">
-                $0.00
+                0.00 $
             </strong>
 
         </div>
@@ -77,7 +193,7 @@
             <span>📈 Profit total</span>
 
             <strong id="totalProfit">
-                $0.00
+                0.00 $
             </strong>
 
         </div>
@@ -148,7 +264,9 @@
 
                 <div>
 
-                    <label>Actif</label>
+                    <label for="asset">
+                        Actif
+                    </label>
 
                     <input
                         type="text"
@@ -161,7 +279,9 @@
 
                 <div>
 
-                    <label>Date</label>
+                    <label for="date">
+                        Date
+                    </label>
 
                     <input
                         type="date"
@@ -173,16 +293,18 @@
 
                 <div>
 
-                    <label>Direction</label>
+                    <label for="direction">
+                        Position
+                    </label>
 
                     <select id="direction">
 
-                        <option value="BUY">
-                            BUY
+                        <option value="Buy">
+                            Buy
                         </option>
 
-                        <option value="SELL">
-                            SELL
+                        <option value="Sell">
+                            Sell
                         </option>
 
                     </select>
@@ -192,12 +314,14 @@
 
                 <div>
 
-                    <label>Type d'ordre</label>
+                    <label for="orderType">
+                        Type d'ordre
+                    </label>
 
                     <select id="orderType">
 
                         <option value="Market">
-                            Immediat
+                            Immédiat
                         </option>
 
                         <option value="Buy Limit">
@@ -215,7 +339,9 @@
 
                 <div>
 
-                    <label>Entry</label>
+                    <label for="entry">
+                        Entry
+                    </label>
 
                     <input
                         type="number"
@@ -229,35 +355,41 @@
 
                 <div>
 
-                    <label>Stop Loss</label>
+                    <label for="sl">
+                        Stop Loss
+                    </label>
 
                     <input
                         type="number"
                         step="any"
                         id="sl"
-                        placeholder="4445.00">
+                        placeholder="4445.00"
+                        required>
 
                 </div>
 
 
                 <div>
 
-                    <label>Take Profit</label>
+                    <label for="tp">
+                        Take Profit
+                    </label>
 
                     <input
                         type="number"
                         step="any"
                         id="tp"
-                        placeholder="4460.00">
+                        placeholder="4460.00"
+                        required>
 
                 </div>
 
 
-                <!-- RR AUTOMATIQUE -->
-
                 <div>
 
-                    <label>RR calculé</label>
+                    <label for="calculatedRR">
+                        RR calculé
+                    </label>
 
                     <input
                         type="text"
@@ -270,7 +402,9 @@
 
                 <div>
 
-                    <label>Résultat</label>
+                    <label for="result">
+                        Résultat
+                    </label>
 
                     <select id="result">
 
@@ -293,37 +427,55 @@
 
                 <div>
 
-                    <label>Setup</label>
+                    <label for="setup">
+                        Setup
+                    </label>
 
                     <select id="setup">
 
-                        <option>LDP + QML</option>
+                        <option value="LDP+QML">
+                            LDP+QML
+                        </option>
 
-                        <option>LDP + Fibonacci</option>
+                        <option value="LDP+FIBO 50">
+                            LDP+FIBO 50
+                        </option>
 
-                        <option>QML</option>
+                        <option value="OB">
+                            OB
+                        </option>
 
-                        <option>OB</option>
+                        <option value="BB">
+                            BB
+                        </option>
 
-                        <option>BB</option>
+                        <option value="ZS OA">
+                            ZS OA
+                        </option>
 
-                        <option>ZS</option>
+                        <option value="SSM1">
+                            SSM1
+                        </option>
 
-                        <option>OA</option>
+                        <option value="SSM2">
+                            SSM2
+                        </option>
 
-                        <option>SSM1</option>
+                        <option value="SSM3">
+                            SSM3
+                        </option>
 
-                        <option>SSM2</option>
+                        <option value="SBM1">
+                            SBM1
+                        </option>
 
-                        <option>SSM3</option>
+                        <option value="SBM2">
+                            SBM2
+                        </option>
 
-                        <option>SBM1</option>
-
-                        <option>SBM2</option>
-
-                        <option>SBM3</option>
-
-                        <option>Autre</option>
+                        <option value="SBM3">
+                            SBM3
+                        </option>
 
                     </select>
 
@@ -332,7 +484,9 @@
 
                 <div>
 
-                    <label>Gain / Perte ($)</label>
+                    <label for="profit">
+                        Gain / Perte ($)
+                    </label>
 
                     <input
                         type="number"
@@ -343,13 +497,14 @@
 
                 </div>
 
-
             </div>
 
 
             <div>
 
-                <label>Commentaire</label>
+                <label for="comment">
+                    Commentaire
+                </label>
 
                 <textarea
                     id="comment"
@@ -372,7 +527,7 @@
 
 
     <!-- ========================= -->
-    <!-- MEILLEURS SETUPS -->
+    <!-- PERFORMANCE DES SETUPS -->
     <!-- ========================= -->
 
     <section class="panel">
@@ -424,7 +579,8 @@
 
             <button
                 id="clearBtn"
-                class="danger">
+                class="danger"
+                type="button">
 
                 🗑️ Tout supprimer
 
@@ -445,7 +601,7 @@
 
                         <th>Actif</th>
 
-                        <th>Direction</th>
+                        <th>Position</th>
 
                         <th>Entry</th>
 
@@ -483,7 +639,120 @@
 
     </section>
 
+
+    <!-- ========================= -->
+    <!-- ARCHIVES -->
+    <!-- ========================= -->
+
+    <section class="panel archives-panel">
+
+        <div class="history-header">
+
+            <div>
+
+                <h2>
+                    📦 Archives des capitaux
+                </h2>
+
+                <p class="panel-description">
+                    Chaque capital archivé conserve son propre historique et ses statistiques.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="archivesList"
+            class="archives-list">
+
+        </div>
+
+
+        <div
+            id="emptyArchives"
+            class="empty-archives">
+
+            Aucun capital archivé.
+
+        </div>
+
+    </section>
+
 </main>
+
+
+<!-- ========================= -->
+<!-- MODALE NOUVEAU CAPITAL -->
+<!-- ========================= -->
+
+<div
+    id="capitalModal"
+    class="modal hidden">
+
+    <div class="modal-content">
+
+        <h2>➕ Nouveau capital</h2>
+
+        <p>
+            Le capital actuel sera conservé. Tu pourras ensuite commencer un nouvel historique.
+        </p>
+
+        <div>
+
+            <label for="newCapitalName">
+                Nom du nouveau capital
+            </label>
+
+            <input
+                type="text"
+                id="newCapitalName"
+                placeholder="Ex : Capital 500$">
+
+        </div>
+
+
+        <div>
+
+            <label for="newInitialCapital">
+                Capital initial ($)
+            </label>
+
+            <input
+                type="number"
+                step="any"
+                id="newInitialCapital"
+                placeholder="500">
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                id="cancelCapitalBtn"
+                class="secondary"
+                type="button">
+
+                Annuler
+
+            </button>
+
+            <button
+                id="confirmCapitalBtn"
+                class="primary modal-primary"
+                type="button">
+
+                Créer le capital
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 
 <script src="app.js"></script>
