@@ -3,6 +3,7 @@
    + RECOMMANDATIONS
    + ANALYSE DU RISQUE
    + CALENDRIER DE PERFORMANCE
+   + CORRECTION MULTI-PAGES
    ============================================================ */
 
 (function () {
@@ -42,64 +43,153 @@
 
     let chartResizeAttached = false;
 
+    let calendarMonth;
+    let calendarYear;
+
+    /* ============================================================
+       GESTION DES PAGES
+       ============================================================ */
+
+    function getCurrentPage() {
+        try {
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+            const page =
+                params.get("page");
+
+            if (
+                page === "analysis" ||
+                page === "archives" ||
+                page === "dashboard"
+            ) {
+                return page;
+            }
+
+            return "dashboard";
+        } catch (error) {
+            return "dashboard";
+        }
+    }
+
+    function isAnalysisPage() {
+        return (
+            getCurrentPage() ===
+            "analysis"
+        );
+    }
+
+    function removeFilterSection() {
+        const section =
+            document.getElementById(
+                "v51FilterCard"
+            );
+
+        if (section) {
+            section.remove();
+        }
+    }
+
     /* ============================================================
        OUTILS
        ============================================================ */
 
     function formatMoney(value) {
-        const number = Number(value) || 0;
+        const number =
+            Number(value) || 0;
 
-        if (typeof money === "function") {
+        if (
+            typeof money ===
+            "function"
+        ) {
             return money(number);
         }
 
-        return "$" + number.toFixed(2);
+        return (
+            "$" +
+            number.toFixed(2)
+        );
     }
 
     function escapeValue(value) {
-        if (typeof escapeHtml === "function") {
+        if (
+            typeof escapeHtml ===
+            "function"
+        ) {
             return escapeHtml(value);
         }
 
         return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
     }
 
     function getCapitalTrades() {
         if (
-            typeof trades === "undefined" ||
+            typeof trades ===
+                "undefined" ||
             !Array.isArray(trades)
         ) {
             return [];
         }
 
         if (
-            typeof activeCapital === "undefined" ||
+            typeof activeCapital ===
+                "undefined" ||
             !activeCapital ||
             !activeCapital.id
         ) {
             return [];
         }
 
-        return trades.filter(function (trade) {
-            return trade.capitalId === activeCapital.id;
-        });
+        return trades.filter(
+            function (trade) {
+                return (
+                    trade.capitalId ===
+                    activeCapital.id
+                );
+            }
+        );
     }
 
-    function parseTradeDate(dateValue) {
+    function parseTradeDate(
+        dateValue
+    ) {
         if (!dateValue) {
             return null;
         }
 
-        const date = new Date(
-            String(dateValue) + "T00:00:00"
-        );
+        const date =
+            new Date(
+                String(dateValue) +
+                    "T00:00:00"
+            );
 
-        if (Number.isNaN(date.getTime())) {
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
             return null;
         }
 
@@ -111,80 +201,113 @@
        ============================================================ */
 
     function isToday(dateValue) {
-        const tradeDate = parseTradeDate(dateValue);
+        const tradeDate =
+            parseTradeDate(
+                dateValue
+            );
 
         if (!tradeDate) {
             return false;
         }
 
-        const today = new Date();
+        const today =
+            new Date();
 
         return (
-            tradeDate.getFullYear() === today.getFullYear() &&
-            tradeDate.getMonth() === today.getMonth() &&
-            tradeDate.getDate() === today.getDate()
+            tradeDate.getFullYear() ===
+                today.getFullYear() &&
+            tradeDate.getMonth() ===
+                today.getMonth() &&
+            tradeDate.getDate() ===
+                today.getDate()
         );
     }
 
     function isThisWeek(dateValue) {
-        const tradeDate = parseTradeDate(dateValue);
+        const tradeDate =
+            parseTradeDate(
+                dateValue
+            );
 
         if (!tradeDate) {
             return false;
         }
 
-        const today = new Date();
-        const day = today.getDay();
+        const today =
+            new Date();
+
+        const day =
+            today.getDay();
 
         const diffToMonday =
             day === 0
                 ? 6
                 : day - 1;
 
-        const monday = new Date(today);
+        const monday =
+            new Date(today);
 
-        monday.setHours(0, 0, 0, 0);
+        monday.setHours(
+            0,
+            0,
+            0,
+            0
+        );
 
         monday.setDate(
-            today.getDate() - diffToMonday
+            today.getDate() -
+                diffToMonday
         );
 
         const nextMonday =
             new Date(monday);
 
         nextMonday.setDate(
-            monday.getDate() + 7
+            monday.getDate() +
+                7
         );
 
         return (
-            tradeDate >= monday &&
-            tradeDate < nextMonday
+            tradeDate >=
+                monday &&
+            tradeDate <
+                nextMonday
         );
     }
 
     function isThisMonth(dateValue) {
-        const tradeDate = parseTradeDate(dateValue);
+        const tradeDate =
+            parseTradeDate(
+                dateValue
+            );
 
         if (!tradeDate) {
             return false;
         }
 
-        const today = new Date();
+        const today =
+            new Date();
 
         return (
-            tradeDate.getFullYear() === today.getFullYear() &&
-            tradeDate.getMonth() === today.getMonth()
+            tradeDate.getFullYear() ===
+                today.getFullYear() &&
+            tradeDate.getMonth() ===
+                today.getMonth()
         );
     }
 
     function isThisYear(dateValue) {
-        const tradeDate = parseTradeDate(dateValue);
+        const tradeDate =
+            parseTradeDate(
+                dateValue
+            );
 
         if (!tradeDate) {
             return false;
         }
 
-        const today = new Date();
+        const today =
+            new Date();
 
         return (
             tradeDate.getFullYear() ===
@@ -197,58 +320,107 @@
         period
     ) {
         if (period === "all") {
-            return [...tradeList];
+            return [
+                ...tradeList
+            ];
         }
 
-        return tradeList.filter(function (trade) {
-            if (period === "today") {
-                return isToday(trade.date);
-            }
+        return tradeList.filter(
+            function (trade) {
+                if (
+                    period ===
+                    "today"
+                ) {
+                    return isToday(
+                        trade.date
+                    );
+                }
 
-            if (period === "week") {
-                return isThisWeek(trade.date);
-            }
+                if (
+                    period ===
+                    "week"
+                ) {
+                    return isThisWeek(
+                        trade.date
+                    );
+                }
 
-            if (period === "month") {
-                return isThisMonth(trade.date);
-            }
+                if (
+                    period ===
+                    "month"
+                ) {
+                    return isThisMonth(
+                        trade.date
+                    );
+                }
 
-            if (period === "year") {
-                return isThisYear(trade.date);
-            }
+                if (
+                    period ===
+                    "year"
+                ) {
+                    return isThisYear(
+                        trade.date
+                    );
+                }
 
-            return true;
-        });
+                return true;
+            }
+        );
     }
 
     /* ============================================================
        TRI CHRONOLOGIQUE
        ============================================================ */
 
-    function sortChronologically(tradeList) {
-        return [...tradeList].sort(function (a, b) {
-            const dateA = new Date(
-                a.date || a.createdAt || 0
-            ).getTime();
+    function sortChronologically(
+        tradeList
+    ) {
+        return [
+            ...tradeList
+        ].sort(
+            function (a, b) {
+                const dateA =
+                    new Date(
+                        a.date ||
+                            a.createdAt ||
+                            0
+                    ).getTime();
 
-            const dateB = new Date(
-                b.date || b.createdAt || 0
-            ).getTime();
+                const dateB =
+                    new Date(
+                        b.date ||
+                            b.createdAt ||
+                            0
+                    ).getTime();
 
-            if (dateA !== dateB) {
-                return dateA - dateB;
+                if (
+                    dateA !==
+                    dateB
+                ) {
+                    return (
+                        dateA -
+                        dateB
+                    );
+                }
+
+                const createdA =
+                    new Date(
+                        a.createdAt ||
+                            0
+                    ).getTime();
+
+                const createdB =
+                    new Date(
+                        b.createdAt ||
+                            0
+                    ).getTime();
+
+                return (
+                    createdA -
+                    createdB
+                );
             }
-
-            const createdA = new Date(
-                a.createdAt || 0
-            ).getTime();
-
-            const createdB = new Date(
-                b.createdAt || 0
-            ).getTime();
-
-            return createdA - createdB;
-        });
+        );
     }
 
     /* ============================================================
@@ -256,6 +428,17 @@
        ============================================================ */
 
     function createFilterSection() {
+        /*
+         * IMPORTANT :
+         * Cette section appartient UNIQUEMENT
+         * à la page Analyse & Performance.
+         */
+
+        if (!isAnalysisPage()) {
+            removeFilterSection();
+            return null;
+        }
+
         let section =
             document.getElementById(
                 "v51FilterCard"
@@ -266,13 +449,18 @@
         }
 
         section =
-            document.createElement("section");
+            document.createElement(
+                "section"
+            );
 
         section.id =
             "v51FilterCard";
 
         section.className =
             "card";
+
+        section.dataset.page =
+            "analysis";
 
         section.innerHTML = `
             <div class="section-header">
@@ -1027,7 +1215,9 @@
 
         if (
             periodButtons &&
-            periodButtons.closest(".card")
+            periodButtons.closest(
+                ".card"
+            )
         ) {
             const performanceCard =
                 periodButtons.closest(
@@ -1063,6 +1253,10 @@
        ============================================================ */
 
     function populateFilters() {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const assetSelect =
             document.getElementById(
                 "v51AssetFilter"
@@ -1114,7 +1308,9 @@
             </option>
         `;
 
-        [...assets]
+        [
+            ...assets
+        ]
             .sort(
                 function (a, b) {
                     return String(
@@ -1149,7 +1345,9 @@
             );
 
         if (
-            [...assets].includes(
+            [
+                ...assets
+            ].includes(
                 currentAsset
             )
         ) {
@@ -1183,7 +1381,9 @@
             </option>
         `;
 
-        [...setups]
+        [
+            ...setups
+        ]
             .sort(
                 function (a, b) {
                     return String(
@@ -1218,7 +1418,9 @@
             );
 
         if (
-            [...setups].includes(
+            [
+                ...setups
+            ].includes(
                 currentSetup
             )
         ) {
@@ -1235,6 +1437,10 @@
        ============================================================ */
 
     function getFilteredTrades() {
+        if (!isAnalysisPage()) {
+            return [];
+        }
+
         const periodSelect =
             document.getElementById(
                 "v51PeriodFilter"
@@ -1423,7 +1629,9 @@
                 ) {
                     return (
                         sum +
-                        Math.abs(value)
+                        Math.abs(
+                            value
+                        )
                     );
                 },
                 0
@@ -1463,7 +1671,8 @@
                 );
 
         const averageRR =
-            rrValues.length > 0
+            rrValues.length >
+            0
                 ? rrValues.reduce(
                       function (
                           sum,
@@ -1486,13 +1695,15 @@
                 : 0;
 
         const averageWinner =
-            positivePnls.length > 0
+            positivePnls.length >
+            0
                 ? grossProfit /
                   positivePnls.length
                 : 0;
 
         const averageLoser =
-            negativePnls.length > 0
+            negativePnls.length >
+            0
                 ? negativePnls.reduce(
                       function (
                           sum,
@@ -1674,6 +1885,10 @@
     function displayStats(
         filteredTrades
     ) {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const stats =
             calculateAdvancedStats(
                 filteredTrades
@@ -1807,7 +2022,9 @@
        RISQUE
        ============================================================ */
 
-    function getTradeRisk(trade) {
+    function getTradeRisk(
+        trade
+    ) {
         const possibleFields = [
             "actualRisk",
             "riskAmount",
@@ -1825,12 +2042,16 @@
             const value =
                 Number(
                     trade[
-                        possibleFields[i]
+                        possibleFields[
+                            i
+                        ]
                     ]
                 );
 
             if (
-                Number.isFinite(value) &&
+                Number.isFinite(
+                    value
+                ) &&
                 value > 0
             ) {
                 return value;
@@ -1840,7 +2061,9 @@
         return null;
     }
 
-    function getReferenceRisk(trade) {
+    function getReferenceRisk(
+        trade
+    ) {
         const possibleFields = [
             "riskReference",
             "referenceRisk",
@@ -1857,12 +2080,16 @@
             const value =
                 Number(
                     trade[
-                        possibleFields[i]
+                        possibleFields[
+                            i
+                        ]
                     ]
                 );
 
             if (
-                Number.isFinite(value) &&
+                Number.isFinite(
+                    value
+                ) &&
                 value > 0
             ) {
                 return value;
@@ -1890,12 +2117,16 @@
                 const value =
                     Number(
                         activeCapital[
-                            capitalFields[i]
+                            capitalFields[
+                                i
+                            ]
                         ]
                     );
 
                 if (
-                    Number.isFinite(value) &&
+                    Number.isFinite(
+                        value
+                    ) &&
                     value > 0
                 ) {
                     return value;
@@ -1906,7 +2137,9 @@
         return null;
     }
 
-    function getTradeTargetRR(trade) {
+    function getTradeTargetRR(
+        trade
+    ) {
         const possibleFields = [
             "targetRR",
             "rrTarget",
@@ -1923,12 +2156,16 @@
             const value =
                 Number(
                     trade[
-                        possibleFields[i]
+                        possibleFields[
+                            i
+                        ]
                     ]
                 );
 
             if (
-                Number.isFinite(value) &&
+                Number.isFinite(
+                    value
+                ) &&
                 value > 0
             ) {
                 return value;
@@ -1956,12 +2193,16 @@
                 const value =
                     Number(
                         activeCapital[
-                            capitalFields[i]
+                            capitalFields[
+                                i
+                            ]
                         ]
                     );
 
                 if (
-                    Number.isFinite(value) &&
+                    Number.isFinite(
+                        value
+                    ) &&
                     value > 0
                 ) {
                     return value;
@@ -2302,7 +2543,8 @@
             rrValues.filter(
                 function (value) {
                     return (
-                        value >= 2
+                        value >=
+                        2
                     );
                 }
             ).length;
@@ -2338,6 +2580,10 @@
     function displayRiskStats(
         filteredTrades
     ) {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const riskStats =
             calculateRiskStats(
                 filteredTrades
@@ -2639,10 +2885,10 @@
             return "🥉";
         }
 
-        return "#" +
-            (
-                position + 1
-            );
+        return (
+            "#" +
+            (position + 1)
+        );
     }
 
     /* ============================================================
@@ -2652,6 +2898,10 @@
     function renderSetupRanking(
         filteredTrades
     ) {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const tbody =
             document.getElementById(
                 "v55SetupRankingBody"
@@ -2773,6 +3023,10 @@
     function renderAssetRanking(
         filteredTrades
     ) {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const tbody =
             document.getElementById(
                 "v55AssetRankingBody"
@@ -2898,6 +3152,10 @@
     function renderSetupAnalysis(
         filteredTrades
     ) {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const tbody =
             document.getElementById(
                 "v54SetupBody"
@@ -2929,7 +3187,9 @@
         let rowsAdded =
             0;
 
-        [...setups]
+        [
+            ...setups
+        ]
             .sort(
                 function (a, b) {
                     return String(
@@ -3075,6 +3335,10 @@
     function renderAssetAnalysis(
         filteredTrades
     ) {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const tbody =
             document.getElementById(
                 "v54AssetBody"
@@ -3106,7 +3370,9 @@
         let rowsAdded =
             0;
 
-        [...assets]
+        [
+            ...assets
+        ]
             .sort(
                 function (a, b) {
                     return String(
@@ -3391,6 +3657,10 @@
     function displayRecommendations(
         filteredTrades
     ) {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const setupGroups =
             getRecommendationGroups(
                 filteredTrades,
@@ -3623,11 +3893,9 @@
        CALENDRIER V5.8
        ============================================================ */
 
-    let calendarMonth;
-    let calendarYear;
-
     function initializeCalendarDate() {
-        const today = new Date();
+        const today =
+            new Date();
 
         calendarMonth =
             today.getMonth();
@@ -3670,7 +3938,8 @@
             function (trade) {
                 return (
                     String(
-                        trade.date || ""
+                        trade.date ||
+                            ""
                     ) ===
                     dateString
                 );
@@ -3729,15 +3998,6 @@
         return "neutral";
     }
 
-    function formatCalendarNumber(
-        day
-    ) {
-        return String(day).padStart(
-            2,
-            "0"
-        );
-    }
-
     function getCalendarDateString(
         year,
         month,
@@ -3763,6 +4023,10 @@
     function renderCalendar(
         filteredTrades
     ) {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const calendar =
             document.getElementById(
                 "v58Calendar"
@@ -4112,6 +4376,10 @@
     }
 
     function goToPreviousMonth() {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         calendarMonth--;
 
         if (
@@ -4130,6 +4398,10 @@
     }
 
     function goToNextMonth() {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         calendarMonth++;
 
         if (
@@ -4154,6 +4426,10 @@
     function drawChart(
         filteredTrades
     ) {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const canvas =
             document.getElementById(
                 "v51PerformanceChart"
@@ -4186,9 +4462,13 @@
             window.addEventListener(
                 "resize",
                 function () {
-                    drawChart(
-                        getFilteredTrades()
-                    );
+                    if (
+                        isAnalysisPage()
+                    ) {
+                        drawChart(
+                            getFilteredTrades()
+                        );
+                    }
                 }
             );
         }
@@ -4618,6 +4898,17 @@
 
     function refreshV58() {
         try {
+            /*
+             * IMPORTANT :
+             * Aucune analyse V5.8 sur Dashboard
+             * ou Archives.
+             */
+
+            if (!isAnalysisPage()) {
+                removeFilterSection();
+                return;
+            }
+
             createFilterSection();
 
             populateFilters();
@@ -4674,6 +4965,10 @@
        ============================================================ */
 
     function attachEvents() {
+        if (!isAnalysisPage()) {
+            return;
+        }
+
         const periodSelect =
             document.getElementById(
                 "v51PeriodFilter"
@@ -4750,6 +5045,16 @@
        ============================================================ */
 
     function initV58() {
+        /*
+         * Sur Dashboard / Archives :
+         * aucun élément V5.8 n'est créé.
+         */
+
+        if (!isAnalysisPage()) {
+            removeFilterSection();
+            return;
+        }
+
         initializeCalendarDate();
 
         createFilterSection();
