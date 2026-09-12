@@ -74,27 +74,48 @@
 
 
         /* =========================================================
-           SECTIONS
+           SYSTÈME STRICT DES 4 VUES
            ========================================================= */
 
         .page-section {
-            display: none;
+            display: none !important;
         }
 
         body[data-page="dashboard"] .dashboard-section {
-            display: block;
+            display: block !important;
         }
 
         body[data-page="analysis"] .analysis-section {
-            display: block;
+            display: block !important;
         }
 
         body[data-page="performance"] .performance-section {
-            display: block;
+            display: block !important;
         }
 
         body[data-page="archives"] .archives-section {
-            display: block;
+            display: block !important;
+        }
+
+
+        /* =========================================================
+           TITRES DE PAGE
+           ========================================================= */
+
+        body[data-page="dashboard"] .dashboard-page-title {
+            display: block !important;
+        }
+
+        body[data-page="analysis"] .analysis-page-title {
+            display: block !important;
+        }
+
+        body[data-page="performance"] .performance-page-title {
+            display: block !important;
+        }
+
+        body[data-page="archives"] .archives-page-title {
+            display: block !important;
         }
 
 
@@ -103,7 +124,7 @@
            ========================================================= */
 
         #v51FilterCard {
-            display: none;
+            display: none !important;
         }
 
         body[data-page="analysis"] #v51FilterCard {
@@ -183,10 +204,9 @@
      INITIALISATION DE LA PAGE
      
      IMPORTANT :
-     Cette partie doit être exécutée AVANT app.js.
-
-     Elle ne supprime aucune donnée.
-     Elle ne modifie aucun localStorage.
+     La page est déterminée AVANT le chargement de app.js.
+     
+     Aucune donnée localStorage n'est supprimée ou modifiée.
      ========================================================= -->
 
 <script>
@@ -226,6 +246,10 @@
 </script>
 
 
+<!-- =========================================================
+     HEADER GLOBAL
+     ========================================================= -->
+
 <header class="topbar">
 
     <div>
@@ -244,6 +268,7 @@
     <button
         id="themeToggle"
         class="theme-btn"
+        type="button"
     >
         🌙
     </button>
@@ -255,7 +280,7 @@
 
 
     <!-- =========================================================
-         NAVIGATION
+         NAVIGATION GLOBALE
          ========================================================= -->
 
     <nav
@@ -298,12 +323,31 @@
 
 
     <!-- =========================================================
+         TITRE DASHBOARD
+         ========================================================= -->
+
+    <section
+        class="page-title dashboard-page-title page-section dashboard-section"
+    >
+
+        <h2>
+            🏠 Dashboard
+        </h2>
+
+        <p>
+            Vue générale de votre capital et de vos trades.
+        </p>
+
+    </section>
+
+
+    <!-- =========================================================
          TITRE ANALYSES
          ========================================================= -->
 
     <section
         id="analysisPageHeader"
-        class="page-title analysis-section"
+        class="page-title analysis-page-title page-section analysis-section"
     >
 
         <h2>
@@ -324,7 +368,7 @@
 
     <section
         id="performancePageHeader"
-        class="page-title performance-section"
+        class="page-title performance-page-title page-section performance-section"
     >
 
         <h2>
@@ -332,8 +376,8 @@
         </h2>
 
         <p>
-            Comparez les performances
-            de vos setups et de vos actifs.
+            Comparez les performances de vos setups
+            et de vos actifs.
         </p>
 
     </section>
@@ -345,7 +389,7 @@
 
     <section
         id="archivesPageHeader"
-        class="page-title archives-section"
+        class="page-title archives-page-title page-section archives-section"
     >
 
         <h2>
@@ -360,11 +404,15 @@
 
 
     <!-- =========================================================
-         CAPITAL ACTIF
+         ==================== DASHBOARD ==========================
          ========================================================= -->
 
+
+    <!-- CAPITAL ACTIF -->
+
     <section
-        class="card dashboard-section"
+        id="dashboardCapitalCard"
+        class="card page-section dashboard-section"
     >
 
         <div class="section-header">
@@ -387,6 +435,7 @@
                 <button
                     id="changeCapitalBtn"
                     class="secondary-btn"
+                    type="button"
                 >
                     Modifier
                 </button>
@@ -395,6 +444,7 @@
                 <button
                     id="archiveCapitalBtn"
                     class="warning-btn"
+                    type="button"
                 >
                     Archiver
                 </button>
@@ -403,6 +453,7 @@
                 <button
                     id="newCapitalBtn"
                     class="primary-btn"
+                    type="button"
                 >
                     Nouveau capital
                 </button>
@@ -458,12 +509,11 @@
     </section>
 
 
-    <!-- =========================================================
-         GRAPHIQUE CAPITAL
-         ========================================================= -->
+    <!-- ÉVOLUTION CAPITAL -->
 
     <section
-        class="card chart-card dashboard-section"
+        id="capitalChartCard"
+        class="card chart-card page-section dashboard-section"
     >
 
         <div class="section-header">
@@ -503,13 +553,11 @@
     </section>
 
 
-    <!-- =========================================================
-         PERFORMANCE GENERALE
-         ========================================================= -->
+    <!-- PERFORMANCE RAPIDE -->
 
     <section
         id="performanceSummaryCard"
-        class="card dashboard-section"
+        class="card page-section dashboard-section"
     >
 
         <div class="section-header">
@@ -535,6 +583,7 @@
             <button
                 class="period-btn active"
                 data-period="today"
+                type="button"
             >
                 Aujourd'hui
             </button>
@@ -543,6 +592,7 @@
             <button
                 class="period-btn"
                 data-period="week"
+                type="button"
             >
                 Cette semaine
             </button>
@@ -551,6 +601,7 @@
             <button
                 class="period-btn"
                 data-period="month"
+                type="button"
             >
                 Ce mois
             </button>
@@ -559,6 +610,7 @@
             <button
                 class="period-btn"
                 data-period="year"
+                type="button"
             >
                 Cette année
             </button>
@@ -567,6 +619,7 @@
             <button
                 class="period-btn"
                 data-period="all"
+                type="button"
             >
                 Tout l'historique
             </button>
@@ -659,12 +712,11 @@
     </section>
 
 
-    <!-- =========================================================
-         AJOUTER UN TRADE
-         ========================================================= -->
+    <!-- AJOUTER UN TRADE -->
 
     <section
-        class="card dashboard-section"
+        id="addTradeCard"
+        class="card page-section dashboard-section"
     >
 
         <button
@@ -684,13 +736,186 @@
     </section>
 
 
+    <!-- HISTORIQUE -->
+
+    <section
+        id="historyCard"
+        class="card page-section dashboard-section"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    📜 Historique des trades
+                </h2>
+
+                <p>
+                    Tous les trades du capital actif
+                </p>
+
+            </div>
+
+
+            <button
+                id="clearBtn"
+                class="danger-btn"
+                type="button"
+            >
+                Effacer les trades
+            </button>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+
+                        <th>Actif</th>
+
+                        <th>Position</th>
+
+                        <th>Lot</th>
+
+                        <th>Entry</th>
+
+                        <th>SL</th>
+
+                        <th>TP</th>
+
+                        <th>RR</th>
+
+                        <th>Setup</th>
+
+                        <th>Résultat</th>
+
+                        <th>P/L</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="historyBody"
+                ></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+
     <!-- =========================================================
-         PERFORMANCE SETUPS
+         ================= ANALYSES & RISQUE =====================
          ========================================================= -->
+
+
+    <!-- SUPPORT / FILTRES -->
+
+    <section
+        id="analysisSupportCard"
+        class="card page-section analysis-section"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    🔎 Analyse filtrée
+                </h2>
+
+                <p>
+                    Analyse selon la période,
+                    l'actif et le setup.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="period-buttons">
+
+            <button
+                class="period-btn active"
+                data-period="today"
+                type="button"
+            >
+                Aujourd'hui
+            </button>
+
+
+            <button
+                class="period-btn"
+                data-period="week"
+                type="button"
+            >
+                Cette semaine
+            </button>
+
+
+            <button
+                class="period-btn"
+                data-period="month"
+                type="button"
+            >
+                Ce mois
+            </button>
+
+
+            <button
+                class="period-btn"
+                data-period="year"
+                type="button"
+            >
+                Cette année
+            </button>
+
+
+            <button
+                class="period-btn"
+                data-period="all"
+                type="button"
+            >
+                Tout l'historique
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!--
+        IMPORTANT :
+        v51-filters.js peut créer/remplir #v51FilterCard.
+        Ce conteneur reste exclusivement lié à la page Analyse.
+    -->
+
+
+    <!-- =========================================================
+         ==================== PERFORMANCES ========================
+         ========================================================= -->
+
+
+    <!-- PERFORMANCE DES SETUPS -->
 
     <section
         id="setupPerformanceCard"
-        class="card performance-section"
+        class="card page-section performance-section"
     >
 
         <div class="section-header">
@@ -754,13 +979,11 @@
     </section>
 
 
-    <!-- =========================================================
-         PERFORMANCE ACTIFS
-         ========================================================= -->
+    <!-- PERFORMANCE DES ACTIFS -->
 
     <section
         id="assetPerformanceCard"
-        class="card performance-section"
+        class="card page-section performance-section"
     >
 
         <div class="section-header">
@@ -788,45 +1011,25 @@
 
                     <tr>
 
-                        <th>
-                            Actif
-                        </th>
+                        <th>Actif</th>
 
-                        <th>
-                            Trades
-                        </th>
+                        <th>Trades</th>
 
-                        <th>
-                            Gagnants
-                        </th>
+                        <th>Gagnants</th>
 
-                        <th>
-                            Perdants
-                        </th>
+                        <th>Perdants</th>
 
-                        <th>
-                            BE
-                        </th>
+                        <th>BE</th>
 
-                        <th>
-                            Winrate
-                        </th>
+                        <th>Winrate</th>
 
-                        <th>
-                            Profit
-                        </th>
+                        <th>Profit</th>
 
-                        <th>
-                            RR moyen
-                        </th>
+                        <th>RR moyen</th>
 
-                        <th>
-                            Meilleur
-                        </th>
+                        <th>Meilleur</th>
 
-                        <th>
-                            Pire
-                        </th>
+                        <th>Pire</th>
 
                     </tr>
 
@@ -844,119 +1047,15 @@
     </section>
 
 
-    <!-- =========================================================
-         HISTORIQUE
-         ========================================================= -->
-
-    <section
-        id="historyCard"
-        class="card dashboard-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    📜 Historique des trades
-                </h2>
-
-                <p>
-                    Tous les trades du capital actif
-                </p>
-
-            </div>
-
-
-            <button
-                id="clearBtn"
-                class="danger-btn"
-            >
-                Effacer les trades
-            </button>
-
-        </div>
-
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Date
-                        </th>
-
-                        <th>
-                            Actif
-                        </th>
-
-                        <th>
-                            Position
-                        </th>
-
-                        <th>
-                            Lot
-                        </th>
-
-                        <th>
-                            Entry
-                        </th>
-
-                        <th>
-                            SL
-                        </th>
-
-                        <th>
-                            TP
-                        </th>
-
-                        <th>
-                            RR
-                        </th>
-
-                        <th>
-                            Setup
-                        </th>
-
-                        <th>
-                            Résultat
-                        </th>
-
-                        <th>
-                            P/L
-                        </th>
-
-                        <th>
-                            Action
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody
-                    id="historyBody"
-                ></tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
 
     <!-- =========================================================
-         ARCHIVES
+         ====================== ARCHIVES ==========================
          ========================================================= -->
+
 
     <section
         id="archivesCard"
-        class="card archives-section"
+        class="card page-section archives-section"
     >
 
         <div class="section-header">
@@ -968,7 +1067,7 @@
                 </h2>
 
                 <p>
-                    Historique indépendant de chaque capital
+                    Historique indépendant de chaque capital.
                 </p>
 
             </div>
@@ -984,78 +1083,8 @@
     </section>
 
 
-    <!-- =========================================================
-         SUPPORT V51 / V5.8
-         ========================================================= -->
-
-    <section
-        class="card analysis-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    📊 Analyse filtrée
-                </h2>
-
-                <p>
-                    Analyse avancée V5.8.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="period-buttons">
-
-            <button
-                class="period-btn active"
-                data-period="today"
-            >
-                Aujourd'hui
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="week"
-            >
-                Cette semaine
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="month"
-            >
-                Ce mois
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="year"
-            >
-                Cette année
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="all"
-            >
-                Tout l'historique
-            </button>
-
-        </div>
-
-    </section>
-
-
 </main>
+
 
 
 <!-- =========================================================
@@ -1432,6 +1461,7 @@
 </div>
 
 
+
 <!-- =========================================================
      MODALE CAPITAL
      ========================================================= -->
@@ -1587,6 +1617,7 @@
 </div>
 
 
+
 <!-- =========================================================
      MODALE GRAPHIQUE ARCHIVE
      ========================================================= -->
@@ -1687,18 +1718,25 @@
 </div>
 
 
+
 <!-- =========================================================
      APP.JS
+     
+     NE PAS MODIFIER
      ========================================================= -->
 
 <script src="app.js"></script>
 
 
+
 <!-- =========================================================
-     V5.8
+     V5.8 / V51
+     
+     NE PAS MODIFIER
      ========================================================= -->
 
 <script src="v51-filters.js"></script>
+
 
 
 <!-- =========================================================
@@ -1751,6 +1789,7 @@
 })();
 
 </script>
+
 
 
 <!-- =========================================================
