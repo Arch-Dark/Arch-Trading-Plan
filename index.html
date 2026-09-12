@@ -17,10 +17,547 @@
         href="style.css"
     >
 
+
+    <!-- ======================================================
+         STYLE SPECIFIQUE AJOUT TRADE
+         ====================================================== -->
+
+    <style>
+
+        /* =====================================================
+           BOUTON / CARTE AJOUT TRADE
+           ===================================================== */
+
+        .trade-launcher {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 22px 0;
+        }
+
+
+        .add-trade-main-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            min-width: 205px;
+            height: 52px;
+
+            padding: 0 24px;
+
+            border: none;
+            border-radius: 14px;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            color: #ffffff;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb 0%,
+                    #4f46e5 100%
+                );
+
+            box-shadow:
+                0 8px 24px
+                rgba(37, 99, 235, 0.28);
+
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.18s ease,
+                filter 0.18s ease;
+        }
+
+
+        .add-trade-main-btn:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 12px 30px
+                rgba(37, 99, 235, 0.38);
+
+            filter:
+                brightness(1.06);
+        }
+
+
+        .add-trade-main-btn:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        .add-trade-main-btn .trade-icon {
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 28px;
+            height: 28px;
+
+            border-radius: 9px;
+
+            font-size: 20px;
+
+            background:
+                rgba(255, 255, 255, 0.16);
+        }
+
+
+        .trade-launcher-subtitle {
+
+            margin-top: 8px;
+
+            font-size: 12px;
+
+            text-align: center;
+
+            color: #64748b;
+        }
+
+
+        /* =====================================================
+           MODAL AJOUT TRADE
+           ===================================================== */
+
+        #tradeModal {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 9999;
+
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+
+            background:
+                rgba(15, 23, 42, 0.68);
+
+            backdrop-filter:
+                blur(6px);
+
+            -webkit-backdrop-filter:
+                blur(6px);
+        }
+
+
+        #tradeModal.show {
+
+            display: flex;
+        }
+
+
+        .trade-modal-content {
+
+            width:
+                min(980px, 100%);
+
+            max-height:
+                calc(100vh - 40px);
+
+            overflow-y:
+                auto;
+
+            position: relative;
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 25px 70px
+                rgba(15, 23, 42, 0.38);
+
+            animation:
+                tradeModalIn
+                0.18s ease-out;
+        }
+
+
+        @keyframes tradeModalIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(12px)
+                    scale(0.985);
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+        }
+
+
+        .trade-modal-header {
+
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding: 22px 24px;
+
+            border-bottom:
+                1px solid
+                rgba(148, 163, 184, 0.18);
+        }
+
+
+        .trade-modal-title-area h2 {
+
+            margin:
+                0 0 5px 0;
+        }
+
+
+        .trade-modal-title-area p {
+
+            margin:
+                0;
+
+            font-size:
+                13px;
+
+            color:
+                #64748b;
+        }
+
+
+        .trade-modal-close {
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 40px;
+            height: 40px;
+
+            flex: 0 0 40px;
+
+            border: none;
+
+            border-radius: 11px;
+
+            background:
+                rgba(148, 163, 184, 0.12);
+
+            color:
+                #64748b;
+
+            font-size:
+                18px;
+
+            cursor:
+                pointer;
+
+            transition:
+                background 0.18s ease,
+                color 0.18s ease,
+                transform 0.18s ease;
+        }
+
+
+        .trade-modal-close:hover {
+
+            background:
+                rgba(220, 38, 38, 0.12);
+
+            color:
+                #dc2626;
+
+            transform:
+                rotate(3deg);
+        }
+
+
+        .trade-modal-body {
+
+            padding:
+                24px;
+        }
+
+
+        .trade-modal-section-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            margin:
+                0 0 16px 0;
+
+            font-size:
+                14px;
+
+            font-weight:
+                700;
+
+            color:
+                #334155;
+        }
+
+
+        .trade-modal-section-title .section-dot {
+
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background:
+                #2563eb;
+        }
+
+
+        .trade-modal-body .form-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 16px;
+        }
+
+
+        .trade-modal-body .form-full {
+
+            margin-top:
+                16px;
+        }
+
+
+        .trade-modal-body label {
+
+            display: block;
+
+            margin-bottom:
+                7px;
+
+            font-size:
+                13px;
+
+            font-weight:
+                600;
+        }
+
+
+        .trade-modal-body input,
+        .trade-modal-body select,
+        .trade-modal-body textarea {
+
+            width:
+                100%;
+
+            box-sizing:
+                border-box;
+        }
+
+
+        .trade-mm-box {
+
+            margin-top:
+                18px;
+
+            padding:
+                14px 16px;
+
+            border-radius:
+                13px;
+
+            border:
+                1px solid
+                rgba(37, 99, 235, 0.14);
+
+            background:
+                rgba(37, 99, 235, 0.06);
+
+            font-size:
+                13px;
+
+            line-height:
+                1.55;
+        }
+
+
+        .trade-modal-footer {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            padding:
+                18px 24px 22px;
+
+            border-top:
+                1px solid
+                rgba(148, 163, 184, 0.18);
+        }
+
+
+        .trade-modal-footer .cancel-trade-btn {
+
+            min-width:
+                120px;
+        }
+
+
+        .trade-modal-footer .save-trade-btn {
+
+            min-width:
+                180px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .trade-modal-body .form-grid {
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+
+        @media (max-width: 620px) {
+
+            .trade-launcher {
+
+                margin:
+                    18px 0;
+            }
+
+
+            .add-trade-main-btn {
+
+                min-width:
+                    190px;
+
+                height:
+                    50px;
+
+                padding:
+                    0 20px;
+            }
+
+
+            #tradeModal {
+
+                padding:
+                    10px;
+            }
+
+
+            .trade-modal-content {
+
+                max-height:
+                    calc(100vh - 20px);
+
+                border-radius:
+                    16px;
+            }
+
+
+            .trade-modal-header {
+
+                padding:
+                    18px;
+            }
+
+
+            .trade-modal-body {
+
+                padding:
+                    18px;
+            }
+
+
+            .trade-modal-body .form-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .trade-modal-footer {
+
+                flex-direction:
+                    column-reverse;
+
+                padding:
+                    16px 18px 18px;
+            }
+
+
+            .trade-modal-footer button {
+
+                width:
+                    100%;
+            }
+        }
+
+
+        /* =====================================================
+           THEME CLAIRE
+           ===================================================== */
+
+        body.light-theme
+        .trade-modal-title-area p,
+        body.light-theme
+        .trade-launcher-subtitle {
+
+            color:
+                #64748b;
+        }
+
+
+        body.light-theme
+        .trade-modal-section-title {
+
+            color:
+                #334155;
+        }
+
+    </style>
+
 </head>
 
 
 <body>
+
 
 <header class="topbar">
 
@@ -36,6 +573,7 @@
 
     </div>
 
+
     <button
         id="themeToggle"
         class="theme-btn"
@@ -45,6 +583,7 @@
     </button>
 
 </header>
+
 
 
 <main class="container">
@@ -194,6 +733,41 @@
 
 
     <!-- ======================================================
+         BOUTON AJOUT TRADE
+    ======================================================= -->
+
+    <section class="trade-launcher">
+
+        <div>
+
+            <button
+                id="openTradeModalBtn"
+                class="add-trade-main-btn"
+                type="button"
+            >
+
+                <span class="trade-icon">
+                    ＋
+                </span>
+
+                <span>
+                    Ajouter un trade
+                </span>
+
+            </button>
+
+
+            <div class="trade-launcher-subtitle">
+                Enregistrer rapidement un nouveau trade
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ======================================================
          GRAPHIQUE CAPITAL
     ======================================================= -->
 
@@ -309,6 +883,7 @@
 
 
         <div class="stats-grid">
+
 
             <div class="stat-box">
 
@@ -518,413 +1093,6 @@
             </div>
 
         </div>
-
-    </section>
-
-
-
-    <!-- ======================================================
-         AJOUT TRADE
-    ======================================================= -->
-
-    <section class="card">
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    ➕ Ajouter un trade
-                </h2>
-
-                <p>
-                    Enregistrez votre trade manuellement
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <form id="tradeForm">
-
-            <div class="form-grid">
-
-
-                <!-- ACTIF -->
-
-                <div>
-
-                    <label for="asset">
-                        Actif
-                    </label>
-
-                    <input
-                        type="text"
-                        id="asset"
-                        list="assetList"
-                        placeholder="XAUUSD"
-                        required
-                    >
-
-
-                    <datalist id="assetList">
-
-                        <option value="EUR/USD"></option>
-                        <option value="GBP/USD"></option>
-                        <option value="AUD/USD"></option>
-                        <option value="NZD/USD"></option>
-                        <option value="USD/CAD"></option>
-                        <option value="USD/CHF"></option>
-                        <option value="USD/JPY"></option>
-                        <option value="XAUUSD"></option>
-                        <option value="BTCUSD"></option>
-
-                    </datalist>
-
-                </div>
-
-
-
-                <!-- DATE -->
-
-                <div>
-
-                    <label for="date">
-                        Date
-                    </label>
-
-                    <input
-                        type="date"
-                        id="date"
-                        required
-                    >
-
-                </div>
-
-
-
-                <!-- POSITION -->
-
-                <div>
-
-                    <label for="direction">
-                        Position
-                    </label>
-
-                    <select
-                        id="direction"
-                        required
-                    >
-
-                        <option value="BUY">
-                            Buy
-                        </option>
-
-                        <option value="SELL">
-                            Sell
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- TYPE ORDRE -->
-
-                <div>
-
-                    <label for="orderType">
-                        Type d'ordre
-                    </label>
-
-                    <select
-                        id="orderType"
-                        required
-                    >
-
-                        <option value="Market">
-                            Immediat
-                        </option>
-
-                        <option value="Buy Limit">
-                            Buy Limit
-                        </option>
-
-                        <option value="Sell Limit">
-                            Sell Limit
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- LOT -->
-
-                <div>
-
-                    <label for="lot">
-                        Lot
-                    </label>
-
-                    <input
-                        type="number"
-                        id="lot"
-                        step="0.01"
-                        min="0.01"
-                        placeholder="0.01"
-                        readonly
-                        required
-                    >
-
-                </div>
-
-
-
-                <!-- ENTRY -->
-
-                <div>
-
-                    <label for="entry">
-                        Entry
-                    </label>
-
-                    <input
-                        type="number"
-                        id="entry"
-                        step="any"
-                        placeholder="4450.00"
-                        required
-                    >
-
-                </div>
-
-
-
-                <!-- SL -->
-
-                <div>
-
-                    <label for="sl">
-                        Stop Loss
-                    </label>
-
-                    <input
-                        type="number"
-                        id="sl"
-                        step="any"
-                        placeholder="4445.00"
-                        required
-                    >
-
-                </div>
-
-
-
-                <!-- TP -->
-
-                <div>
-
-                    <label for="tp">
-                        Take Profit
-                    </label>
-
-                    <input
-                        type="number"
-                        id="tp"
-                        step="any"
-                        placeholder="4460.00"
-                        readonly
-                    >
-
-                </div>
-
-
-
-                <!-- RR -->
-
-                <div>
-
-                    <label for="calculatedRR">
-                        RR
-                    </label>
-
-                    <input
-                        type="text"
-                        id="calculatedRR"
-                        value="0.00"
-                        readonly
-                    >
-
-                </div>
-
-
-
-                <!-- RESULTAT -->
-
-                <div>
-
-                    <label for="result">
-                        Résultat
-                    </label>
-
-                    <select
-                        id="result"
-                        required
-                    >
-
-                        <option value="TP">
-                            TP
-                        </option>
-
-                        <option value="SL">
-                            SL
-                        </option>
-
-                        <option value="BE">
-                            BE
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- SETUP -->
-
-                <div>
-
-                    <label for="setup">
-                        Setup
-                    </label>
-
-                    <select
-                        id="setup"
-                        required
-                    >
-
-                        <option value="LDP+QML">
-                            LDP+QML
-                        </option>
-
-                        <option value="LDP+FIBO 50">
-                            LDP+FIBO 50
-                        </option>
-
-                        <option value="OB">
-                            OB
-                        </option>
-
-                        <option value="BB">
-                            BB
-                        </option>
-
-                        <option value="ZS OA">
-                            ZS OA
-                        </option>
-
-                        <option value="SSM1">
-                            SSM1
-                        </option>
-
-                        <option value="SSM2">
-                            SSM2
-                        </option>
-
-                        <option value="SSM3">
-                            SSM3
-                        </option>
-
-                        <option value="SBM1">
-                            SBM1
-                        </option>
-
-                        <option value="SBM2">
-                            SBM2
-                        </option>
-
-                        <option value="SBM3">
-                            SBM3
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- P/L -->
-
-                <div>
-
-                    <label
-                        for="profit"
-                        id="profitLabel"
-                    >
-                        P/L automatique
-                    </label>
-
-                    <input
-                        type="number"
-                        step="any"
-                        id="profit"
-                        placeholder="Calculé automatiquement"
-                        readonly
-                        required
-                    >
-
-                </div>
-
-
-            </div>
-
-
-
-            <!-- INFO MONEY MANAGEMENT -->
-
-            <div
-                id="tradeMMInfo"
-                class="form-full"
-            ></div>
-
-
-
-            <!-- COMMENTAIRE -->
-
-            <div class="form-full">
-
-                <label for="comment">
-                    Commentaire
-                </label>
-
-                <textarea
-                    id="comment"
-                    rows="3"
-                    placeholder="Commentaire sur le trade..."
-                ></textarea>
-
-            </div>
-
-
-
-            <!-- ACTION -->
-
-            <div class="form-actions">
-
-                <button
-                    type="submit"
-                    class="primary-btn"
-                >
-                    Enregistrer le trade
-                </button>
-
-            </div>
-
-        </form>
 
     </section>
 
@@ -1232,6 +1400,471 @@
 
 
 <!-- ==========================================================
+     MODAL AJOUT TRADE
+=========================================================== -->
+
+<div
+    id="tradeModal"
+    class="trade-modal"
+    aria-hidden="true"
+>
+
+    <div
+        class="trade-modal-content card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tradeModalTitle"
+    >
+
+
+        <!-- HEADER -->
+
+        <div class="trade-modal-header">
+
+            <div class="trade-modal-title-area">
+
+                <h2 id="tradeModalTitle">
+                    ➕ Ajouter un trade
+                </h2>
+
+                <p>
+                    Enregistrez votre trade manuellement
+                </p>
+
+            </div>
+
+
+            <button
+                id="closeTradeModalBtn"
+                class="trade-modal-close"
+                type="button"
+                aria-label="Fermer"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+
+        <!-- FORMULAIRE -->
+
+        <form id="tradeForm">
+
+
+            <div class="trade-modal-body">
+
+
+                <!-- SECTION INFORMATIONS -->
+
+                <div class="trade-modal-section-title">
+
+                    <span class="section-dot"></span>
+
+                    Informations du trade
+
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <!-- ACTIF -->
+
+                    <div>
+
+                        <label for="asset">
+                            Actif
+                        </label>
+
+                        <input
+                            type="text"
+                            id="asset"
+                            list="assetList"
+                            placeholder="XAUUSD"
+                            required
+                        >
+
+
+                        <datalist id="assetList">
+
+                            <option value="EUR/USD"></option>
+                            <option value="GBP/USD"></option>
+                            <option value="AUD/USD"></option>
+                            <option value="NZD/USD"></option>
+                            <option value="USD/CAD"></option>
+                            <option value="USD/CHF"></option>
+                            <option value="USD/JPY"></option>
+                            <option value="XAUUSD"></option>
+                            <option value="BTCUSD"></option>
+
+                        </datalist>
+
+                    </div>
+
+
+
+                    <!-- DATE -->
+
+                    <div>
+
+                        <label for="date">
+                            Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="date"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- POSITION -->
+
+                    <div>
+
+                        <label for="direction">
+                            Position
+                        </label>
+
+                        <select
+                            id="direction"
+                            required
+                        >
+
+                            <option value="BUY">
+                                Buy
+                            </option>
+
+                            <option value="SELL">
+                                Sell
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- TYPE ORDRE -->
+
+                    <div>
+
+                        <label for="orderType">
+                            Type d'ordre
+                        </label>
+
+                        <select
+                            id="orderType"
+                            required
+                        >
+
+                            <option value="Market">
+                                Immediat
+                            </option>
+
+                            <option value="Buy Limit">
+                                Buy Limit
+                            </option>
+
+                            <option value="Sell Limit">
+                                Sell Limit
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- LOT -->
+
+                    <div>
+
+                        <label for="lot">
+                            Lot
+                        </label>
+
+                        <input
+                            type="number"
+                            id="lot"
+                            step="0.01"
+                            min="0.01"
+                            placeholder="0.01"
+                            readonly
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- ENTRY -->
+
+                    <div>
+
+                        <label for="entry">
+                            Entry
+                        </label>
+
+                        <input
+                            type="number"
+                            id="entry"
+                            step="any"
+                            placeholder="4450.00"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- SL -->
+
+                    <div>
+
+                        <label for="sl">
+                            Stop Loss
+                        </label>
+
+                        <input
+                            type="number"
+                            id="sl"
+                            step="any"
+                            placeholder="4445.00"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- TP -->
+
+                    <div>
+
+                        <label for="tp">
+                            Take Profit
+                        </label>
+
+                        <input
+                            type="number"
+                            id="tp"
+                            step="any"
+                            placeholder="4460.00"
+                            readonly
+                        >
+
+                    </div>
+
+
+
+                    <!-- RR -->
+
+                    <div>
+
+                        <label for="calculatedRR">
+                            RR
+                        </label>
+
+                        <input
+                            type="text"
+                            id="calculatedRR"
+                            value="0.00"
+                            readonly
+                        >
+
+                    </div>
+
+
+
+                    <!-- RESULTAT -->
+
+                    <div>
+
+                        <label for="result">
+                            Résultat
+                        </label>
+
+                        <select
+                            id="result"
+                            required
+                        >
+
+                            <option value="TP">
+                                TP
+                            </option>
+
+                            <option value="SL">
+                                SL
+                            </option>
+
+                            <option value="BE">
+                                BE
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- SETUP -->
+
+                    <div>
+
+                        <label for="setup">
+                            Setup
+                        </label>
+
+                        <select
+                            id="setup"
+                            required
+                        >
+
+                            <option value="LDP+QML">
+                                LDP+QML
+                            </option>
+
+                            <option value="LDP+FIBO 50">
+                                LDP+FIBO 50
+                            </option>
+
+                            <option value="OB">
+                                OB
+                            </option>
+
+                            <option value="BB">
+                                BB
+                            </option>
+
+                            <option value="ZS OA">
+                                ZS OA
+                            </option>
+
+                            <option value="SSM1">
+                                SSM1
+                            </option>
+
+                            <option value="SSM2">
+                                SSM2
+                            </option>
+
+                            <option value="SSM3">
+                                SSM3
+                            </option>
+
+                            <option value="SBM1">
+                                SBM1
+                            </option>
+
+                            <option value="SBM2">
+                                SBM2
+                            </option>
+
+                            <option value="SBM3">
+                                SBM3
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- P/L -->
+
+                    <div>
+
+                        <label
+                            for="profit"
+                            id="profitLabel"
+                        >
+                            P/L automatique
+                        </label>
+
+                        <input
+                            type="number"
+                            step="any"
+                            id="profit"
+                            placeholder="Calculé automatiquement"
+                            readonly
+                            required
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- INFO MONEY MANAGEMENT -->
+
+                <div
+                    id="tradeMMInfo"
+                    class="trade-mm-box form-full"
+                ></div>
+
+
+
+                <!-- COMMENTAIRE -->
+
+                <div class="form-full">
+
+                    <label for="comment">
+                        Commentaire
+                    </label>
+
+                    <textarea
+                        id="comment"
+                        rows="3"
+                        placeholder="Commentaire sur le trade..."
+                    ></textarea>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- FOOTER -->
+
+            <div class="trade-modal-footer">
+
+                <button
+                    id="cancelTradeModalBtn"
+                    class="secondary-btn cancel-trade-btn"
+                    type="button"
+                >
+                    Annuler
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-btn save-trade-btn"
+                >
+                    💾 Enregistrer le trade
+                </button>
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ==========================================================
      MODAL CAPITAL
 =========================================================== -->
 
@@ -1365,7 +1998,7 @@
 
 
 
-            <!-- PREVIEW MONEY MANAGEMENT -->
+            <!-- PREVIEW -->
 
             <div
                 class="capital-modal-preview"
@@ -1533,6 +2166,312 @@
 <script src="app.js"></script>
 
 <script src="v51-filters.js"></script>
+
+
+
+<!-- ==========================================================
+     SCRIPT MODAL AJOUT TRADE
+=========================================================== -->
+
+<script>
+
+    function openTradeModal() {
+
+        const modal =
+            document.getElementById(
+                "tradeModal"
+            );
+
+
+        if (!modal) {
+            return;
+        }
+
+
+        modal.classList.add(
+            "show"
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+        document.body.classList.add(
+            "trade-modal-open"
+        );
+
+
+        /*
+         * On remet la date actuelle si elle est vide.
+         */
+        const dateInput =
+            document.getElementById(
+                "date"
+            );
+
+
+        if (
+            dateInput &&
+            !dateInput.value &&
+            typeof getTodayDate ===
+                "function"
+        ) {
+
+            dateInput.value =
+                getTodayDate();
+        }
+
+
+        /*
+         * Recalcul immédiat des valeurs
+         * si app.js est déjà initialisé.
+         */
+        if (
+            typeof updateAutomaticTradeValues ===
+            "function"
+        ) {
+
+            updateAutomaticTradeValues();
+        }
+
+
+        setTimeout(
+            () => {
+
+                const assetInput =
+                    document.getElementById(
+                        "asset"
+                    );
+
+
+                if (assetInput) {
+
+                    assetInput.focus();
+                }
+
+            },
+            80
+        );
+    }
+
+
+
+    function closeTradeModal() {
+
+        const modal =
+            document.getElementById(
+                "tradeModal"
+            );
+
+
+        if (!modal) {
+            return;
+        }
+
+
+        modal.classList.remove(
+            "show"
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        document.body.classList.remove(
+            "trade-modal-open"
+        );
+    }
+
+
+
+    const openTradeModalBtn =
+        document.getElementById(
+            "openTradeModalBtn"
+        );
+
+
+    if (openTradeModalBtn) {
+
+        openTradeModalBtn.addEventListener(
+            "click",
+            openTradeModal
+        );
+    }
+
+
+
+    const closeTradeModalBtn =
+        document.getElementById(
+            "closeTradeModalBtn"
+        );
+
+
+    if (closeTradeModalBtn) {
+
+        closeTradeModalBtn.addEventListener(
+            "click",
+            closeTradeModal
+        );
+    }
+
+
+
+    const cancelTradeModalBtn =
+        document.getElementById(
+            "cancelTradeModalBtn"
+        );
+
+
+    if (cancelTradeModalBtn) {
+
+        cancelTradeModalBtn.addEventListener(
+            "click",
+            closeTradeModal
+        );
+    }
+
+
+
+    const tradeModal =
+        document.getElementById(
+            "tradeModal"
+        );
+
+
+    if (tradeModal) {
+
+        tradeModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    tradeModal
+                ) {
+
+                    closeTradeModal();
+                }
+
+            }
+        );
+    }
+
+
+
+    /*
+     * Le formulaire est toujours géré par app.js.
+     *
+     * Ici nous surveillons le stockage après
+     * la soumission. Si le nombre de trades
+     * augmente réellement, la fenêtre se ferme.
+     *
+     * Cela évite de fermer la fenêtre lorsqu'une
+     * validation du trade échoue.
+     */
+
+    const tradeForm =
+        document.getElementById(
+            "tradeForm"
+        );
+
+
+    if (tradeForm) {
+
+        tradeForm.addEventListener(
+            "submit",
+            () => {
+
+                const beforeRaw =
+                    localStorage.getItem(
+                        "tradingTrades"
+                    );
+
+
+                let beforeTrades = [];
+
+
+                try {
+
+                    beforeTrades =
+                        JSON.parse(
+                            beforeRaw
+                        ) || [];
+
+                } catch {
+
+                    beforeTrades = [];
+                }
+
+
+                setTimeout(
+                    () => {
+
+                        const afterRaw =
+                            localStorage.getItem(
+                                "tradingTrades"
+                            );
+
+
+                        let afterTrades =
+                            [];
+
+
+                        try {
+
+                            afterTrades =
+                                JSON.parse(
+                                    afterRaw
+                                ) || [];
+
+                        } catch {
+
+                            afterTrades = [];
+                        }
+
+
+                        if (
+                            afterTrades.length >
+                            beforeTrades.length
+                        ) {
+
+                            closeTradeModal();
+                        }
+
+                    },
+                    80
+                );
+
+            }
+        );
+    }
+
+
+
+    /*
+     * Fermer avec Échap.
+     */
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Escape"
+            ) {
+
+                closeTradeModal();
+            }
+
+        }
+    );
+
+</script>
 
 
 </body>
