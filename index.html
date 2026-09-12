@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
 
 <style>
+
 /* ============================================================
    NAVIGATION MULTI-PAGES
    ============================================================ */
@@ -58,70 +59,12 @@
     opacity: .72;
 }
 
-/* ============================================================
-   DASHBOARD
-   ============================================================ */
-
-body[data-page="dashboard"] #dashboardCapitalCard,
-body[data-page="dashboard"] #dashboardChartCard,
-body[data-page="dashboard"] #performanceSummaryCard,
-body[data-page="dashboard"] #dashboardTradeCard,
-body[data-page="dashboard"] #historyCard {
-    display: block;
-}
 
 /* ============================================================
-   ANALYSES
+   AFFICHAGE DES PAGES
    ============================================================ */
 
-body[data-page="analysis"] #analysisPageHeader {
-    display: block;
-}
-
-body[data-page="analysis"] #v51FilterCard {
-    display: block !important;
-}
-
-body[data-page="analysis"] #performanceSummaryCard {
-    display: none !important;
-}
-
-/* ============================================================
-   PERFORMANCES
-   ============================================================ */
-
-body[data-page="performance"] #performancePageHeader {
-    display: block;
-}
-
-body[data-page="performance"] #setupPerformanceCard,
-body[data-page="performance"] #assetPerformanceCard {
-    display: block;
-}
-
-body[data-page="performance"] #performanceSummaryCard {
-    display: none !important;
-}
-
-/* ============================================================
-   ARCHIVES
-   ============================================================ */
-
-body[data-page="archives"] #archivesPageHeader {
-    display: block;
-}
-
-body[data-page="archives"] #archivesCard {
-    display: block;
-}
-
-body[data-page="archives"] #performanceSummaryCard {
-    display: none !important;
-}
-
-/* ============================================================
-   SECTIONS CACHEES PAR DEFAUT
-   ============================================================ */
+/* Tout est caché par défaut */
 
 #dashboardCapitalCard,
 #dashboardChartCard,
@@ -137,10 +80,70 @@ body[data-page="archives"] #performanceSummaryCard {
     display: none;
 }
 
-/* V51 est créé dynamiquement par v51-filters.js */
+
+/* ---------------- DASHBOARD ---------------- */
+
+body[data-page="dashboard"] #dashboardCapitalCard,
+body[data-page="dashboard"] #dashboardChartCard,
+body[data-page="dashboard"] #performanceSummaryCard,
+body[data-page="dashboard"] #dashboardTradeCard,
+body[data-page="dashboard"] #historyCard {
+    display: block !important;
+}
+
+
+/* ---------------- ANALYSES ---------------- */
+
+body[data-page="analysis"] #analysisPageHeader {
+    display: block !important;
+}
+
+body[data-page="analysis"] #v51FilterCard {
+    display: block !important;
+}
+
+body[data-page="analysis"] #performanceSummaryCard {
+    display: none !important;
+}
+
+
+/* ---------------- PERFORMANCES ---------------- */
+
+body[data-page="performance"] #performancePageHeader {
+    display: block !important;
+}
+
+body[data-page="performance"] #setupPerformanceCard,
+body[data-page="performance"] #assetPerformanceCard {
+    display: block !important;
+}
+
+body[data-page="performance"] #performanceSummaryCard {
+    display: none !important;
+}
+
+
+/* ---------------- ARCHIVES ---------------- */
+
+body[data-page="archives"] #archivesPageHeader {
+    display: block !important;
+}
+
+body[data-page="archives"] #archivesCard {
+    display: block !important;
+}
+
+body[data-page="archives"] #performanceSummaryCard {
+    display: none !important;
+}
+
+
+/* V51 est créé dynamiquement */
+
 #v51FilterCard {
     display: none;
 }
+
 
 /* ============================================================
    BOUTON AJOUT TRADE
@@ -151,7 +154,7 @@ body[data-page="archives"] #performanceSummaryCard {
 }
 
 body[data-page="dashboard"] .trade-launcher-card {
-    display: block;
+    display: block !important;
 }
 
 .trade-launcher {
@@ -179,6 +182,34 @@ body[data-page="dashboard"] .trade-launcher-card {
     font-weight: 500;
 }
 
+
+/* ============================================================
+   ARCHIVES
+   ============================================================ */
+
+#archivesCard {
+    width: 100%;
+}
+
+#archivesList {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.archive-card {
+    width: 100%;
+}
+
+.empty-archives {
+    width: 100%;
+    padding: 30px 20px;
+    text-align: center;
+    opacity: .7;
+}
+
+
 /* ============================================================
    MODAL TRADE
    ============================================================ */
@@ -197,20 +228,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     overflow: auto;
 }
 
-/* ============================================================
-   TABLEAU PERFORMANCE
-   ============================================================ */
-
-#assetPerformanceCard .table-wrapper {
-    overflow-x: auto;
-}
-
-#assetPerformanceCard table {
-    min-width: 900px;
-}
 
 /* ============================================================
-   MOBILE
+   NAVIGATION MOBILE
    ============================================================ */
 
 @media (max-width: 760px) {
@@ -231,14 +251,12 @@ body[data-page="dashboard"] .trade-launcher-card {
         padding-right: 12px;
     }
 }
+
 </style>
 </head>
 
-<body>
 
-<!-- ============================================================
-     HEADER
-     ============================================================ -->
+<body>
 
 <header class="topbar">
 
@@ -299,13 +317,10 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
     <!-- ========================================================
-         TITRE ANALYSES
+         HEADER ANALYSES
          ======================================================== -->
 
-    <div
-        id="analysisPageHeader"
-        class="page-title"
-    >
+    <div id="analysisPageHeader" class="page-title">
 
         <h2>
             📊 Analyses & Risque
@@ -320,13 +335,10 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
     <!-- ========================================================
-         TITRE PERFORMANCES
+         HEADER PERFORMANCES
          ======================================================== -->
 
-    <div
-        id="performancePageHeader"
-        class="page-title"
-    >
+    <div id="performancePageHeader" class="page-title">
 
         <h2>
             🎯 Performances
@@ -341,13 +353,10 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
     <!-- ========================================================
-         TITRE ARCHIVES
+         HEADER ARCHIVES
          ======================================================== -->
 
-    <div
-        id="archivesPageHeader"
-        class="page-title"
-    >
+    <div id="archivesPageHeader" class="page-title">
 
         <h2>
             🗄️ Archives des capitaux
@@ -394,12 +403,14 @@ body[data-page="dashboard"] .trade-launcher-card {
                     Modifier
                 </button>
 
+
                 <button
                     id="archiveCapitalBtn"
                     class="warning-btn"
                 >
                     Archiver
                 </button>
+
 
                 <button
                     id="newCapitalBtn"
@@ -501,7 +512,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
     <!-- ========================================================
-         PERFORMANCE / PERIODES
+         PERFORMANCE SUMMARY
          ======================================================== -->
 
     <section
@@ -973,6 +984,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
     </section>
 
+
 </main>
 
 
@@ -1018,6 +1030,7 @@ body[data-page="dashboard"] .trade-launcher-card {
             <form id="tradeForm">
 
                 <div class="form-grid">
+
 
                     <div>
 
@@ -1344,6 +1357,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                         Enregistrer le trade
                     </button>
 
+
                     <button
                         id="cancelTradeModalBtn"
                         type="button"
@@ -1401,6 +1415,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
         <div class="modal-body">
 
+
             <div>
 
                 <label for="capitalNameInput">
@@ -1448,8 +1463,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                 <small
                     id="capitalAmountHelp"
                     style="display:block;margin-top:6px;opacity:.7;"
-                >
-                </small>
+                ></small>
 
             </div>
 
@@ -1482,14 +1496,12 @@ body[data-page="dashboard"] .trade-launcher-card {
                 <div
                     id="capitalModalRiskPreview"
                     style="margin-bottom:6px;"
-                >
-                </div>
+                ></div>
 
                 <div
                     id="capitalModalRR"
                     style="margin-bottom:6px;"
-                >
-                </div>
+                ></div>
 
                 <strong id="capitalModalObjective">
                 </strong>
@@ -1507,6 +1519,7 @@ body[data-page="dashboard"] .trade-launcher-card {
             >
                 Annuler
             </button>
+
 
             <button
                 id="saveCapitalBtn"
@@ -1532,6 +1545,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 >
 
     <div class="modal-content archive-chart-modal-content">
+
 
         <div class="modal-header">
 
@@ -1559,6 +1573,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
         <div class="archive-chart-info">
+
 
             <div>
 
@@ -1613,18 +1628,18 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
 <!-- ============================================================
-     SCRIPTS PRINCIPAUX
+     SCRIPTS
      ============================================================ -->
 
 <script src="app.js"></script>
 <script src="v51-filters.js"></script>
 
 
-<!-- ============================================================
-     NAVIGATION + MODAL
-     ============================================================ -->
-
 <script>
+
+/* ============================================================
+   GESTION DES PAGES
+   ============================================================ */
 
 (function () {
 
@@ -1666,7 +1681,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
     /* ========================================================
-       OUVERTURE MODAL TRADE
+       MODAL TRADE
        ======================================================== */
 
     function openTradeModal() {
@@ -1676,7 +1691,9 @@ body[data-page="dashboard"] .trade-launcher-card {
                 "tradeModal"
             );
 
-        if (!modal) return;
+        if (!modal) {
+            return;
+        }
 
         modal.classList.add("open");
 
@@ -1690,10 +1707,6 @@ body[data-page="dashboard"] .trade-launcher-card {
     }
 
 
-    /* ========================================================
-       FERMETURE MODAL TRADE
-       ======================================================== */
-
     function closeTradeModal() {
 
         const modal =
@@ -1701,7 +1714,9 @@ body[data-page="dashboard"] .trade-launcher-card {
                 "tradeModal"
             );
 
-        if (!modal) return;
+        if (!modal) {
+            return;
+        }
 
         modal.classList.remove("open");
 
@@ -1715,10 +1730,6 @@ body[data-page="dashboard"] .trade-launcher-card {
     }
 
 
-    /* ========================================================
-       BOUTONS MODAL
-       ======================================================== */
-
     document.addEventListener(
         "click",
         function (event) {
@@ -1728,7 +1739,9 @@ body[data-page="dashboard"] .trade-launcher-card {
                     "#openTradeModalBtn, #closeTradeModalBtn, #cancelTradeModalBtn"
                 );
 
-            if (!target) return;
+            if (!target) {
+                return;
+            }
 
 
             if (
@@ -1748,14 +1761,11 @@ body[data-page="dashboard"] .trade-launcher-card {
     );
 
 
-    /* ========================================================
-       CLICK EXTERIEUR
-       ======================================================== */
-
     const tradeModal =
         document.getElementById(
             "tradeModal"
         );
+
 
     if (tradeModal) {
 
@@ -1778,10 +1788,6 @@ body[data-page="dashboard"] .trade-launcher-card {
     }
 
 
-    /* ========================================================
-       TOUCHE ESCAPE
-       ======================================================== */
-
     document.addEventListener(
         "keydown",
         event => {
@@ -1800,13 +1806,14 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
     /* ========================================================
-       FERMETURE APRES ENREGISTREMENT
+       FERMETURE AUTOMATIQUE DU MODAL APRÈS TRADE
        ======================================================== */
 
     const tradeForm =
         document.getElementById(
             "tradeForm"
         );
+
 
     if (tradeForm) {
 
@@ -1825,403 +1832,118 @@ body[data-page="dashboard"] .trade-launcher-card {
 
     }
 
-})();
 
-</script>
+    /* ========================================================
+       CORRECTION AFFICHAGE ARCHIVES
+       ======================================================== */
 
+    function refreshArchiveView() {
 
-<!-- ============================================================
-     PERFORMANCE PAR ACTIF
-     ------------------------------------------------------------
-     AFFICHAGE UNIQUEMENT.
-     LES CALCULS PRINCIPAUX RESTENT DANS app.js.
-     ============================================================ -->
-
-<script>
-
-(function () {
-
-    function renderAssetPerformanceTable() {
-
-        const tbody =
-            document.getElementById(
-                "assetTableBody"
-            );
-
-        if (!tbody) {
+        if (
+            document.body.dataset.page !==
+            "archives"
+        ) {
             return;
         }
+
+
+        const archivesCard =
+            document.getElementById(
+                "archivesCard"
+            );
+
+        const archivesList =
+            document.getElementById(
+                "archivesList"
+            );
+
+
+        if (!archivesCard || !archivesList) {
+            return;
+        }
+
+
+        /* Force uniquement l'affichage
+           de la page Archives. */
+
+        archivesCard.style.setProperty(
+            "display",
+            "block",
+            "important"
+        );
 
 
         /*
-         * On utilise directement les fonctions
-         * déjà présentes dans app.js.
+         * app.js possède déjà la fonction officielle
+         * renderArchives().
          *
-         * Aucun calcul principal de l'application
-         * n'est modifié.
+         * On la réutilise afin de conserver exactement
+         * le système de calcul et de stockage existant.
          */
 
         if (
-            typeof getCurrentCapitalTrades !==
+            typeof window.renderArchives ===
             "function"
         ) {
-            return;
-        }
 
-        if (
-            typeof filterByPeriod !==
-            "function"
-        ) {
-            return;
-        }
+            try {
 
-        if (
-            typeof calculateProfit !==
-            "function"
-        ) {
-            return;
-        }
+                window.renderArchives();
 
-        if (
-            typeof calculateWinrate !==
-            "function"
-        ) {
-            return;
-        }
+            } catch (error) {
 
-        if (
-            typeof calculateAverageRR !==
-            "function"
-        ) {
-            return;
-        }
-
-        if (
-            typeof money !==
-            "function"
-        ) {
-            return;
-        }
-
-
-        const currentTrades =
-            getCurrentCapitalTrades();
-
-
-        const periodTrades =
-            filterByPeriod(
-                currentTrades
-            );
-
-
-        tbody.innerHTML =
-            "";
-
-
-        /* ====================================================
-           AUCUN TRADE
-           ==================================================== */
-
-        if (
-            !periodTrades.length
-        ) {
-
-            tbody.innerHTML = `
-
-                <tr>
-
-                    <td
-                        colspan="10"
-                        style="
-                            text-align:center;
-                            opacity:.7;
-                            padding:20px;
-                        "
-                    >
-
-                        Aucun trade pour
-                        la période sélectionnée.
-
-                    </td>
-
-                </tr>
-
-            `;
-
-            return;
-
-        }
-
-
-        /* ====================================================
-           GROUPEMENT PAR ACTIF
-           ==================================================== */
-
-        const assetStats = {};
-
-
-        periodTrades.forEach(
-            trade => {
-
-                const asset =
-                    String(
-                        trade.asset || "-"
-                    ).trim() || "-";
-
-
-                if (
-                    !assetStats[asset]
-                ) {
-
-                    assetStats[asset] =
-                        [];
-
-                }
-
-
-                assetStats[asset].push(
-                    trade
+                console.error(
+                    "Erreur affichage archives :",
+                    error
                 );
 
             }
-        );
+
+        }
+
+    }
 
 
-        /* ====================================================
-           AFFICHAGE
-           ==================================================== */
+    /*
+     * app.js initialise ses données sur DOMContentLoaded.
+     * On attend donc que cette initialisation soit terminée.
+     */
 
-        Object
-            .entries(assetStats)
-            .sort(
-                (a, b) =>
-                    a[0].localeCompare(
-                        b[0]
-                    )
-            )
-            .forEach(
-                ([asset, trades]) => {
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
 
-                    const winners =
-                        trades.filter(
-                            trade =>
-                                trade.result ===
-                                "TP"
-                        ).length;
-
-
-                    const losers =
-                        trades.filter(
-                            trade =>
-                                trade.result ===
-                                "SL"
-                        ).length;
-
-
-                    const breakeven =
-                        trades.filter(
-                            trade =>
-                                trade.result ===
-                                "BE"
-                        ).length;
-
-
-                    const winrate =
-                        calculateWinrate(
-                            trades
-                        );
-
-
-                    const profit =
-                        calculateProfit(
-                            trades
-                        );
-
-
-                    const averageRR =
-                        calculateAverageRR(
-                            trades
-                        );
-
-
-                    const pnlValues =
-                        trades
-                            .map(
-                                trade =>
-                                    Number(
-                                        trade.pnl
-                                    )
-                            )
-                            .filter(
-                                value =>
-                                    Number.isFinite(
-                                        value
-                                    )
-                            );
-
-
-                    const best =
-                        pnlValues.length
-                            ? Math.max(
-                                ...pnlValues
-                            )
-                            : 0;
-
-
-                    const worst =
-                        pnlValues.length
-                            ? Math.min(
-                                ...pnlValues
-                            )
-                            : 0;
-
-
-                    const row =
-                        document.createElement(
-                            "tr"
-                        );
-
-
-                    row.innerHTML = `
-
-                        <td>
-                            <strong>
-                                ${escapeHtmlForAssetTable(asset)}
-                            </strong>
-                        </td>
-
-                        <td>
-                            ${trades.length}
-                        </td>
-
-                        <td>
-                            ${winners}
-                        </td>
-
-                        <td>
-                            ${losers}
-                        </td>
-
-                        <td>
-                            ${breakeven}
-                        </td>
-
-                        <td>
-                            ${Number(
-                                winrate
-                            ).toFixed(1)}%
-                        </td>
-
-                        <td>
-                            ${money(
-                                profit
-                            )}
-                        </td>
-
-                        <td>
-                            ${Number(
-                                averageRR
-                            ).toFixed(2)}
-                        </td>
-
-                        <td>
-                            ${money(
-                                best
-                            )}
-                        </td>
-
-                        <td>
-                            ${money(
-                                worst
-                            )}
-                        </td>
-
-                    `;
-
-
-                    tbody.appendChild(
-                        row
-                    );
-
-                }
+            setTimeout(
+                refreshArchiveView,
+                100
             );
 
-    }
+        }
+    );
 
 
-    /* ========================================================
-       SECURITE HTML
-       ======================================================== */
-
-    function escapeHtmlForAssetTable(
-        value
-    ) {
-
-        return String(value)
-
-            .replace(
-                /&/g,
-                "&amp;"
-            )
-
-            .replace(
-                /</g,
-                "&lt;"
-            )
-
-            .replace(
-                />/g,
-                "&gt;"
-            )
-
-            .replace(
-                /"/g,
-                "&quot;"
-            )
-
-            .replace(
-                /'/g,
-                "&#039;"
-            );
-
-    }
-
-
-    /* ========================================================
-       ACTUALISATION
-       ======================================================== */
-
-    function startAssetPerformanceRefresh() {
-
-        renderAssetPerformanceTable();
-
-        setInterval(
-            renderAssetPerformanceTable,
-            1000
-        );
-
-    }
-
+    /*
+     * Petite sécurité supplémentaire lorsque
+     * l'utilisateur revient sur la page Archives.
+     */
 
     if (
-        document.readyState ===
-        "loading"
+        page ===
+        "archives"
     ) {
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            startAssetPerformanceRefresh
+        setTimeout(
+            refreshArchiveView,
+            300
         );
 
-    } else {
-
-        startAssetPerformanceRefresh();
-
     }
+
 
 })();
 
 </script>
+
 
 </body>
 </html>
