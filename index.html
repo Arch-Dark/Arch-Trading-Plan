@@ -161,18 +161,36 @@
 
             <div class="form-grid">
 
+                <!-- ACTIF -->
                 <div>
                     <label for="asset">Actif</label>
+
                     <input
                         type="text"
                         id="asset"
-                        placeholder="XAUUSD"
+                        list="assetList"
+                        placeholder="Ex: XAUUSD"
+                        autocomplete="off"
                         required
                     >
+
+                    <datalist id="assetList">
+                        <option value="EUR/USD">
+                        <option value="GBP/USD">
+                        <option value="AUD/USD">
+                        <option value="NZD/USD">
+                        <option value="USD/CAD">
+                        <option value="USD/CHF">
+                        <option value="USD/JPY">
+                        <option value="XAUUSD">
+                    </datalist>
                 </div>
 
+
+                <!-- DATE -->
                 <div>
                     <label for="date">Date</label>
+
                     <input
                         type="date"
                         id="date"
@@ -180,16 +198,22 @@
                     >
                 </div>
 
+
+                <!-- POSITION -->
                 <div>
                     <label for="direction">Position</label>
+
                     <select id="direction" required>
                         <option value="BUY">Buy</option>
                         <option value="SELL">Sell</option>
                     </select>
                 </div>
 
+
+                <!-- TYPE D'ORDRE -->
                 <div>
                     <label for="orderType">Type d'ordre</label>
+
                     <select id="orderType" required>
                         <option value="Market">Immediat</option>
                         <option value="Buy Limit">Buy Limit</option>
@@ -197,9 +221,11 @@
                     </select>
                 </div>
 
+
                 <!-- LOT -->
                 <div>
                     <label for="lot">Lot</label>
+
                     <input
                         type="number"
                         id="lot"
@@ -210,8 +236,11 @@
                     >
                 </div>
 
+
+                <!-- ENTRY -->
                 <div>
                     <label for="entry">Entry</label>
+
                     <input
                         type="number"
                         step="any"
@@ -221,8 +250,11 @@
                     >
                 </div>
 
+
+                <!-- STOP LOSS -->
                 <div>
                     <label for="sl">Stop Loss</label>
+
                     <input
                         type="number"
                         step="any"
@@ -231,8 +263,11 @@
                     >
                 </div>
 
+
+                <!-- TAKE PROFIT -->
                 <div>
                     <label for="tp">Take Profit</label>
+
                     <input
                         type="number"
                         step="any"
@@ -241,8 +276,11 @@
                     >
                 </div>
 
+
+                <!-- RR -->
                 <div>
                     <label for="calculatedRR">RR</label>
+
                     <input
                         type="text"
                         id="calculatedRR"
@@ -251,8 +289,11 @@
                     >
                 </div>
 
+
+                <!-- RESULTAT -->
                 <div>
                     <label for="result">Résultat</label>
+
                     <select id="result" required>
                         <option value="TP">TP</option>
                         <option value="SL">SL</option>
@@ -260,8 +301,11 @@
                     </select>
                 </div>
 
+
+                <!-- SETUP -->
                 <div>
                     <label for="setup">Setup</label>
+
                     <select id="setup" required>
                         <option value="LDP+QML">LDP+QML</option>
                         <option value="LDP+FIBO 50">LDP+FIBO 50</option>
@@ -277,8 +321,11 @@
                     </select>
                 </div>
 
+
+                <!-- P/L -->
                 <div>
                     <label for="profit">P/L</label>
+
                     <input
                         type="number"
                         step="any"
@@ -290,8 +337,11 @@
 
             </div>
 
+
+            <!-- COMMENTAIRE -->
             <div class="form-full">
                 <label for="comment">Commentaire</label>
+
                 <textarea
                     id="comment"
                     rows="3"
@@ -299,6 +349,8 @@
                 ></textarea>
             </div>
 
+
+            <!-- BOUTON -->
             <div class="form-actions">
                 <button type="submit" class="primary-btn">
                     Enregistrer le trade
@@ -362,6 +414,7 @@
                         <th>SL</th>
                         <th>TP</th>
                         <th>RR</th>
+                        <th>Pips</th>
                         <th>Setup</th>
                         <th>Résultat</th>
                         <th>P/L</th>
