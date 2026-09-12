@@ -44,8 +44,12 @@
                 <h2>💰 Capital actif</h2>
 
                 <p id="activeCapitalName">
-                    Capital 1
+                    Aucun capital actif
                 </p>
+
+                <small id="activeCapitalCreatedAt">
+                    -
+                </small>
 
             </div>
 
@@ -373,7 +377,7 @@
 
                 <p>
                     Le lot, le TP et le P/L sont calculés
-                    automatiquement selon le MM du capital actif.
+                    automatiquement selon le MM du capital.
                 </p>
 
             </div>
@@ -385,14 +389,11 @@
 
             <div class="form-grid">
 
-                <!-- ACTIF -->
-
                 <div>
 
                     <label for="asset">
                         Actif
                     </label>
-
 
                     <input
                         type="text"
@@ -403,25 +404,16 @@
                         required
                     >
 
-
                     <datalist id="assetList">
 
                         <option value="EUR/USD"></option>
-
                         <option value="GBP/USD"></option>
-
                         <option value="AUD/USD"></option>
-
                         <option value="NZD/USD"></option>
-
                         <option value="USD/CAD"></option>
-
                         <option value="USD/CHF"></option>
-
                         <option value="USD/JPY"></option>
-
                         <option value="XAUUSD"></option>
-
                         <option value="BTCUSD"></option>
 
                     </datalist>
@@ -429,14 +421,11 @@
                 </div>
 
 
-                <!-- DATE -->
-
                 <div>
 
                     <label for="date">
                         Date
                     </label>
-
 
                     <input
                         type="date"
@@ -447,14 +436,11 @@
                 </div>
 
 
-                <!-- POSITION -->
-
                 <div>
 
                     <label for="direction">
                         Position
                     </label>
-
 
                     <select
                         id="direction"
@@ -474,14 +460,11 @@
                 </div>
 
 
-                <!-- TYPE ORDRE -->
-
                 <div>
 
                     <label for="orderType">
                         Type d'ordre
                     </label>
-
 
                     <select
                         id="orderType"
@@ -505,14 +488,11 @@
                 </div>
 
 
-                <!-- LOT -->
-
                 <div>
 
                     <label for="lot">
                         Lot automatique
                     </label>
-
 
                     <input
                         type="number"
@@ -527,14 +507,11 @@
                 </div>
 
 
-                <!-- ENTRY -->
-
                 <div>
 
                     <label for="entry">
                         Entry
                     </label>
-
 
                     <input
                         type="number"
@@ -547,14 +524,11 @@
                 </div>
 
 
-                <!-- SL -->
-
                 <div>
 
                     <label for="sl">
                         Stop Loss
                     </label>
-
 
                     <input
                         type="number"
@@ -567,14 +541,11 @@
                 </div>
 
 
-                <!-- TP -->
-
                 <div>
 
                     <label for="tp">
                         Take Profit automatique
                     </label>
-
 
                     <input
                         type="number"
@@ -588,14 +559,11 @@
                 </div>
 
 
-                <!-- RR -->
-
                 <div>
 
                     <label for="calculatedRR">
                         RR
                     </label>
-
 
                     <input
                         type="text"
@@ -604,7 +572,6 @@
                         readonly
                     >
 
-
                     <small>
                         RR minimum : 2.00
                     </small>
@@ -612,14 +579,11 @@
                 </div>
 
 
-                <!-- RESULTAT -->
-
                 <div>
 
                     <label for="result">
                         Résultat
                     </label>
-
 
                     <select
                         id="result"
@@ -643,14 +607,11 @@
                 </div>
 
 
-                <!-- SETUP -->
-
                 <div>
 
                     <label for="setup">
                         Setup
                     </label>
-
 
                     <select
                         id="setup"
@@ -706,14 +667,11 @@
                 </div>
 
 
-                <!-- P/L AUTOMATIQUE -->
-
                 <div>
 
                     <label for="profit">
                         P/L réel
                     </label>
-
 
                     <input
                         type="number"
@@ -724,7 +682,6 @@
                         required
                     >
 
-
                     <small>
                         TP = +Risque réel × RR | SL = −Risque réel | BE = 0
                     </small>
@@ -733,10 +690,6 @@
 
             </div>
 
-
-            <!-- =================================================
-                 INFORMATION MM
-            ================================================== -->
 
             <div
                 id="tradeMMInfo"
@@ -751,14 +704,11 @@
             </div>
 
 
-            <!-- COMMENTAIRE -->
-
             <div class="form-full">
 
                 <label for="comment">
                     Commentaire
                 </label>
-
 
                 <textarea
                     id="comment"
@@ -768,8 +718,6 @@
 
             </div>
 
-
-            <!-- BOUTON -->
 
             <div class="form-actions">
 
@@ -815,21 +763,14 @@
                 <thead>
 
                     <tr>
-
                         <th>Setup</th>
-
                         <th>Trades</th>
-
                         <th>Gagnants</th>
-
                         <th>Winrate</th>
-
                         <th>Profit</th>
-
                     </tr>
 
                 </thead>
-
 
                 <tbody id="setupTableBody">
                 </tbody>
@@ -880,35 +821,22 @@
                     <tr>
 
                         <th>Date</th>
-
                         <th>Actif</th>
-
                         <th>Position</th>
-
                         <th>Lot</th>
-
                         <th>Entry</th>
-
                         <th>SL</th>
-
                         <th>TP</th>
-
                         <th>RR</th>
-
                         <th>Pips</th>
-
                         <th>Setup</th>
-
                         <th>Résultat</th>
-
                         <th>P/L</th>
-
                         <th>Action</th>
 
                     </tr>
 
                 </thead>
-
 
                 <tbody id="historyBody">
                 </tbody>
@@ -933,7 +861,7 @@
                 <h2>🗄️ Archives des capitaux</h2>
 
                 <p>
-                    Historique indépendant de chaque capital
+                    Historique indépendant et chronologique de chaque capital
                 </p>
 
             </div>
@@ -971,7 +899,7 @@
                     Nouveau capital
                 </h2>
 
-                <p>
+                <p id="capitalModalSubtitle">
                     Créer ou modifier un capital et son MM
                 </p>
 
@@ -991,14 +919,11 @@
 
         <div class="modal-body">
 
-            <!-- NOM -->
-
             <div>
 
                 <label for="capitalNameInput">
                     Nom du capital
                 </label>
-
 
                 <input
                     type="text"
@@ -1009,14 +934,11 @@
             </div>
 
 
-            <!-- CAPITAL -->
-
             <div>
 
                 <label for="capitalAmountInput">
                     Capital initial ($)
                 </label>
-
 
                 <input
                     type="number"
@@ -1025,17 +947,18 @@
                     placeholder="100"
                 >
 
+                <small id="capitalAmountHelp">
+                    Capital initial du compte.
+                </small>
+
             </div>
 
-
-            <!-- RISQUE DE REFERENCE -->
 
             <div>
 
                 <label for="capitalRiskInput">
                     Risque de référence ($)
                 </label>
-
 
                 <input
                     type="number"
@@ -1045,22 +968,18 @@
                     placeholder="2.50"
                 >
 
-
                 <small>
-                    Risque cible utilisé pour calculer automatiquement le lot.
+                    Risque de référence utilisé pour calculer automatiquement le lot.
                 </small>
 
             </div>
 
-
-            <!-- RR CIBLE -->
 
             <div>
 
                 <label for="capitalRRInput">
                     RR cible
                 </label>
-
 
                 <input
                     type="number"
@@ -1070,15 +989,12 @@
                     placeholder="2.00"
                 >
 
-
                 <small>
                     RR minimum autorisé : 2.00
                 </small>
 
             </div>
 
-
-            <!-- PREVIEW MM -->
 
             <div
                 style="
@@ -1141,8 +1057,14 @@
                         font-size: 0.9em;
                     "
                 >
+
                     L'objectif théorique = risque de référence × RR.
-                    Le P/L réel sera calculé à partir du risque réel du trade.
+
+                    <br>
+
+                    Le P/L réel dépend du risque réellement pris
+                    par le lot automatique.
+
                 </div>
 
             </div>
