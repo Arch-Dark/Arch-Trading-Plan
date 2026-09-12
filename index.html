@@ -1,80 +1,55 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Trading Dashboard</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link rel="stylesheet" href="style.css">
 
     <style>
-
         /* =========================================================
-           NAVIGATION
+           NAVIGATION GLOBALE
            ========================================================= */
 
         .app-nav {
+            width: 100%;
             display: flex;
-            flex-wrap: wrap;
+            justify-content: center;
             gap: 8px;
-            padding: 12px 0;
-            margin-bottom: 20px;
+            padding: 12px 16px;
+            box-sizing: border-box;
+            flex-wrap: wrap;
         }
 
         .app-nav a {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 10px 14px;
-            border-radius: 10px;
             text-decoration: none;
             color: inherit;
-            font-weight: 700;
+        }
+
+        .app-nav-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
             transition: 0.2s ease;
         }
 
-        .app-nav a:hover {
+        .app-nav-link:hover {
             transform: translateY(-1px);
         }
 
-        .app-nav a.active {
-            background: rgba(59, 130, 246, 0.15);
-            box-shadow:
-                inset 0 0 0 1px
-                rgba(59, 130, 246, 0.30);
+        .app-nav-link.active {
+            font-weight: 700;
         }
-
 
         /* =========================================================
-           TITRES DES PAGES
-           ========================================================= */
-
-        .page-title {
-            margin-bottom: 20px;
-        }
-
-        .page-title h2 {
-            margin: 0 0 5px;
-        }
-
-        .page-title p {
-            margin: 0;
-            opacity: 0.70;
-        }
-
-
-        /* =========================================================
-           SYSTÈME STRICT DES 4 VUES
+           PAGES
            ========================================================= */
 
         .page-section {
@@ -97,223 +72,272 @@
             display: block !important;
         }
 
+        .page-title {
+            margin: 20px 0;
+        }
+
+        .page-title h1 {
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            margin-top: 0;
+            opacity: 0.75;
+        }
 
         /* =========================================================
-           TITRES DE PAGE
+           ANCHOR TECHNIQUE POUR V5.8
+           
+           v51-filters.js cherche :
+           .period-buttons -> closest(.card)
+           
+           puis insère #v51FilterCard après cette card.
+           
+           Cette card est volontairement invisible.
+           Elle sert uniquement de point d'insertion.
            ========================================================= */
 
-        body[data-page="dashboard"] .dashboard-page-title {
-            display: block !important;
-        }
-
-        body[data-page="analysis"] .analysis-page-title {
-            display: block !important;
-        }
-
-        body[data-page="performance"] .performance-page-title {
-            display: block !important;
-        }
-
-        body[data-page="archives"] .archives-page-title {
-            display: block !important;
-        }
-
-
-        /* =========================================================
-           FILTRE V5.8
-           ========================================================= */
-
-        #v51FilterCard {
+        .v51-analysis-anchor {
             display: none !important;
         }
 
-        body[data-page="analysis"] #v51FilterCard {
-            display: block !important;
-        }
-
-
         /* =========================================================
-           BOUTON AJOUT TRADE
+           BOUTON AJOUTER UN TRADE
            ========================================================= */
 
         .trade-launcher {
-            width: 100%;
-            min-height: 90px;
-            border: none;
-            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .trade-launcher button {
             cursor: pointer;
-            padding: 20px;
-            font-size: 1.05rem;
-            font-weight: 800;
         }
-
-        .trade-launcher small {
-            display: block;
-            margin-top: 6px;
-            opacity: 0.70;
-            font-weight: 500;
-        }
-
 
         /* =========================================================
-           MODALE TRADE
+           MODAL TRADE
            ========================================================= */
 
         .trade-modal {
             display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.65);
         }
 
-        .trade-modal.open {
+        .trade-modal.show {
             display: flex;
         }
 
-        .trade-modal .modal-content {
-            width: min(1100px, 96vw);
-            max-height: 92vh;
+        .trade-modal-content {
+            width: min(900px, 100%);
+            max-height: 90vh;
             overflow-y: auto;
+            border-radius: 16px;
+            padding: 24px;
+            box-sizing: border-box;
         }
 
+        .trade-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .trade-modal-close {
+            border: 0;
+            background: transparent;
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+        }
 
         /* =========================================================
-           MOBILE
+           FORMULAIRE TRADE
            ========================================================= */
 
-        @media (max-width: 760px) {
-
-            .app-nav {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .app-nav a {
-                justify-content: center;
-                font-size: 0.90rem;
-            }
-
+        .trade-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
         }
 
+        .trade-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .trade-form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .trade-form-group input,
+        .trade-form-group select,
+        .trade-form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .trade-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        #tradeMMInfo {
+            margin-top: 12px;
+        }
+
+        /* =========================================================
+           MODAL CAPITAL
+           ========================================================= */
+
+        #capitalModal {
+            display: none;
+        }
+
+        #capitalModal.show {
+            display: flex;
+        }
+
+        /* =========================================================
+           MODAL ARCHIVE
+           ========================================================= */
+
+        #archiveChartModal {
+            display: none;
+        }
+
+        #archiveChartModal.show {
+            display: flex;
+        }
+
+        /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+        @media (max-width: 700px) {
+            .app-nav {
+                justify-content: stretch;
+            }
+
+            .app-nav-link {
+                flex: 1 1 45%;
+            }
+
+            .trade-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .trade-form-group.full {
+                grid-column: auto;
+            }
+
+            .trade-modal-content {
+                padding: 16px;
+            }
+        }
     </style>
 
-</head>
+    <!-- =========================================================
+         DÉTERMINATION DE LA PAGE
+         ========================================================= -->
+    <script>
+        (function () {
+            const allowedPages = [
+                "dashboard",
+                "analysis",
+                "performance",
+                "archives"
+            ];
 
+            const params = new URLSearchParams(
+                window.location.search
+            );
+
+            const requestedPage = params.get("page");
+
+            const page = allowedPages.includes(requestedPage)
+                ? requestedPage
+                : "dashboard";
+
+            document.documentElement.dataset.page = page;
+
+            window.addEventListener("DOMContentLoaded", function () {
+                document.body.dataset.page = page;
+            });
+
+            window.__TRADING_DASHBOARD_PAGE__ = page;
+        })();
+    </script>
+</head>
 
 <body>
 
+    <!-- =========================================================
+         TOPBAR GLOBAL
+         ========================================================= -->
 
-<!-- =========================================================
-     INITIALISATION DE LA PAGE
-     
-     IMPORTANT :
-     La page est déterminée AVANT le chargement de app.js.
-     
-     Aucune donnée localStorage n'est supprimée ou modifiée.
-     ========================================================= -->
+    <header class="topbar">
+        <div>
+            <h1>Trading Dashboard</h1>
+            <p>Journal &amp; performance de trading</p>
+        </div>
 
-<script>
-
-(function () {
-
-    const allowedPages = [
-        "dashboard",
-        "analysis",
-        "performance",
-        "archives"
-    ];
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    const requestedPage =
-        params.get("page");
-
-    const page =
-        allowedPages.includes(
-            requestedPage
-        )
-        ? requestedPage
-        : "dashboard";
-
-    document.body.dataset.page =
-        page;
-
-    window.__TRADING_DASHBOARD_PAGE__ =
-        page;
-
-})();
-
-</script>
-
-
-<!-- =========================================================
-     HEADER GLOBAL
-     ========================================================= -->
-
-<header class="topbar">
-
-    <div>
-
-        <h1>
-            Trading Dashboard
-        </h1>
-
-        <p>
-            Journal & performance de trading
-        </p>
-
-    </div>
-
-
-    <button
-        id="themeToggle"
-        class="theme-btn"
-        type="button"
-    >
-        🌙
-    </button>
-
-</header>
-
-
-<main class="container">
+        <button
+            id="themeToggle"
+            type="button"
+            aria-label="Changer le thème"
+        >
+            🌙
+        </button>
+    </header>
 
 
     <!-- =========================================================
          NAVIGATION GLOBALE
          ========================================================= -->
 
-    <nav
-        class="app-nav"
-        aria-label="Navigation principale"
-    >
+    <nav class="app-nav">
 
         <a
             href="index.html?page=dashboard"
+            class="app-nav-link"
             data-page-link="dashboard"
         >
             🏠 Dashboard
         </a>
 
-
         <a
             href="index.html?page=analysis"
+            class="app-nav-link"
             data-page-link="analysis"
         >
-            📊 Analyses & Risque
+            📊 Analyses &amp; Risque
         </a>
-
 
         <a
             href="index.html?page=performance"
+            class="app-nav-link"
             data-page-link="performance"
         >
             🎯 Performances
         </a>
 
-
         <a
             href="index.html?page=archives"
+            class="app-nav-link"
             data-page-link="archives"
         >
             🗄️ Archives
@@ -322,845 +346,535 @@
     </nav>
 
 
-    <!-- =========================================================
-         TITRE DASHBOARD
-         ========================================================= -->
-
-    <section
-        class="page-title dashboard-page-title page-section dashboard-section"
-    >
-
-        <h2>
-            🏠 Dashboard
-        </h2>
-
-        <p>
-            Vue générale de votre capital et de vos trades.
-        </p>
-
-    </section>
-
-
-    <!-- =========================================================
-         TITRE ANALYSES
-         ========================================================= -->
-
-    <section
-        id="analysisPageHeader"
-        class="page-title analysis-page-title page-section analysis-section"
-    >
-
-        <h2>
-            📊 Analyses & Risque
-        </h2>
-
-        <p>
-            Analyse filtrée, risque, régularité,
-            calendrier et recommandations.
-        </p>
-
-    </section>
-
-
-    <!-- =========================================================
-         TITRE PERFORMANCES
-         ========================================================= -->
-
-    <section
-        id="performancePageHeader"
-        class="page-title performance-page-title page-section performance-section"
-    >
-
-        <h2>
-            🎯 Performances
-        </h2>
-
-        <p>
-            Comparez les performances de vos setups
-            et de vos actifs.
-        </p>
-
-    </section>
-
-
-    <!-- =========================================================
-         TITRE ARCHIVES
-         ========================================================= -->
-
-    <section
-        id="archivesPageHeader"
-        class="page-title archives-page-title page-section archives-section"
-    >
-
-        <h2>
-            🗄️ Archives des capitaux
-        </h2>
-
-        <p>
-            Historique indépendant de chaque capital.
-        </p>
-
-    </section>
-
-
-    <!-- =========================================================
-         ==================== DASHBOARD ==========================
-         ========================================================= -->
-
-
-    <!-- CAPITAL ACTIF -->
-
-    <section
-        id="dashboardCapitalCard"
-        class="card page-section dashboard-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    💰 Capital actif
-                </h2>
-
-                <p id="activeCapitalName">
-                    Capital 1
-                </p>
-
-            </div>
-
-
-            <div class="capital-actions">
-
-                <button
-                    id="changeCapitalBtn"
-                    class="secondary-btn"
-                    type="button"
-                >
-                    Modifier
-                </button>
-
-
-                <button
-                    id="archiveCapitalBtn"
-                    class="warning-btn"
-                    type="button"
-                >
-                    Archiver
-                </button>
-
-
-                <button
-                    id="newCapitalBtn"
-                    class="primary-btn"
-                    type="button"
-                >
-                    Nouveau capital
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="capital-summary">
-
-
-            <div class="capital-box">
-
-                <span>
-                    Capital initial
-                </span>
-
-                <strong id="initialCapital">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="capital-box">
-
-                <span>
-                    Solde actuel
-                </span>
-
-                <strong id="currentBalance">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="capital-box">
-
-                <span>
-                    Profit total
-                </span>
-
-                <strong id="totalProfit">
-                    $0.00
-                </strong>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ÉVOLUTION CAPITAL -->
-
-    <section
-        id="capitalChartCard"
-        class="card chart-card page-section dashboard-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    📈 Évolution du capital
-                </h2>
-
-                <p>
-                    Évolution du solde après chaque trade
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="chart-container">
-
-            <canvas
-                id="capitalChart"
-            ></canvas>
-
-
-            <div
-                id="emptyChartMessage"
-                class="empty-chart-message"
-            >
-                Aucun trade enregistré
-                pour afficher le graphique.
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- PERFORMANCE RAPIDE -->
-
-    <section
-        id="performanceSummaryCard"
-        class="card page-section dashboard-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    📊 Performance
-                </h2>
-
-                <p>
-                    Analyse de vos résultats
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="period-buttons">
-
-
-            <button
-                class="period-btn active"
-                data-period="today"
-                type="button"
-            >
-                Aujourd'hui
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="week"
-                type="button"
-            >
-                Cette semaine
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="month"
-                type="button"
-            >
-                Ce mois
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="year"
-                type="button"
-            >
-                Cette année
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="all"
-                type="button"
-            >
-                Tout l'historique
-            </button>
-
-        </div>
-
-
-        <div class="stats-grid">
-
-
-            <div class="stat-box">
-
-                <span>
-                    Capital / Solde
-                </span>
-
-                <strong id="statBalance">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Profit total
-                </span>
-
-                <strong id="statProfit">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Winrate
-                </span>
-
-                <strong id="statWinrate">
-                    0%
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    RR moyen
-                </span>
-
-                <strong id="statAverageRR">
-                    0.00
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Nombre de trades
-                </span>
-
-                <strong id="statTrades">
-                    0
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Meilleur setup
-                </span>
-
-                <strong id="statBestSetup">
-                    -
-                </strong>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- AJOUTER UN TRADE -->
-
-    <section
-        id="addTradeCard"
-        class="card page-section dashboard-section"
-    >
-
-        <button
-            id="openTradeModalBtn"
-            class="trade-launcher primary-btn"
-            type="button"
+    <main>
+
+        <!-- =====================================================
+             =====================================================
+             🏠 DASHBOARD
+             =====================================================
+             ===================================================== -->
+
+        <section
+            class="page-section dashboard-section"
+            data-page-section="dashboard"
         >
 
-            ➕ Ajouter un trade
-
-            <small>
-                Ouvrir le formulaire d'enregistrement
-            </small>
-
-        </button>
-
-    </section>
-
-
-    <!-- HISTORIQUE -->
-
-    <section
-        id="historyCard"
-        class="card page-section dashboard-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    📜 Historique des trades
-                </h2>
-
-                <p>
-                    Tous les trades du capital actif
-                </p>
-
+            <div class="page-title">
+                <h1>🏠 Dashboard</h1>
+                <p>Vue générale de votre activité de trading.</p>
             </div>
 
 
-            <button
-                id="clearBtn"
-                class="danger-btn"
-                type="button"
-            >
-                Effacer les trades
-            </button>
+            <!-- ================= CAPITAL ACTIF ================= -->
 
-        </div>
+            <section class="card">
 
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>Date</th>
-
-                        <th>Actif</th>
-
-                        <th>Position</th>
-
-                        <th>Lot</th>
-
-                        <th>Entry</th>
-
-                        <th>SL</th>
-
-                        <th>TP</th>
-
-                        <th>RR</th>
-
-                        <th>Setup</th>
-
-                        <th>Résultat</th>
-
-                        <th>P/L</th>
-
-                        <th>Action</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody
-                    id="historyBody"
-                ></tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- =========================================================
-         ================= ANALYSES & RISQUE =====================
-         ========================================================= -->
-
-
-    <!-- SUPPORT / FILTRES -->
-
-    <section
-        id="analysisSupportCard"
-        class="card page-section analysis-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    🔎 Analyse filtrée
-                </h2>
-
-                <p>
-                    Analyse selon la période,
-                    l'actif et le setup.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="period-buttons">
-
-            <button
-                class="period-btn active"
-                data-period="today"
-                type="button"
-            >
-                Aujourd'hui
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="week"
-                type="button"
-            >
-                Cette semaine
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="month"
-                type="button"
-            >
-                Ce mois
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="year"
-                type="button"
-            >
-                Cette année
-            </button>
-
-
-            <button
-                class="period-btn"
-                data-period="all"
-                type="button"
-            >
-                Tout l'historique
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!--
-        IMPORTANT :
-        v51-filters.js peut créer/remplir #v51FilterCard.
-        Ce conteneur reste exclusivement lié à la page Analyse.
-    -->
-
-
-    <!-- =========================================================
-         ==================== PERFORMANCES ========================
-         ========================================================= -->
-
-
-    <!-- PERFORMANCE DES SETUPS -->
-
-    <section
-        id="setupPerformanceCard"
-        class="card page-section performance-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    🎯 Performance des setups
-                </h2>
-
-                <p>
-                    Résultats par stratégie
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Setup
-                        </th>
-
-                        <th>
-                            Trades
-                        </th>
-
-                        <th>
-                            Gagnants
-                        </th>
-
-                        <th>
-                            Winrate
-                        </th>
-
-                        <th>
-                            Profit
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody
-                    id="setupTableBody"
-                ></tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-
-    <!-- PERFORMANCE DES ACTIFS -->
-
-    <section
-        id="assetPerformanceCard"
-        class="card page-section performance-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    📈 Performance par actif
-                </h2>
-
-                <p>
-                    Résultats détaillés pour chaque actif.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>Actif</th>
-
-                        <th>Trades</th>
-
-                        <th>Gagnants</th>
-
-                        <th>Perdants</th>
-
-                        <th>BE</th>
-
-                        <th>Winrate</th>
-
-                        <th>Profit</th>
-
-                        <th>RR moyen</th>
-
-                        <th>Meilleur</th>
-
-                        <th>Pire</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody
-                    id="assetTableBody"
-                ></tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- =========================================================
-         ====================== ARCHIVES ==========================
-         ========================================================= -->
-
-
-    <section
-        id="archivesCard"
-        class="card page-section archives-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    🗄️ Archives des capitaux
-                </h2>
-
-                <p>
-                    Historique indépendant de chaque capital.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div
-            id="archivesList"
-            class="archives-list"
-        ></div>
-
-    </section>
-
-
-</main>
-
-
-
-<!-- =========================================================
-     MODALE AJOUT TRADE
-     ========================================================= -->
-
-<div
-    id="tradeModal"
-    class="modal trade-modal"
->
-
-
-    <div class="modal-content">
-
-
-        <div class="modal-header">
-
-            <div>
-
-                <h2>
-                    ➕ Ajouter un trade
-                </h2>
-
-                <p>
-                    Enregistrez votre trade manuellement
-                </p>
-
-            </div>
-
-
-            <button
-                id="closeTradeModalBtn"
-                class="close-btn"
-                type="button"
-            >
-                ✕
-            </button>
-
-        </div>
-
-
-        <div class="modal-body">
-
-
-            <form
-                id="tradeForm"
-            >
-
-
-                <div class="form-grid">
-
-
+                <div class="section-header">
                     <div>
+                        <h2>💰 Capital actif</h2>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <span>Nom</span>
+                        <strong id="activeCapitalName">—</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Date de création</span>
+                        <strong id="activeCapitalCreatedAt">—</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Capital initial</span>
+                        <strong id="initialCapital">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Solde actuel</span>
+                        <strong id="currentBalance">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Profit total</span>
+                        <strong id="totalProfit">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Risque de référence</span>
+                        <strong id="riskReference">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>RR cible</span>
+                        <strong id="rrTarget">0.00</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Objectif théorique</span>
+                        <strong id="theoreticalObjective">0.00 $</strong>
+                    </div>
+
+                </div>
+
+                <div class="section-actions">
+
+                    <button
+                        type="button"
+                        id="changeCapitalBtn"
+                    >
+                        ⚙️ Modifier le capital
+                    </button>
+
+                    <button
+                        type="button"
+                        id="newCapitalBtn"
+                    >
+                        ➕ Nouveau capital
+                    </button>
+
+                    <button
+                        type="button"
+                        id="archiveCapitalBtn"
+                    >
+                        🗄️ Archiver
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= ÉVOLUTION CAPITAL ================= -->
+
+            <section class="card">
+
+                <div class="section-header">
+                    <div>
+                        <h2>📈 Évolution du capital</h2>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <canvas id="capitalChart"></canvas>
+
+                    <div
+                        id="emptyChartMessage"
+                        style="display:none;"
+                    >
+                        Aucune donnée disponible pour le graphique.
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- ================= PERFORMANCE SUMMARY ================= -->
+
+            <section class="card">
+
+                <div class="section-header">
+                    <div>
+                        <h2>📊 Résumé de performance</h2>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <span>Solde</span>
+                        <strong id="statBalance">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Profit</span>
+                        <strong id="statProfit">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Winrate</span>
+                        <strong id="statWinrate">0 %</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>RR moyen</span>
+                        <strong id="statAverageRR">0.00</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Trades</span>
+                        <strong id="statTrades">0</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Meilleur setup</span>
+                        <strong id="statBestSetup">—</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Dernier trade</span>
+                        <strong id="statLastTrade">—</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Profit Factor</span>
+                        <strong id="statProfitFactor">0.00</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Trade moyen</span>
+                        <strong id="statAverageTrade">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Gain moyen</span>
+                        <strong id="statAverageWin">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Perte moyenne</span>
+                        <strong id="statAverageLoss">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Meilleur trade</span>
+                        <strong id="statBestTrade">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Pire trade</span>
+                        <strong id="statWorstTrade">0.00 $</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Max série gagnante</span>
+                        <strong id="statMaxWinStreak">0</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Max série perdante</span>
+                        <strong id="statMaxLossStreak">0</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Max Drawdown</span>
+                        <strong id="statMaxDrawdown">0.00 $</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= AJOUT TRADE ================= -->
+
+            <div class="trade-launcher">
+
+                <button
+                    type="button"
+                    id="openTradeModalBtn"
+                >
+                    ➕ Ajouter un trade
+                </button>
+
+            </div>
+
+
+            <!-- ================= HISTORIQUE ================= -->
+
+            <section class="card">
+
+                <div class="section-header">
+                    <div>
+                        <h2>📜 Historique des trades</h2>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Actif</th>
+                                <th>Direction</th>
+                                <th>Type</th>
+                                <th>Lot</th>
+                                <th>Entrée</th>
+                                <th>SL</th>
+                                <th>TP</th>
+                                <th>Setup</th>
+                                <th>Résultat</th>
+                                <th>P/L</th>
+                                <th>Commentaire</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="historyBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <!-- =====================================================
+             =====================================================
+             📊 ANALYSES & RISQUE
+             =====================================================
+             ===================================================== -->
+
+        <section
+            class="page-section analysis-section"
+            data-page-section="analysis"
+        >
+
+            <div class="page-title">
+                <h1>📊 Analyses &amp; Risque</h1>
+                <p>
+                    Analyse avancée V5.8 de vos performances,
+                    risques, setups et actifs.
+                </p>
+            </div>
+
+
+            <!--
+                POINT D'ANCRAGE POUR v51-filters.js
+
+                NE PAS SUPPRIMER.
+
+                v51-filters.js cherche .period-buttons,
+                puis insère automatiquement #v51FilterCard
+                juste après cette card.
+
+                La card est invisible et n'affecte aucun calcul.
+            -->
+
+            <div class="card v51-analysis-anchor">
+
+                <div class="period-buttons">
+
+                </div>
+
+            </div>
+
+            <!--
+                #v51FilterCard est créé automatiquement ici
+                par v51-filters.js.
+
+                NE PAS créer manuellement cet élément.
+            -->
+
+        </section>
+
+
+        <!-- =====================================================
+             =====================================================
+             🎯 PERFORMANCES
+             =====================================================
+             ===================================================== -->
+
+        <section
+            class="page-section performance-section"
+            data-page-section="performance"
+        >
+
+            <div class="page-title">
+                <h1>🎯 Performances</h1>
+                <p>
+                    Analyse des performances par setup et par actif.
+                </p>
+            </div>
+
+
+            <!-- ================= SETUPS ================= -->
+
+            <section class="card">
+
+                <div class="section-header">
+                    <div>
+                        <h2>🎯 Performance par setup</h2>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Setup</th>
+                                <th>Trades</th>
+                                <th>Wins</th>
+                                <th>Losses</th>
+                                <th>BE</th>
+                                <th>Winrate</th>
+                                <th>Profit</th>
+                                <th>RR moyen</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="setupTableBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= ACTIFS ================= -->
+
+            <section class="card">
+
+                <div class="section-header">
+                    <div>
+                        <h2>💹 Performance par actif</h2>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Actif</th>
+                                <th>Trades</th>
+                                <th>Wins</th>
+                                <th>Losses</th>
+                                <th>BE</th>
+                                <th>Winrate</th>
+                                <th>Profit</th>
+                                <th>RR moyen</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="assetTableBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <!-- =====================================================
+             =====================================================
+             🗄️ ARCHIVES
+             =====================================================
+             ===================================================== -->
+
+        <section
+            class="page-section archives-section"
+            data-page-section="archives"
+        >
+
+            <div class="page-title">
+                <h1>🗄️ Archives</h1>
+                <p>
+                    Historique des anciens capitaux et performances.
+                </p>
+            </div>
+
+
+            <section class="card">
+
+                <div class="section-header">
+                    <div>
+                        <h2>🗄️ Capitaux archivés</h2>
+                    </div>
+                </div>
+
+                <div id="archivesList"></div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================================
+         =========================================================
+         MODAL AJOUT / MODIFICATION TRADE
+         =========================================================
+         ========================================================= -->
+
+    <div
+        id="tradeModal"
+        class="trade-modal"
+        aria-hidden="true"
+    >
+
+        <div class="trade-modal-content card">
+
+            <div class="trade-modal-header">
+
+                <div>
+                    <h2>➕ Ajouter un trade</h2>
+                </div>
+
+                <button
+                    type="button"
+                    class="trade-modal-close"
+                    id="closeTradeModalBtn"
+                    aria-label="Fermer"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form id="tradeForm">
+
+                <div class="trade-form-grid">
+
+
+                    <!-- ACTIF -->
+
+                    <div class="trade-form-group">
 
                         <label for="asset">
                             Actif
                         </label>
 
-                        <input
-                            type="text"
-                            id="asset"
-                            placeholder="XAUUSD"
-                            required
-                        >
+                        <select id="asset" required>
+                            <option value="">Sélectionner</option>
+                            <option value="XAUUSD">XAUUSD</option>
+                            <option value="EURUSD">EURUSD</option>
+                            <option value="GBPUSD">GBPUSD</option>
+                            <option value="USDJPY">USDJPY</option>
+                            <option value="USDCHF">USDCHF</option>
+                            <option value="AUDUSD">AUDUSD</option>
+                            <option value="USDCAD">USDCAD</option>
+                            <option value="NZDUSD">NZDUSD</option>
+                            <option value="BTCUSD">BTCUSD</option>
+                            <option value="ETHUSD">ETHUSD</option>
+                        </select>
 
                     </div>
 
 
-                    <div>
+                    <!-- DATE -->
+
+                    <div class="trade-form-group">
 
                         <label for="date">
-                            Date
+                            Date / heure
                         </label>
 
                         <input
-                            type="date"
+                            type="datetime-local"
                             id="date"
                             required
                         >
@@ -1168,16 +882,19 @@
                     </div>
 
 
-                    <div>
+                    <!-- DIRECTION -->
+
+                    <div class="trade-form-group">
 
                         <label for="direction">
-                            Position
+                            Direction
                         </label>
 
-                        <select
-                            id="direction"
-                            required
-                        >
+                        <select id="direction" required>
+
+                            <option value="">
+                                Sélectionner
+                            </option>
 
                             <option value="BUY">
                                 Buy
@@ -1192,26 +909,29 @@
                     </div>
 
 
-                    <div>
+                    <!-- TYPE D'ORDRE -->
+
+                    <div class="trade-form-group">
 
                         <label for="orderType">
                             Type d'ordre
                         </label>
 
-                        <select
-                            id="orderType"
-                            required
-                        >
+                        <select id="orderType" required>
 
-                            <option value="Market">
-                                Immediat
+                            <option value="">
+                                Sélectionner
                             </option>
 
-                            <option value="Buy Limit">
+                            <option value="MARKET">
+                                Immédiat
+                            </option>
+
+                            <option value="BUY_LIMIT">
                                 Buy Limit
                             </option>
 
-                            <option value="Sell Limit">
+                            <option value="SELL_LIMIT">
                                 Sell Limit
                             </option>
 
@@ -1220,42 +940,27 @@
                     </div>
 
 
-                    <div>
+                    <!-- ENTRY -->
 
-                        <label for="lot">
-                            Lot
-                        </label>
-
-                        <input
-                            type="number"
-                            id="lot"
-                            step="0.01"
-                            min="0.01"
-                            placeholder="0.01"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div>
+                    <div class="trade-form-group">
 
                         <label for="entry">
-                            Entry
+                            Entrée
                         </label>
 
                         <input
                             type="number"
                             id="entry"
                             step="any"
-                            placeholder="4450.00"
                             required
                         >
 
                     </div>
 
 
-                    <div>
+                    <!-- SL -->
+
+                    <div class="trade-form-group">
 
                         <label for="sl">
                             Stop Loss
@@ -1265,13 +970,33 @@
                             type="number"
                             id="sl"
                             step="any"
-                            placeholder="4445.00"
+                            required
                         >
 
                     </div>
 
 
-                    <div>
+                    <!-- LOT -->
+
+                    <div class="trade-form-group">
+
+                        <label for="lot">
+                            Lot
+                        </label>
+
+                        <input
+                            type="number"
+                            id="lot"
+                            step="any"
+                            min="0"
+                        >
+
+                    </div>
+
+
+                    <!-- TP -->
+
+                    <div class="trade-form-group">
 
                         <label for="tp">
                             Take Profit
@@ -1281,85 +1006,31 @@
                             type="number"
                             id="tp"
                             step="any"
-                            placeholder="4460.00"
                         >
 
                     </div>
 
 
-                    <div>
+                    <!-- SETUP -->
 
-                        <label for="calculatedRR">
-                            RR
-                        </label>
-
-                        <input
-                            type="text"
-                            id="calculatedRR"
-                            value="0.00"
-                            readonly
-                        >
-
-                    </div>
-
-
-                    <div>
-
-                        <label for="result">
-                            Résultat
-                        </label>
-
-                        <select
-                            id="result"
-                            required
-                        >
-
-                            <option value="TP">
-                                TP
-                            </option>
-
-                            <option value="SL">
-                                SL
-                            </option>
-
-                            <option value="BE">
-                                BE
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div>
+                    <div class="trade-form-group">
 
                         <label for="setup">
                             Setup
                         </label>
 
-                        <select
-                            id="setup"
-                            required
-                        >
+                        <select id="setup" required>
+
+                            <option value="">
+                                Sélectionner
+                            </option>
 
                             <option value="LDP+QML">
-                                LDP+QML
+                                LDP + QML
                             </option>
 
-                            <option value="LDP+FIBO 50">
-                                LDP+FIBO 50
-                            </option>
-
-                            <option value="OB">
-                                OB
-                            </option>
-
-                            <option value="BB">
-                                BB
-                            </option>
-
-                            <option value="ZS OA">
-                                ZS OA
+                            <option value="LDP+FIBONACCI">
+                                LDP + FIBONACCI
                             </option>
 
                             <option value="SSM1">
@@ -1386,68 +1057,134 @@
                                 SBM3
                             </option>
 
+                            <option value="OB">
+                                OB
+                            </option>
+
+                            <option value="BB">
+                                BB
+                            </option>
+
+                            <option value="ZS">
+                                ZS
+                            </option>
+
+                            <option value="OA">
+                                OA
+                            </option>
+
                         </select>
 
                     </div>
 
 
-                    <div>
+                    <!-- RESULTAT -->
+
+                    <div class="trade-form-group">
+
+                        <label for="result">
+                            Résultat
+                        </label>
+
+                        <select id="result" required>
+
+                            <option value="">
+                                Sélectionner
+                            </option>
+
+                            <option value="TP">
+                                TP
+                            </option>
+
+                            <option value="SL">
+                                SL
+                            </option>
+
+                            <option value="BE">
+                                BE
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- RR CALCULE -->
+
+                    <div class="trade-form-group">
+
+                        <label for="calculatedRR">
+                            RR calculé
+                        </label>
+
+                        <input
+                            type="text"
+                            id="calculatedRR"
+                            readonly
+                        >
+
+                    </div>
+
+
+                    <!-- PROFIT -->
+
+                    <div class="trade-form-group">
 
                         <label for="profit">
-                            P/L
+                            Profit / Perte réel(le)
                         </label>
 
                         <input
                             type="number"
                             id="profit"
                             step="any"
-                            placeholder="20 ou -10"
-                            required
                         >
+
+                    </div>
+
+
+                    <!-- COMMENTAIRE -->
+
+                    <div class="trade-form-group full">
+
+                        <label for="comment">
+                            Commentaire
+                        </label>
+
+                        <textarea
+                            id="comment"
+                            rows="4"
+                        ></textarea>
 
                     </div>
 
                 </div>
 
 
+                <!-- INFORMATIONS MM -->
+
                 <div
                     id="tradeMMInfo"
-                    class="form-full"
-                ></div>
-
-
-                <div class="form-full">
-
-                    <label for="comment">
-                        Commentaire
-                    </label>
-
-                    <textarea
-                        id="comment"
-                        rows="3"
-                        placeholder="Commentaire sur le trade..."
-                    ></textarea>
-
+                    class="card"
+                >
                 </div>
 
 
-                <div class="form-actions">
+                <!-- ACTIONS -->
 
+                <div class="trade-form-actions">
+
+                    <button
+                        type="button"
+                        id="cancelTradeBtn"
+                    >
+                        Annuler
+                    </button>
 
                     <button
                         type="submit"
-                        class="primary-btn"
                     >
-                        Enregistrer le trade
-                    </button>
-
-
-                    <button
-                        id="cancelTradeModalBtn"
-                        type="button"
-                        class="secondary-btn"
-                    >
-                        Annuler
+                        💾 Enregistrer le trade
                     </button>
 
                 </div>
@@ -1458,493 +1195,392 @@
 
     </div>
 
-</div>
 
+    <!-- =========================================================
+         =========================================================
+         MODAL CAPITAL
+         =========================================================
+         ========================================================= -->
 
+    <div
+        id="capitalModal"
+        class="trade-modal"
+        aria-hidden="true"
+    >
 
-<!-- =========================================================
-     MODALE CAPITAL
-     ========================================================= -->
+        <div class="trade-modal-content card">
 
-<div
-    id="capitalModal"
-    class="modal"
->
+            <div class="trade-modal-header">
 
+                <div>
+                    <h2 id="capitalModalTitle">
+                        Nouveau capital
+                    </h2>
+                </div>
 
-    <div class="modal-content">
-
-
-        <div class="modal-header">
-
-            <div>
-
-                <h2 id="capitalModalTitle">
-                    Nouveau capital
-                </h2>
-
-                <p>
-                    Créer ou modifier un capital
-                </p>
-
-            </div>
-
-
-            <button
-                id="cancelCapitalBtn"
-                class="close-btn"
-                type="button"
-            >
-                ✕
-            </button>
-
-        </div>
-
-
-        <div class="modal-body">
-
-
-            <div>
-
-                <label for="capitalNameInput">
-                    Nom du capital
-                </label>
-
-                <input
-                    type="text"
-                    id="capitalNameInput"
-                    placeholder="Capital 1"
+                <button
+                    type="button"
+                    id="cancelCapitalBtn2"
+                    class="trade-modal-close"
+                    aria-label="Fermer"
                 >
+                    ×
+                </button>
 
             </div>
 
 
-            <div>
+            <div class="trade-form-grid">
 
-                <label for="capitalAmountInput">
-                    Capital initial
-                </label>
+                <!-- NOM -->
 
-                <input
-                    type="number"
-                    step="any"
-                    id="capitalAmountInput"
-                    placeholder="100"
-                >
+                <div class="trade-form-group full">
+
+                    <label for="capitalNameInput">
+                        Nom du capital
+                    </label>
+
+                    <input
+                        type="text"
+                        id="capitalNameInput"
+                        placeholder="Ex : Compte principal"
+                    >
+
+                </div>
+
+
+                <!-- MONTANT -->
+
+                <div class="trade-form-group">
+
+                    <label for="capitalAmountInput">
+                        Capital initial
+                    </label>
+
+                    <input
+                        type="number"
+                        id="capitalAmountInput"
+                        step="any"
+                        min="0"
+                    >
+
+                    <small id="capitalAmountHelp"></small>
+
+                </div>
+
+
+                <!-- RISQUE -->
+
+                <div class="trade-form-group">
+
+                    <label for="capitalRiskInput">
+                        Risque par trade
+                    </label>
+
+                    <input
+                        type="number"
+                        id="capitalRiskInput"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <!-- RR -->
+
+                <div class="trade-form-group">
+
+                    <label for="capitalRRInput">
+                        RR cible
+                    </label>
+
+                    <input
+                        type="number"
+                        id="capitalRRInput"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
 
             </div>
 
 
-            <div
-                id="capitalAmountHelp"
-            ></div>
-
-
-            <div>
-
-                <label for="capitalRiskInput">
-                    Risque de référence
-                </label>
-
-                <input
-                    type="number"
-                    step="any"
-                    id="capitalRiskInput"
-                    placeholder="1"
-                >
-
-            </div>
-
-
-            <div>
-
-                <label for="capitalRRInput">
-                    RR cible
-                </label>
-
-                <input
-                    type="number"
-                    step="0.10"
-                    min="2"
-                    id="capitalRRInput"
-                    placeholder="2.00"
-                >
-
-            </div>
-
+            <!-- PREVIEW -->
 
             <div
                 id="capitalModalRiskPreview"
-            ></div>
-
+                class="card"
+            >
+            </div>
 
             <div
                 id="capitalModalRR"
-            ></div>
-
+                class="card"
+            >
+            </div>
 
             <div
                 id="capitalModalObjective"
-            ></div>
-
-        </div>
-
-
-        <div class="modal-actions">
-
-
-            <button
-                id="cancelCapitalBtn2"
-                class="secondary-btn"
-                type="button"
+                class="card"
             >
-                Annuler
-            </button>
+            </div>
 
 
-            <button
-                id="saveCapitalBtn"
-                class="primary-btn"
-                type="button"
-            >
-                Enregistrer
-            </button>
+            <!-- ACTIONS -->
+
+            <div class="trade-form-actions">
+
+                <button
+                    type="button"
+                    id="cancelCapitalBtn"
+                >
+                    Annuler
+                </button>
+
+                <button
+                    type="button"
+                    id="saveCapitalBtn"
+                >
+                    💾 Enregistrer
+                </button>
+
+            </div>
 
         </div>
 
     </div>
 
-</div>
 
-
-
-<!-- =========================================================
-     MODALE GRAPHIQUE ARCHIVE
-     ========================================================= -->
-
-<div
-    id="archiveChartModal"
-    class="modal"
->
-
+    <!-- =========================================================
+         =========================================================
+         MODAL GRAPHIQUE ARCHIVE
+         =========================================================
+         ========================================================= -->
 
     <div
-        class="modal-content archive-chart-modal-content"
+        id="archiveChartModal"
+        class="trade-modal"
+        aria-hidden="true"
     >
 
+        <div class="trade-modal-content card">
 
-        <div class="modal-header">
+            <div class="trade-modal-header">
 
-            <div>
+                <div>
+                    <h2 id="archiveChartTitle">
+                        Archive
+                    </h2>
 
-                <h2 id="archiveChartTitle">
-                    Graphique du capital
-                </h2>
+                    <p id="archiveChartSubtitle"></p>
+                </div>
 
-                <p id="archiveChartSubtitle">
-                    Évolution du capital archivé
-                </p>
-
-            </div>
-
-
-            <button
-                id="closeArchiveChartBtn"
-                class="close-btn"
-                type="button"
-            >
-                ✕
-            </button>
-
-        </div>
-
-
-        <div class="archive-chart-info">
-
-
-            <div>
-
-                <span>
-                    Capital initial
-                </span>
-
-                <strong id="archiveChartInitial">
-                    $0.00
-                </strong>
+                <button
+                    type="button"
+                    class="trade-modal-close"
+                    aria-label="Fermer"
+                >
+                    ×
+                </button>
 
             </div>
 
 
-            <div>
+            <div class="stats-grid">
 
-                <span>
-                    Capital final
-                </span>
+                <div class="stat-card">
 
-                <strong id="archiveChartFinal">
-                    $0.00
-                </strong>
+                    <span>Capital initial</span>
+
+                    <strong id="archiveChartInitial">
+                        0.00 $
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span>Capital final</span>
+
+                    <strong id="archiveChartFinal">
+                        0.00 $
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span>Profit</span>
+
+                    <strong id="archiveChartProfit">
+                        0.00 $
+                    </strong>
+
+                </div>
 
             </div>
-
-
-            <div>
-
-                <span>
-                    Profit total
-                </span>
-
-                <strong id="archiveChartProfit">
-                    $0.00
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <div
-            class="chart-container archive-chart-container"
-        >
-
-            <canvas
-                id="archiveChart"
-            ></canvas>
 
         </div>
 
     </div>
 
-</div>
 
+    <!-- =========================================================
+         SCRIPTS
+         =========================================================
 
+         ORDRE IMPORTANT :
 
-<!-- =========================================================
-     APP.JS
-     
-     NE PAS MODIFIER
-     ========================================================= -->
+         1. app.js
+         2. v51-filters.js
 
-<script src="app.js"></script>
+         NE PAS MODIFIER.
+         ========================================================= -->
 
+    <script src="app.js"></script>
+    <script src="v51-filters.js"></script>
 
 
-<!-- =========================================================
-     V5.8 / V51
-     
-     NE PAS MODIFIER
-     ========================================================= -->
+    <!-- =========================================================
+         NAVIGATION
+         ========================================================= -->
 
-<script src="v51-filters.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
+            const currentPage =
+                document.body.dataset.page || "dashboard";
 
+            document
+                .querySelectorAll("[data-page-link]")
+                .forEach(function (link) {
 
-<!-- =========================================================
-     NAVIGATION ACTIVE
-     ========================================================= -->
+                    const page =
+                        link.dataset.pageLink;
 
-<script>
+                    if (page === currentPage) {
+                        link.classList.add("active");
+                    } else {
+                        link.classList.remove("active");
+                    }
 
-(function () {
+                });
 
-    function initializeNavigation() {
+        });
+    </script>
 
-        const page =
-            window.__TRADING_DASHBOARD_PAGE__ ||
-            document.body.dataset.page ||
-            "dashboard";
 
-        document
-            .querySelectorAll(
-                "[data-page-link]"
-            )
-            .forEach(link => {
+    <!-- =========================================================
+         MODAL TRADE
+         
+         Ce script ne touche pas aux calculs.
+         Il sert uniquement à ouvrir/fermer le modal.
+         ========================================================= -->
 
-                link.classList.toggle(
-                    "active",
-                    link.dataset.pageLink === page
-                );
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-            });
+            const modal =
+                document.getElementById("tradeModal");
 
-    }
+            const openButton =
+                document.getElementById("openTradeModalBtn");
 
+            const closeButton =
+                document.getElementById("closeTradeModalBtn");
 
-    if (
-        document.readyState ===
-        "loading"
-    ) {
+            const cancelButton =
+                document.getElementById("cancelTradeBtn");
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            initializeNavigation
-        );
 
-    } else {
+            function openTradeModal() {
 
-        initializeNavigation();
-
-    }
-
-})();
-
-</script>
-
-
-
-<!-- =========================================================
-     MODALE AJOUT TRADE
-     ========================================================= -->
-
-<script>
-
-(function () {
-
-
-    function openTradeModal() {
-
-        const modal =
-            document.getElementById(
-                "tradeModal"
-            );
-
-
-        if (!modal) {
-            return;
-        }
-
-
-        modal.classList.add(
-            "open"
-        );
-
-    }
-
-
-    function closeTradeModal() {
-
-        const modal =
-            document.getElementById(
-                "tradeModal"
-            );
-
-
-        if (!modal) {
-            return;
-        }
-
-
-        modal.classList.remove(
-            "open"
-        );
-
-    }
-
-
-    document.addEventListener(
-        "click",
-        function (event) {
-
-            const target =
-                event.target.closest(
-                    "#openTradeModalBtn, #closeTradeModalBtn, #cancelTradeModalBtn"
-                );
-
-
-            if (!target) {
-                return;
-            }
-
-
-            if (
-                target.id ===
-                "openTradeModalBtn"
-            ) {
-
-                openTradeModal();
-
-            } else {
-
-                closeTradeModal();
-
-            }
-
-        }
-    );
-
-
-    const modal =
-        document.getElementById(
-            "tradeModal"
-        );
-
-
-    if (modal) {
-
-        modal.addEventListener(
-            "click",
-            function (event) {
-
-                if (
-                    event.target ===
-                    modal
-                ) {
-
-                    closeTradeModal();
-
+                if (!modal) {
+                    return;
                 }
 
-            }
-        );
-
-    }
-
-
-    document.addEventListener(
-        "keydown",
-        function (event) {
-
-            if (
-                event.key ===
-                "Escape"
-            ) {
-
-                closeTradeModal();
+                modal.classList.add("show");
+                modal.setAttribute("aria-hidden", "false");
 
             }
 
-        }
-    );
+
+            function closeTradeModal() {
+
+                if (!modal) {
+                    return;
+                }
+
+                modal.classList.remove("show");
+                modal.setAttribute("aria-hidden", "true");
+
+            }
 
 
-    const form =
-        document.getElementById(
-            "tradeForm"
-        );
+            if (openButton) {
+                openButton.addEventListener(
+                    "click",
+                    openTradeModal
+                );
+            }
 
 
-    if (form) {
+            if (closeButton) {
+                closeButton.addEventListener(
+                    "click",
+                    closeTradeModal
+                );
+            }
 
-        form.addEventListener(
-            "submit",
-            function () {
 
-                setTimeout(
-                    closeTradeModal,
-                    100
+            if (cancelButton) {
+                cancelButton.addEventListener(
+                    "click",
+                    closeTradeModal
+                );
+            }
+
+
+            if (modal) {
+
+                modal.addEventListener(
+                    "click",
+                    function (event) {
+
+                        if (event.target === modal) {
+                            closeTradeModal();
+                        }
+
+                    }
                 );
 
-            },
-            true
-        );
+            }
 
-    }
 
-})();
+            document.addEventListener(
+                "keydown",
+                function (event) {
 
-</script>
+                    if (event.key === "Escape") {
 
+                        if (
+                            modal &&
+                            modal.classList.contains("show")
+                        ) {
+                            closeTradeModal();
+                        }
+
+                    }
+
+                }
+            );
+
+        });
+    </script>
 
 </body>
-
 </html>
