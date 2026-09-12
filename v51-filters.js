@@ -1,5 +1,6 @@
 /* ============================================================
-   V5.5 — FILTRES + STATISTIQUES + ANALYSE + CLASSEMENT
+   V5.6 — FILTRES + STATS + ANALYSE + CLASSEMENT
+   + RECOMMANDATIONS AUTOMATIQUES
    ============================================================ */
 
 (function () {
@@ -129,7 +130,6 @@
         }
 
         const today = new Date();
-
         const day = today.getDay();
 
         const diffToMonday =
@@ -246,7 +246,7 @@
     }
 
     /* ============================================================
-       CREATION SECTION
+       CREATION DE LA SECTION
        ============================================================ */
 
     function createFilterSection() {
@@ -338,6 +338,107 @@
                             Tous les setups
                         </option>
                     </select>
+                </div>
+
+            </div>
+
+            <!-- ==================================================
+                 RECOMMANDATIONS
+                 ================================================== -->
+
+            <div
+                id="v56Recommendations"
+                style="
+                    display:grid;
+                    grid-template-columns:
+                        repeat(auto-fit,minmax(240px,1fr));
+                    gap:14px;
+                    margin-bottom:28px;
+                "
+            >
+
+                <div
+                    id="v56BestSetupCard"
+                    class="stat-box"
+                >
+                    <span>⭐ Setup à privilégier</span>
+                    <strong id="v56BestSetup">
+                        -
+                    </strong>
+
+                    <small
+                        id="v56BestSetupInfo"
+                        style="
+                            display:block;
+                            margin-top:8px;
+                            opacity:.75;
+                        "
+                    >
+                        Pas assez de données
+                    </small>
+                </div>
+
+                <div
+                    id="v56BestAssetCard"
+                    class="stat-box"
+                >
+                    <span>📈 Actif à surveiller</span>
+                    <strong id="v56BestAsset">
+                        -
+                    </strong>
+
+                    <small
+                        id="v56BestAssetInfo"
+                        style="
+                            display:block;
+                            margin-top:8px;
+                            opacity:.75;
+                        "
+                    >
+                        Pas assez de données
+                    </small>
+                </div>
+
+                <div
+                    id="v56AvoidSetupCard"
+                    class="stat-box"
+                >
+                    <span>⚠️ Setup à éviter</span>
+                    <strong id="v56AvoidSetup">
+                        -
+                    </strong>
+
+                    <small
+                        id="v56AvoidSetupInfo"
+                        style="
+                            display:block;
+                            margin-top:8px;
+                            opacity:.75;
+                        "
+                    >
+                        Pas assez de données
+                    </small>
+                </div>
+
+                <div
+                    id="v56WarningCard"
+                    class="stat-box"
+                >
+                    <span>🛡️ Signal général</span>
+                    <strong id="v56GeneralSignal">
+                        -
+                    </strong>
+
+                    <small
+                        id="v56GeneralSignalInfo"
+                        style="
+                            display:block;
+                            margin-top:8px;
+                            opacity:.75;
+                        "
+                    >
+                        Pas assez de données
+                    </small>
                 </div>
 
             </div>
@@ -444,7 +545,7 @@
                     <div>
                         <h3>🏆 Classement des setups</h3>
                         <p>
-                            Classement selon la performance globale
+                            Performance globale
                         </p>
                     </div>
                 </div>
@@ -480,7 +581,7 @@
                     <div>
                         <h3>🥇 Classement des actifs</h3>
                         <p>
-                            Classement selon la performance globale
+                            Performance globale
                         </p>
                     </div>
                 </div>
@@ -639,9 +740,13 @@
                 document.querySelector("main");
 
             if (main) {
-                main.appendChild(section);
+                main.appendChild(
+                    section
+                );
             } else {
-                document.body.appendChild(section);
+                document.body.appendChild(
+                    section
+                );
             }
         }
 
@@ -649,7 +754,7 @@
     }
 
     /* ============================================================
-       REMPLISSAGE DES FILTRES
+       FILTRES SELECT
        ============================================================ */
 
     function populateFilters() {
@@ -871,7 +976,8 @@
                 result.filter(
                     function (trade) {
                         return String(
-                            trade.asset || ""
+                            trade.asset ||
+                                ""
                         ) ===
                             String(
                                 asset
@@ -887,7 +993,8 @@
                 result.filter(
                     function (trade) {
                         return String(
-                            trade.setup || ""
+                            trade.setup ||
+                                ""
                         ) ===
                             String(
                                 setup
@@ -902,7 +1009,7 @@
     }
 
     /* ============================================================
-       STATISTIQUES
+       STATISTIQUES AVANCEES
        ============================================================ */
 
     function calculateAdvancedStats(
@@ -1109,11 +1216,17 @@
                   )
                 : 0;
 
-        let currentWinStreak = 0;
-        let maxWinStreak = 0;
+        let currentWinStreak =
+            0;
 
-        let currentLossStreak = 0;
-        let maxLossStreak = 0;
+        let maxWinStreak =
+            0;
+
+        let currentLossStreak =
+            0;
+
+        let maxLossStreak =
+            0;
 
         filteredTrades.forEach(
             function (trade) {
@@ -1157,9 +1270,14 @@
             }
         );
 
-        let cumulativeProfit = 0;
-        let highestPoint = 0;
-        let maxDrawdown = 0;
+        let cumulativeProfit =
+            0;
+
+        let highestPoint =
+            0;
+
+        let maxDrawdown =
+            0;
 
         filteredTrades.forEach(
             function (trade) {
@@ -1246,6 +1364,10 @@
                 maxDrawdown
         };
     }
+
+    /* ============================================================
+       AFFICHAGE STATS
+       ============================================================ */
 
     function displayStats(
         filteredTrades
@@ -1380,7 +1502,7 @@
     }
 
     /* ============================================================
-       SCORE DE CLASSEMENT
+       SCORE
        ============================================================ */
 
     function calculateRankingScore(
@@ -1388,21 +1510,11 @@
     ) {
         if (
             !stats ||
-            stats.totalTrades === 0
+            stats.totalTrades ===
+                0
         ) {
             return -Infinity;
         }
-
-        /*
-         * Score équilibré :
-         *
-         * 40 % = Profit
-         * 30 % = Winrate
-         * 20 % = Profit Factor
-         * 10 % = RR moyen
-         *
-         * Le score sert uniquement au classement.
-         */
 
         const profitComponent =
             stats.totalProfit;
@@ -1423,7 +1535,8 @@
         return (
             profitComponent * 0.40 +
             winrateComponent * 0.30 +
-            profitFactorComponent * 20 +
+            profitFactorComponent *
+                20 +
             rrComponent * 10
         );
     }
@@ -1536,32 +1649,38 @@
     }
 
     /* ============================================================
-       RANG
+       CLASSEMENT
        ============================================================ */
 
     function rankingLabel(
         position
     ) {
-        if (position === 0) {
+        if (
+            position ===
+            0
+        ) {
             return "🥇";
         }
 
-        if (position === 1) {
+        if (
+            position ===
+            1
+        ) {
             return "🥈";
         }
 
-        if (position === 2) {
+        if (
+            position ===
+            2
+        ) {
             return "🥉";
         }
 
-        return "#" + (
-            position + 1
-        );
+        return "#" +
+            (
+                position + 1
+            );
     }
-
-    /* ============================================================
-       AFFICHAGE CLASSEMENT SETUPS
-       ============================================================ */
 
     function renderSetupRanking(
         filteredTrades
@@ -1575,7 +1694,8 @@
             return;
         }
 
-        tbody.innerHTML = "";
+        tbody.innerHTML =
+            "";
 
         const ranking =
             getRankingGroups(
@@ -1609,11 +1729,6 @@
                 const stats =
                     item.stats;
 
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
                 const pf =
                     Number.isFinite(
                         stats.profitFactor
@@ -1622,6 +1737,11 @@
                               2
                           )
                         : "∞";
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
 
                 row.innerHTML = `
                     <td>
@@ -1682,10 +1802,6 @@
         );
     }
 
-    /* ============================================================
-       AFFICHAGE CLASSEMENT ACTIFS
-       ============================================================ */
-
     function renderAssetRanking(
         filteredTrades
     ) {
@@ -1698,7 +1814,8 @@
             return;
         }
 
-        tbody.innerHTML = "";
+        tbody.innerHTML =
+            "";
 
         const ranking =
             getRankingGroups(
@@ -1732,11 +1849,6 @@
                 const stats =
                     item.stats;
 
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
                 const pf =
                     Number.isFinite(
                         stats.profitFactor
@@ -1745,6 +1857,11 @@
                               2
                           )
                         : "∞";
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
 
                 row.innerHTML = `
                     <td>
@@ -1806,7 +1923,7 @@
     }
 
     /* ============================================================
-       DETAIL SETUPS
+       ANALYSE DETAILLEE SETUPS
        ============================================================ */
 
     function renderSetupAnalysis(
@@ -1821,7 +1938,8 @@
             return;
         }
 
-        tbody.innerHTML = "";
+        tbody.innerHTML =
+            "";
 
         const setups =
             new Set(
@@ -1840,7 +1958,8 @@
             }
         );
 
-        let rowsAdded = 0;
+        let rowsAdded =
+            0;
 
         [...setups]
             .sort(
@@ -1884,11 +2003,6 @@
                             groupTrades
                         );
 
-                    const row =
-                        document.createElement(
-                            "tr"
-                        );
-
                     const pf =
                         Number.isFinite(
                             stats.profitFactor
@@ -1897,6 +2011,11 @@
                                   2
                               )
                             : "∞";
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
 
                     row.innerHTML = `
                         <td>
@@ -1965,7 +2084,8 @@
             );
 
         if (
-            rowsAdded === 0
+            rowsAdded ===
+            0
         ) {
             tbody.innerHTML = `
                 <tr>
@@ -1981,7 +2101,7 @@
     }
 
     /* ============================================================
-       DETAIL ACTIFS
+       ANALYSE DETAILLEE ACTIFS
        ============================================================ */
 
     function renderAssetAnalysis(
@@ -1996,7 +2116,8 @@
             return;
         }
 
-        tbody.innerHTML = "";
+        tbody.innerHTML =
+            "";
 
         const assets =
             new Set(
@@ -2015,7 +2136,8 @@
             }
         );
 
-        let rowsAdded = 0;
+        let rowsAdded =
+            0;
 
         [...assets]
             .sort(
@@ -2059,11 +2181,6 @@
                             groupTrades
                         );
 
-                    const row =
-                        document.createElement(
-                            "tr"
-                        );
-
                     const pf =
                         Number.isFinite(
                             stats.profitFactor
@@ -2072,6 +2189,11 @@
                                   2
                               )
                             : "∞";
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
 
                     row.innerHTML = `
                         <td>
@@ -2140,7 +2262,8 @@
             );
 
         if (
-            rowsAdded === 0
+            rowsAdded ===
+            0
         ) {
             tbody.innerHTML = `
                 <tr>
@@ -2153,6 +2276,404 @@
                 </tr>
             `;
         }
+    }
+
+    /* ============================================================
+       RECOMMANDATIONS
+       ============================================================ */
+
+    function calculateRecommendationScore(
+        stats
+    ) {
+        if (
+            !stats ||
+            stats.totalTrades <
+                3
+        ) {
+            return null;
+        }
+
+        let score =
+            calculateRankingScore(
+                stats
+            );
+
+        /*
+         * Bonus pour un historique
+         * suffisamment représentatif.
+         */
+
+        if (
+            stats.totalTrades >=
+            10
+        ) {
+            score += 10;
+        }
+
+        if (
+            stats.totalTrades >=
+            20
+        ) {
+            score += 10;
+        }
+
+        /*
+         * Pénalité en cas de très forte
+         * série de pertes.
+         */
+
+        if (
+            stats.maxLossStreak >=
+            3
+        ) {
+            score -=
+                stats.maxLossStreak *
+                3;
+        }
+
+        return score;
+    }
+
+    function getRecommendationGroups(
+        filteredTrades,
+        field
+    ) {
+        const groups =
+            new Map();
+
+        filteredTrades.forEach(
+            function (trade) {
+                const name =
+                    String(
+                        trade[field] ||
+                            "Non défini"
+                    );
+
+                if (
+                    !groups.has(name)
+                ) {
+                    groups.set(
+                        name,
+                        []
+                    );
+                }
+
+                groups
+                    .get(name)
+                    .push(trade);
+            }
+        );
+
+        const result = [];
+
+        groups.forEach(
+            function (
+                groupTrades,
+                name
+            ) {
+                const stats =
+                    calculateAdvancedStats(
+                        groupTrades
+                    );
+
+                const score =
+                    calculateRecommendationScore(
+                        stats
+                    );
+
+                if (
+                    score === null
+                ) {
+                    return;
+                }
+
+                result.push({
+                    name:
+                        name,
+
+                    stats:
+                        stats,
+
+                    score:
+                        score
+                });
+            }
+        );
+
+        result.sort(
+            function (a, b) {
+                return (
+                    b.score -
+                    a.score
+                );
+            }
+        );
+
+        return result;
+    }
+
+    function setRecommendationText(
+        id,
+        value
+    ) {
+        const element =
+            document.getElementById(
+                id
+            );
+
+        if (element) {
+            element.textContent =
+                value;
+        }
+    }
+
+    function displayRecommendations(
+        filteredTrades
+    ) {
+        const setupGroups =
+            getRecommendationGroups(
+                filteredTrades,
+                "setup"
+            );
+
+        const assetGroups =
+            getRecommendationGroups(
+                filteredTrades,
+                "asset"
+            );
+
+        /*
+         * Setup à privilégier
+         */
+
+        if (
+            setupGroups.length >
+            0
+        ) {
+            const best =
+                setupGroups[0];
+
+            setRecommendationText(
+                "v56BestSetup",
+                "🥇 " +
+                    best.name
+            );
+
+            setRecommendationText(
+                "v56BestSetupInfo",
+                best.stats.totalTrades +
+                    " trades • " +
+                    best.stats.winrate.toFixed(
+                        1
+                    ) +
+                    "% winrate • " +
+                    formatMoney(
+                        best.stats.totalProfit
+                    )
+            );
+        } else {
+            setRecommendationText(
+                "v56BestSetup",
+                "-"
+            );
+
+            setRecommendationText(
+                "v56BestSetupInfo",
+                "Pas assez de données (minimum 3 trades)"
+            );
+        }
+
+        /*
+         * Actif à surveiller
+         */
+
+        if (
+            assetGroups.length >
+            0
+        ) {
+            const best =
+                assetGroups[0];
+
+            setRecommendationText(
+                "v56BestAsset",
+                "🥇 " +
+                    best.name
+            );
+
+            setRecommendationText(
+                "v56BestAssetInfo",
+                best.stats.totalTrades +
+                    " trades • " +
+                    best.stats.winrate.toFixed(
+                        1
+                    ) +
+                    "% winrate • " +
+                    formatMoney(
+                        best.stats.totalProfit
+                    )
+            );
+        } else {
+            setRecommendationText(
+                "v56BestAsset",
+                "-"
+            );
+
+            setRecommendationText(
+                "v56BestAssetInfo",
+                "Pas assez de données (minimum 3 trades)"
+            );
+        }
+
+        /*
+         * Setup à éviter
+         *
+         * On cherche le plus faible score.
+         */
+
+        const avoidCandidates =
+            setupGroups
+                .slice()
+                .sort(
+                    function (a, b) {
+                        return (
+                            a.score -
+                            b.score
+                        );
+                    }
+                );
+
+        if (
+            avoidCandidates.length >
+            0
+        ) {
+            const worst =
+                avoidCandidates[0];
+
+            setRecommendationText(
+                "v56AvoidSetup",
+                "⚠️ " +
+                    worst.name
+            );
+
+            setRecommendationText(
+                "v56AvoidSetupInfo",
+                worst.stats.totalTrades +
+                    " trades • " +
+                    worst.stats.winrate.toFixed(
+                        1
+                    ) +
+                    "% winrate • " +
+                    formatMoney(
+                        worst.stats.totalProfit
+                    )
+            );
+        } else {
+            setRecommendationText(
+                "v56AvoidSetup",
+                "-"
+            );
+
+            setRecommendationText(
+                "v56AvoidSetupInfo",
+                "Pas assez de données"
+            );
+        }
+
+        /*
+         * Signal général
+         */
+
+        const globalStats =
+            calculateAdvancedStats(
+                filteredTrades
+            );
+
+        if (
+            globalStats.totalTrades <
+            3
+        ) {
+            setRecommendationText(
+                "v56GeneralSignal",
+                "🟡 NEUTRE"
+            );
+
+            setRecommendationText(
+                "v56GeneralSignalInfo",
+                "Au moins 3 trades sont nécessaires."
+            );
+
+            return;
+        }
+
+        const hasProfit =
+            globalStats.totalProfit >
+            0;
+
+        const strongWinrate =
+            globalStats.winrate >=
+            50;
+
+        const goodProfitFactor =
+            globalStats.profitFactor >=
+            1.20;
+
+        const badProfit =
+            globalStats.totalProfit <
+            0;
+
+        const badWinrate =
+            globalStats.winrate <
+            40;
+
+        const badProfitFactor =
+            globalStats.profitFactor <
+            1;
+
+        if (
+            hasProfit &&
+            strongWinrate &&
+            goodProfitFactor
+        ) {
+            setRecommendationText(
+                "v56GeneralSignal",
+                "🟢 FAVORABLE"
+            );
+
+            setRecommendationText(
+                "v56GeneralSignalInfo",
+                "Les statistiques filtrées sont globalement positives."
+            );
+
+            return;
+        }
+
+        if (
+            badProfit &&
+            badWinrate &&
+            badProfitFactor
+        ) {
+            setRecommendationText(
+                "v56GeneralSignal",
+                "🔴 PRUDENCE"
+            );
+
+            setRecommendationText(
+                "v56GeneralSignalInfo",
+                "Les statistiques filtrées sont actuellement faibles."
+            );
+
+            return;
+        }
+
+        setRecommendationText(
+            "v56GeneralSignal",
+            "🟡 MIXTE"
+        );
+
+        setRecommendationText(
+            "v56GeneralSignalInfo",
+            "Les résultats sont mitigés : attendre davantage de données."
+        );
     }
 
     /* ============================================================
@@ -2495,14 +3016,16 @@
                 "rgb(148,163,184)";
 
             if (
-                difference > 0
+                difference >
+                0
             ) {
                 lineColor =
                     "rgb(34,197,94)";
             }
 
             if (
-                difference < 0
+                difference <
+                0
             ) {
                 lineColor =
                     "rgb(239,68,68)";
@@ -2610,7 +3133,8 @@
             width -
                 paddingRight -
                 85,
-            height - 12
+            height -
+                12
         );
     }
 
@@ -2618,7 +3142,7 @@
        REFRESH
        ============================================================ */
 
-    function refreshV55() {
+    function refreshV56() {
         try {
             createFilterSection();
 
@@ -2626,6 +3150,10 @@
 
             const filteredTrades =
                 getFilteredTrades();
+
+            displayRecommendations(
+                filteredTrades
+            );
 
             displayStats(
                 filteredTrades
@@ -2653,7 +3181,7 @@
 
         } catch (error) {
             console.error(
-                "Erreur V5.5 :",
+                "Erreur V5.6 :",
                 error
             );
         }
@@ -2683,7 +3211,7 @@
             periodSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV55();
+                    refreshV56();
                 }
             );
         }
@@ -2692,7 +3220,7 @@
             assetSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV55();
+                    refreshV56();
                 }
             );
         }
@@ -2701,7 +3229,7 @@
             setupSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV55();
+                    refreshV56();
                 }
             );
         }
@@ -2711,14 +3239,14 @@
        INITIALISATION
        ============================================================ */
 
-    function initV55() {
+    function initV56() {
         createFilterSection();
 
         populateFilters();
 
         attachEvents();
 
-        refreshV55();
+        refreshV56();
     }
 
     /* ============================================================
@@ -2726,7 +3254,7 @@
        ============================================================ */
 
     window.refreshV51 =
-        refreshV55;
+        refreshV56;
 
     window.getV51FilteredTrades =
         getFilteredTrades;
@@ -2736,6 +3264,9 @@
 
     window.calculateV55RankingScore =
         calculateRankingScore;
+
+    window.calculateV56RecommendationScore =
+        calculateRecommendationScore;
 
     /* ============================================================
        LANCEMENT
@@ -2749,24 +3280,24 @@
             "DOMContentLoaded",
             function () {
                 setTimeout(
-                    initV55,
+                    initV56,
                     500
                 );
             }
         );
     } else {
         setTimeout(
-            initV55,
+            initV56,
             500
         );
     }
 
     /* ============================================================
-       ACTUALISATION AUTOMATIQUE
+       ACTUALISATION
        ============================================================ */
 
     setInterval(
-        refreshV55,
+        refreshV56,
         1000
     );
 
