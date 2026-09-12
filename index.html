@@ -222,7 +222,7 @@
                 <h2>📊 Performance</h2>
 
                 <p>
-                    Analyse de vos résultats
+                    Analyse détaillée de vos résultats
                 </p>
 
             </div>
@@ -372,6 +372,123 @@
                     "
                 >
                     -
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Profit Factor
+                </span>
+
+                <strong id="statProfitFactor">
+                    0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Gain moyen / trade
+                </span>
+
+                <strong id="statAverageTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Gain moyen gagnant
+                </span>
+
+                <strong id="statAverageWin">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Perte moyenne perdant
+                </span>
+
+                <strong id="statAverageLoss">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Meilleur trade
+                </span>
+
+                <strong id="statBestTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Pire trade
+                </span>
+
+                <strong id="statWorstTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Série gagnante max
+                </span>
+
+                <strong id="statMaxWinStreak">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Série perdante max
+                </span>
+
+                <strong id="statMaxLossStreak">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Drawdown maximal
+                </span>
+
+                <strong id="statMaxDrawdown">
+                    $0.00
                 </strong>
 
             </div>
@@ -843,31 +960,18 @@
                     <tr>
 
                         <th>Date du trade</th>
-
                         <th>Enregistré le</th>
-
                         <th>Actif</th>
-
                         <th>Position</th>
-
                         <th>Lot</th>
-
                         <th>Entry</th>
-
                         <th>SL</th>
-
                         <th>TP</th>
-
                         <th>RR</th>
-
                         <th>Pips</th>
-
                         <th>Setup</th>
-
                         <th>Résultat</th>
-
                         <th>P/L</th>
-
                         <th>Action</th>
 
                     </tr>
@@ -917,7 +1021,7 @@
 
 
 <!-- ========================================================
-     MODAL NOUVEAU / MODIFIER CAPITAL
+     MODAL CAPITAL
 ========================================================= -->
 
 <div
@@ -1045,45 +1149,27 @@
                 </strong>
 
 
-                <div
-                    style="
-                        margin-top: 6px;
-                    "
-                >
-
+                <div style="margin-top: 6px;">
                     Risque de référence :
                     <strong id="capitalModalRiskPreview">
                         $0.00
                     </strong>
-
                 </div>
 
 
-                <div
-                    style="
-                        margin-top: 6px;
-                    "
-                >
-
+                <div style="margin-top: 6px;">
                     RR cible :
                     <strong id="capitalModalRR">
                         0.00
                     </strong>
-
                 </div>
 
 
-                <div
-                    style="
-                        margin-top: 6px;
-                    "
-                >
-
+                <div style="margin-top: 6px;">
                     Objectif théorique :
                     <strong id="capitalModalObjective">
                         $0.00
                     </strong>
-
                 </div>
 
 
@@ -1093,7 +1179,6 @@
                         font-size: 0.9em;
                     "
                 >
-
                     L'objectif théorique = risque de référence × RR.
 
                     <br>
