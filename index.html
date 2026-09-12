@@ -19,39 +19,262 @@
 
 
     <!-- ======================================================
-         STYLE SPECIFIQUE AJOUT TRADE
-         ====================================================== -->
+         NAVIGATION + VUES
+    ======================================================= -->
 
     <style>
 
         /* =====================================================
-           BOUTON / CARTE AJOUT TRADE
-           ===================================================== */
+           NAVIGATION PRINCIPALE
+        ===================================================== */
 
-        .trade-launcher {
+        .app-nav {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1000;
+
             display: flex;
-            justify-content: center;
+
             align-items: center;
-            margin: 22px 0;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+
+            padding: 12px 20px;
+
+            background:
+                rgba(15, 23, 42, 0.94);
+
+            backdrop-filter:
+                blur(12px);
+
+            -webkit-backdrop-filter:
+                blur(12px);
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,0.08);
         }
 
 
-        .add-trade-main-btn {
+        .app-nav a {
+
             display: inline-flex;
+
             align-items: center;
+
             justify-content: center;
-            gap: 10px;
 
-            min-width: 205px;
-            height: 52px;
+            gap: 8px;
 
-            padding: 0 24px;
+            min-height: 42px;
+
+            padding:
+                9px 17px;
+
+            border-radius: 11px;
+
+            text-decoration: none;
+
+            color: inherit;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            transition:
+                transform 0.18s ease,
+                background 0.18s ease,
+                box-shadow 0.18s ease;
+        }
+
+
+        .app-nav a:hover {
+
+            transform:
+                translateY(-1px);
+
+            background:
+                rgba(255,255,255,0.07);
+        }
+
+
+        .app-nav a.active {
+
+            background:
+                rgba(59,130,246,0.18);
+
+            box-shadow:
+                inset
+                0 0 0 1px
+                rgba(96,165,250,0.28);
+        }
+
+
+        /* =====================================================
+           TITRES DES PAGES
+        ===================================================== */
+
+        .page-title {
+
+            display: none;
+
+            margin:
+                8px 0 20px;
+        }
+
+
+        .page-title h2 {
+
+            margin:
+                0 0 5px;
+        }
+
+
+        .page-title p {
+
+            margin: 0;
+
+            color:
+                var(--muted);
+
+            font-size:
+                13px;
+        }
+
+
+        /* =====================================================
+           TOUT EST CACHE PAR DEFAUT
+        ===================================================== */
+
+        #dashboardCapitalCard,
+        #dashboardChartCard,
+        #dashboardTradeLauncher,
+        #performanceSummaryCard,
+        #historyCard,
+        #setupPerformanceCard,
+        #assetPerformanceCard,
+        #archivesCard,
+        #dashboardPageHeader,
+        #analysisPageHeader,
+        #archivesPageHeader {
+
+            display: none;
+        }
+
+
+        /* =====================================================
+           PAGE DASHBOARD
+        ===================================================== */
+
+        body[data-page="dashboard"]
+        #dashboardPageHeader {
+
+            display: block;
+        }
+
+
+        body[data-page="dashboard"]
+        #dashboardCapitalCard,
+
+        body[data-page="dashboard"]
+        #dashboardChartCard,
+
+        body[data-page="dashboard"]
+        #dashboardTradeLauncher,
+
+        body[data-page="dashboard"]
+        #performanceSummaryCard,
+
+        body[data-page="dashboard"]
+        #historyCard {
+
+            display: block;
+        }
+
+
+        /* =====================================================
+           PAGE ANALYSE
+        ===================================================== */
+
+        body[data-page="analysis"]
+        #analysisPageHeader {
+
+            display: block;
+        }
+
+
+        body[data-page="analysis"]
+        #v51FilterCard {
+
+            display: block !important;
+        }
+
+
+        body[data-page="analysis"]
+        #setupPerformanceCard,
+
+        body[data-page="analysis"]
+        #assetPerformanceCard {
+
+            display: block;
+        }
+
+
+        /* =====================================================
+           PAGE ARCHIVES
+        ===================================================== */
+
+        body[data-page="archives"]
+        #archivesPageHeader {
+
+            display: block;
+        }
+
+
+        body[data-page="archives"]
+        #archivesCard {
+
+            display: block;
+        }
+
+
+        /* =====================================================
+           BOUTON AJOUT TRADE
+        ===================================================== */
+
+        #dashboardTradeLauncher {
+
+            margin:
+                4px 0 24px;
+        }
+
+
+        .trade-launcher {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            width: 100%;
+
+            min-height: 96px;
+
+            padding: 18px;
 
             border: none;
-            border-radius: 14px;
 
-            font-size: 15px;
-            font-weight: 700;
+            border-radius: 16px;
 
             cursor: pointer;
 
@@ -60,13 +283,13 @@
             background:
                 linear-gradient(
                     135deg,
-                    #2563eb 0%,
-                    #4f46e5 100%
+                    rgba(37,99,235,0.96),
+                    rgba(79,70,229,0.96)
                 );
 
             box-shadow:
-                0 8px 24px
-                rgba(37, 99, 235, 0.28);
+                0 12px 32px
+                rgba(37,99,235,0.22);
 
             transition:
                 transform 0.18s ease,
@@ -75,138 +298,107 @@
         }
 
 
-        .add-trade-main-btn:hover {
+        .trade-launcher:hover {
 
             transform:
                 translateY(-2px);
 
             box-shadow:
-                0 12px 30px
-                rgba(37, 99, 235, 0.38);
+                0 16px 36px
+                rgba(37,99,235,0.30);
 
             filter:
-                brightness(1.06);
+                brightness(1.04);
         }
 
 
-        .add-trade-main-btn:active {
+        .trade-launcher-main {
 
-            transform:
-                translateY(0);
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            font-size:
+                16px;
+
+            font-weight:
+                800;
         }
 
 
-        .add-trade-main-btn .trade-icon {
+        .trade-launcher-icon {
 
             display: inline-flex;
 
             align-items: center;
+
             justify-content: center;
 
-            width: 28px;
-            height: 28px;
+            width: 30px;
+
+            height: 30px;
 
             border-radius: 9px;
 
-            font-size: 20px;
-
             background:
-                rgba(255, 255, 255, 0.16);
+                rgba(255,255,255,0.15);
+
+            font-size:
+                21px;
+
+            line-height:
+                1;
         }
 
 
-        .trade-launcher-subtitle {
+        .trade-launcher small {
 
-            margin-top: 8px;
+            display: block;
 
-            font-size: 12px;
+            margin-top:
+                6px;
 
-            text-align: center;
+            font-size:
+                12px;
 
-            color: #64748b;
+            font-weight:
+                500;
+
+            opacity:
+                0.82;
         }
 
 
         /* =====================================================
            MODAL AJOUT TRADE
-           ===================================================== */
+        ===================================================== */
 
-        #tradeModal {
-
-            position: fixed;
-
-            inset: 0;
-
-            z-index: 9999;
+        .modal.trade-modal {
 
             display: none;
-
-            align-items: center;
-            justify-content: center;
-
-            padding: 20px;
-
-            background:
-                rgba(15, 23, 42, 0.68);
-
-            backdrop-filter:
-                blur(6px);
-
-            -webkit-backdrop-filter:
-                blur(6px);
         }
 
 
-        #tradeModal.show {
+        .modal.trade-modal.open {
 
             display: flex;
         }
 
 
-        .trade-modal-content {
+        .trade-modal .modal-content {
 
             width:
-                min(980px, 100%);
+                min(1100px, 96vw);
 
             max-height:
-                calc(100vh - 40px);
+                92vh;
 
             overflow-y:
                 auto;
-
-            position: relative;
-
-            border-radius: 20px;
-
-            box-shadow:
-                0 25px 70px
-                rgba(15, 23, 42, 0.38);
-
-            animation:
-                tradeModalIn
-                0.18s ease-out;
-        }
-
-
-        @keyframes tradeModalIn {
-
-            from {
-
-                opacity: 0;
-
-                transform:
-                    translateY(12px)
-                    scale(0.985);
-            }
-
-            to {
-
-                opacity: 1;
-
-                transform:
-                    translateY(0)
-                    scale(1);
-            }
         }
 
 
@@ -215,35 +407,32 @@
             display: flex;
 
             align-items: center;
+
             justify-content: space-between;
 
             gap: 20px;
 
-            padding: 22px 24px;
-
-            border-bottom:
-                1px solid
-                rgba(148, 163, 184, 0.18);
+            margin-bottom:
+                20px;
         }
 
 
         .trade-modal-title-area h2 {
 
             margin:
-                0 0 5px 0;
+                0 0 5px;
         }
 
 
         .trade-modal-title-area p {
 
-            margin:
-                0;
+            margin: 0;
+
+            color:
+                var(--muted);
 
             font-size:
                 13px;
-
-            color:
-                #64748b;
         }
 
 
@@ -252,53 +441,41 @@
             display: inline-flex;
 
             align-items: center;
+
             justify-content: center;
 
             width: 40px;
+
             height: 40px;
 
-            flex: 0 0 40px;
+            border:
+                1px solid
+                var(--border);
 
-            border: none;
-
-            border-radius: 11px;
+            border-radius:
+                10px;
 
             background:
-                rgba(148, 163, 184, 0.12);
+                var(--panel-2);
 
             color:
-                #64748b;
+                var(--muted);
 
             font-size:
                 18px;
 
             cursor:
                 pointer;
-
-            transition:
-                background 0.18s ease,
-                color 0.18s ease,
-                transform 0.18s ease;
         }
 
 
         .trade-modal-close:hover {
 
-            background:
-                rgba(220, 38, 38, 0.12);
-
             color:
-                #dc2626;
+                var(--red);
 
-            transform:
-                rotate(3deg);
-        }
-
-
-        .trade-modal-body {
-
-            padding:
-                24px;
+            border-color:
+                var(--red);
         }
 
 
@@ -311,77 +488,33 @@
             gap: 9px;
 
             margin:
-                0 0 16px 0;
+                0 0 15px;
 
             font-size:
                 14px;
 
             font-weight:
                 700;
-
-            color:
-                #334155;
         }
 
 
-        .trade-modal-section-title .section-dot {
-
-            width: 8px;
-            height: 8px;
-
-            border-radius: 50%;
-
-            background:
-                #2563eb;
-        }
-
-
-        .trade-modal-body .form-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(4, minmax(0, 1fr));
-
-            gap: 16px;
-        }
-
-
-        .trade-modal-body .form-full {
-
-            margin-top:
-                16px;
-        }
-
-
-        .trade-modal-body label {
-
-            display: block;
-
-            margin-bottom:
-                7px;
-
-            font-size:
-                13px;
-
-            font-weight:
-                600;
-        }
-
-
-        .trade-modal-body input,
-        .trade-modal-body select,
-        .trade-modal-body textarea {
+        .section-dot {
 
             width:
-                100%;
+                8px;
 
-            box-sizing:
-                border-box;
+            height:
+                8px;
+
+            border-radius:
+                50%;
+
+            background:
+                #3b82f6;
         }
 
 
-        .trade-mm-box {
+        .trade-modal .trade-mm-box {
 
             margin-top:
                 18px;
@@ -389,15 +522,15 @@
             padding:
                 14px 16px;
 
-            border-radius:
-                13px;
-
             border:
                 1px solid
-                rgba(37, 99, 235, 0.14);
+                rgba(59,130,246,0.18);
+
+            border-radius:
+                12px;
 
             background:
-                rgba(37, 99, 235, 0.06);
+                rgba(59,130,246,0.06);
 
             font-size:
                 13px;
@@ -415,100 +548,133 @@
 
             gap: 10px;
 
-            padding:
-                18px 24px 22px;
+            margin-top:
+                20px;
+
+            padding-top:
+                18px;
 
             border-top:
                 1px solid
-                rgba(148, 163, 184, 0.18);
+                var(--border);
         }
 
 
-        .trade-modal-footer .cancel-trade-btn {
+        .trade-modal-footer button {
 
             min-width:
-                120px;
+                150px;
         }
 
 
-        .trade-modal-footer .save-trade-btn {
+        /* =====================================================
+           PAGE ANALYSE
+        ===================================================== */
 
-            min-width:
-                180px;
+        body[data-page="analysis"] .container {
+
+            padding-bottom:
+                30px;
+        }
+
+
+        /* =====================================================
+           PAGE ARCHIVES
+        ===================================================== */
+
+        body[data-page="archives"] .container {
+
+            padding-bottom:
+                30px;
+        }
+
+
+        /* =====================================================
+           MODE CLAIR
+        ===================================================== */
+
+        body.light-theme .app-nav {
+
+            background:
+                rgba(255,255,255,0.94);
+
+            border-bottom:
+                1px solid
+                rgba(15,23,42,0.08);
+        }
+
+
+        body.light-theme .app-nav a:hover {
+
+            background:
+                rgba(15,23,42,0.05);
+        }
+
+
+        body.light-theme .trade-launcher {
+
+            box-shadow:
+                0 12px 30px
+                rgba(37,99,235,0.18);
         }
 
 
         /* =====================================================
            RESPONSIVE
-           ===================================================== */
+        ===================================================== */
 
-        @media (max-width: 900px) {
+        @media (max-width: 760px) {
 
-            .trade-modal-body .form-grid {
+            .app-nav {
 
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
+                justify-content:
+                    stretch;
+
+                padding:
+                    10px 12px;
+
+                gap:
+                    6px;
+            }
+
+
+            .app-nav a {
+
+                flex:
+                    1 1 calc(33.333% - 6px);
+
+                padding:
+                    9px 8px;
+
+                font-size:
+                    12px;
+            }
+
+
+            .trade-launcher {
+
+                min-height:
+                    88px;
+            }
+
+
+            .trade-modal .modal-content {
+
+                width:
+                    96vw;
+
+                max-height:
+                    94vh;
             }
         }
 
 
-        @media (max-width: 620px) {
+        @media (max-width: 560px) {
 
-            .trade-launcher {
+            .app-nav a {
 
-                margin:
-                    18px 0;
-            }
-
-
-            .add-trade-main-btn {
-
-                min-width:
-                    190px;
-
-                height:
-                    50px;
-
-                padding:
-                    0 20px;
-            }
-
-
-            #tradeModal {
-
-                padding:
-                    10px;
-            }
-
-
-            .trade-modal-content {
-
-                max-height:
-                    calc(100vh - 20px);
-
-                border-radius:
-                    16px;
-            }
-
-
-            .trade-modal-header {
-
-                padding:
-                    18px;
-            }
-
-
-            .trade-modal-body {
-
-                padding:
-                    18px;
-            }
-
-
-            .trade-modal-body .form-grid {
-
-                grid-template-columns:
-                    1fr;
+                flex:
+                    1 1 100%;
             }
 
 
@@ -516,9 +682,6 @@
 
                 flex-direction:
                     column-reverse;
-
-                padding:
-                    16px 18px 18px;
             }
 
 
@@ -529,31 +692,10 @@
             }
         }
 
-
-        /* =====================================================
-           THEME CLAIRE
-           ===================================================== */
-
-        body.light-theme
-        .trade-modal-title-area p,
-        body.light-theme
-        .trade-launcher-subtitle {
-
-            color:
-                #64748b;
-        }
-
-
-        body.light-theme
-        .trade-modal-section-title {
-
-            color:
-                #334155;
-        }
-
     </style>
 
 </head>
+
 
 
 <body>
@@ -586,14 +728,116 @@
 
 
 
+<!-- ==========================================================
+     NAVIGATION
+=========================================================== -->
+
+<nav
+    class="app-nav"
+    aria-label="Navigation principale"
+>
+
+    <a
+        href="index.html?page=dashboard"
+        data-page-link="dashboard"
+    >
+        🏠 Dashboard
+    </a>
+
+
+    <a
+        href="index.html?page=analysis"
+        data-page-link="analysis"
+    >
+        📊 Analyse & Performance
+    </a>
+
+
+    <a
+        href="index.html?page=archives"
+        data-page-link="archives"
+    >
+        🗄️ Archives
+    </a>
+
+</nav>
+
+
+
 <main class="container">
+
+
+    <!-- ======================================================
+         TITRE DASHBOARD
+    ======================================================= -->
+
+    <div
+        id="dashboardPageHeader"
+        class="page-title"
+    >
+
+        <h2>
+            🏠 Dashboard
+        </h2>
+
+        <p>
+            Vue générale de votre activité et de votre capital.
+        </p>
+
+    </div>
+
+
+
+    <!-- ======================================================
+         TITRE ANALYSE
+    ======================================================= -->
+
+    <div
+        id="analysisPageHeader"
+        class="page-title"
+    >
+
+        <h2>
+            📊 Analyse & Performance
+        </h2>
+
+        <p>
+            Analyse filtrée, risque, setups, actifs, recommandations et calendrier.
+        </p>
+
+    </div>
+
+
+
+    <!-- ======================================================
+         TITRE ARCHIVES
+    ======================================================= -->
+
+    <div
+        id="archivesPageHeader"
+        class="page-title"
+    >
+
+        <h2>
+            🗄️ Archives des capitaux
+        </h2>
+
+        <p>
+            Chaque capital conserve son historique indépendamment.
+        </p>
+
+    </div>
+
 
 
     <!-- ======================================================
          CAPITAL ACTIF
     ======================================================= -->
 
-    <section class="card active-capital-card">
+    <section
+        id="dashboardCapitalCard"
+        class="card active-capital-card"
+    >
 
         <div class="section-header">
 
@@ -717,7 +961,7 @@
             <div class="capital-box">
 
                 <span>
-                    Objectif théorique / trade
+                    Objectif / trade
                 </span>
 
                 <strong id="theoreticalObjective">
@@ -733,35 +977,36 @@
 
 
     <!-- ======================================================
-         BOUTON AJOUT TRADE
+         AJOUT TRADE
     ======================================================= -->
 
-    <section class="trade-launcher">
+    <section
+        id="dashboardTradeLauncher"
+        class="trade-launcher-card"
+    >
 
-        <div>
+        <button
+            id="openTradeModalBtn"
+            class="trade-launcher"
+            type="button"
+        >
 
-            <button
-                id="openTradeModalBtn"
-                class="add-trade-main-btn"
-                type="button"
-            >
+            <span class="trade-launcher-main">
 
-                <span class="trade-icon">
+                <span class="trade-launcher-icon">
                     ＋
                 </span>
 
-                <span>
-                    Ajouter un trade
-                </span>
+                Ajouter un trade
 
-            </button>
+            </span>
 
 
-            <div class="trade-launcher-subtitle">
+            <small>
                 Enregistrer rapidement un nouveau trade
-            </div>
+            </small>
 
-        </div>
+        </button>
 
     </section>
 
@@ -771,7 +1016,10 @@
          GRAPHIQUE CAPITAL
     ======================================================= -->
 
-    <section class="card chart-card">
+    <section
+        id="dashboardChartCard"
+        class="card chart-card"
+    >
 
         <div class="section-header">
 
@@ -811,21 +1059,24 @@
 
 
     <!-- ======================================================
-         PERFORMANCE
+         PERFORMANCE GENERALE
     ======================================================= -->
 
-    <section class="card">
+    <section
+        id="performanceSummaryCard"
+        class="card"
+    >
 
         <div class="section-header">
 
             <div>
 
                 <h2>
-                    📊 Performance
+                    📊 Performance générale
                 </h2>
 
                 <p>
-                    Analyse de vos résultats
+                    Résumé de vos résultats
                 </p>
 
             </div>
@@ -1099,10 +1350,14 @@
 
 
     <!-- ======================================================
-         PERFORMANCE DES SETUPS
+         PERFORMANCE SETUPS
+         Visible uniquement sur Analyse
     ======================================================= -->
 
-    <section class="card">
+    <section
+        id="setupPerformanceCard"
+        class="card"
+    >
 
         <div class="section-header">
 
@@ -1113,7 +1368,7 @@
                 </h2>
 
                 <p>
-                    Résultats par stratégie
+                    Résultats détaillés par stratégie
                 </p>
 
             </div>
@@ -1166,10 +1421,14 @@
 
 
     <!-- ======================================================
-         PERFORMANCE PAR ACTIF
+         PERFORMANCE ACTIFS
+         Visible uniquement sur Analyse
     ======================================================= -->
 
-    <section class="card">
+    <section
+        id="assetPerformanceCard"
+        class="card"
+    >
 
         <div class="section-header">
 
@@ -1256,7 +1515,10 @@
          HISTORIQUE
     ======================================================= -->
 
-    <section class="card">
+    <section
+        id="historyCard"
+        class="card"
+    >
 
         <div class="section-header">
 
@@ -1368,7 +1630,10 @@
          ARCHIVES
     ======================================================= -->
 
-    <section class="card">
+    <section
+        id="archivesCard"
+        class="card"
+    >
 
         <div class="section-header">
 
@@ -1405,19 +1670,17 @@
 
 <div
     id="tradeModal"
-    class="trade-modal"
+    class="modal trade-modal"
     aria-hidden="true"
 >
 
     <div
-        class="trade-modal-content card"
+        class="modal-content"
         role="dialog"
         aria-modal="true"
         aria-labelledby="tradeModalTitle"
     >
 
-
-        <!-- HEADER -->
 
         <div class="trade-modal-header">
 
@@ -1447,383 +1710,348 @@
 
 
 
-        <!-- FORMULAIRE -->
-
         <form id="tradeForm">
 
 
-            <div class="trade-modal-body">
+            <div
+                class="trade-modal-section-title"
+            >
 
+                <span class="section-dot"></span>
 
-                <!-- SECTION INFORMATIONS -->
+                Informations du trade
 
-                <div class="trade-modal-section-title">
+            </div>
 
-                    <span class="section-dot"></span>
 
-                    Informations du trade
+            <div class="form-grid">
 
-                </div>
 
+                <!-- ACTIF -->
 
-                <div class="form-grid">
+                <div>
 
-
-                    <!-- ACTIF -->
-
-                    <div>
-
-                        <label for="asset">
-                            Actif
-                        </label>
-
-                        <input
-                            type="text"
-                            id="asset"
-                            list="assetList"
-                            placeholder="XAUUSD"
-                            required
-                        >
-
-
-                        <datalist id="assetList">
-
-                            <option value="EUR/USD"></option>
-                            <option value="GBP/USD"></option>
-                            <option value="AUD/USD"></option>
-                            <option value="NZD/USD"></option>
-                            <option value="USD/CAD"></option>
-                            <option value="USD/CHF"></option>
-                            <option value="USD/JPY"></option>
-                            <option value="XAUUSD"></option>
-                            <option value="BTCUSD"></option>
-
-                        </datalist>
-
-                    </div>
-
-
-
-                    <!-- DATE -->
-
-                    <div>
-
-                        <label for="date">
-                            Date
-                        </label>
-
-                        <input
-                            type="date"
-                            id="date"
-                            required
-                        >
-
-                    </div>
-
-
-
-                    <!-- POSITION -->
-
-                    <div>
-
-                        <label for="direction">
-                            Position
-                        </label>
-
-                        <select
-                            id="direction"
-                            required
-                        >
-
-                            <option value="BUY">
-                                Buy
-                            </option>
-
-                            <option value="SELL">
-                                Sell
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-
-                    <!-- TYPE ORDRE -->
-
-                    <div>
-
-                        <label for="orderType">
-                            Type d'ordre
-                        </label>
-
-                        <select
-                            id="orderType"
-                            required
-                        >
-
-                            <option value="Market">
-                                Immediat
-                            </option>
-
-                            <option value="Buy Limit">
-                                Buy Limit
-                            </option>
-
-                            <option value="Sell Limit">
-                                Sell Limit
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-
-                    <!-- LOT -->
-
-                    <div>
-
-                        <label for="lot">
-                            Lot
-                        </label>
-
-                        <input
-                            type="number"
-                            id="lot"
-                            step="0.01"
-                            min="0.01"
-                            placeholder="0.01"
-                            readonly
-                            required
-                        >
-
-                    </div>
-
-
-
-                    <!-- ENTRY -->
-
-                    <div>
-
-                        <label for="entry">
-                            Entry
-                        </label>
-
-                        <input
-                            type="number"
-                            id="entry"
-                            step="any"
-                            placeholder="4450.00"
-                            required
-                        >
-
-                    </div>
-
-
-
-                    <!-- SL -->
-
-                    <div>
-
-                        <label for="sl">
-                            Stop Loss
-                        </label>
-
-                        <input
-                            type="number"
-                            id="sl"
-                            step="any"
-                            placeholder="4445.00"
-                            required
-                        >
-
-                    </div>
-
-
-
-                    <!-- TP -->
-
-                    <div>
-
-                        <label for="tp">
-                            Take Profit
-                        </label>
-
-                        <input
-                            type="number"
-                            id="tp"
-                            step="any"
-                            placeholder="4460.00"
-                            readonly
-                        >
-
-                    </div>
-
-
-
-                    <!-- RR -->
-
-                    <div>
-
-                        <label for="calculatedRR">
-                            RR
-                        </label>
-
-                        <input
-                            type="text"
-                            id="calculatedRR"
-                            value="0.00"
-                            readonly
-                        >
-
-                    </div>
-
-
-
-                    <!-- RESULTAT -->
-
-                    <div>
-
-                        <label for="result">
-                            Résultat
-                        </label>
-
-                        <select
-                            id="result"
-                            required
-                        >
-
-                            <option value="TP">
-                                TP
-                            </option>
-
-                            <option value="SL">
-                                SL
-                            </option>
-
-                            <option value="BE">
-                                BE
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-
-                    <!-- SETUP -->
-
-                    <div>
-
-                        <label for="setup">
-                            Setup
-                        </label>
-
-                        <select
-                            id="setup"
-                            required
-                        >
-
-                            <option value="LDP+QML">
-                                LDP+QML
-                            </option>
-
-                            <option value="LDP+FIBO 50">
-                                LDP+FIBO 50
-                            </option>
-
-                            <option value="OB">
-                                OB
-                            </option>
-
-                            <option value="BB">
-                                BB
-                            </option>
-
-                            <option value="ZS OA">
-                                ZS OA
-                            </option>
-
-                            <option value="SSM1">
-                                SSM1
-                            </option>
-
-                            <option value="SSM2">
-                                SSM2
-                            </option>
-
-                            <option value="SSM3">
-                                SSM3
-                            </option>
-
-                            <option value="SBM1">
-                                SBM1
-                            </option>
-
-                            <option value="SBM2">
-                                SBM2
-                            </option>
-
-                            <option value="SBM3">
-                                SBM3
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-
-                    <!-- P/L -->
-
-                    <div>
-
-                        <label
-                            for="profit"
-                            id="profitLabel"
-                        >
-                            P/L automatique
-                        </label>
-
-                        <input
-                            type="number"
-                            step="any"
-                            id="profit"
-                            placeholder="Calculé automatiquement"
-                            readonly
-                            required
-                        >
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- INFO MONEY MANAGEMENT -->
-
-                <div
-                    id="tradeMMInfo"
-                    class="trade-mm-box form-full"
-                ></div>
-
-
-
-                <!-- COMMENTAIRE -->
-
-                <div class="form-full">
-
-                    <label for="comment">
-                        Commentaire
+                    <label for="asset">
+                        Actif
                     </label>
 
-                    <textarea
-                        id="comment"
-                        rows="3"
-                        placeholder="Commentaire sur le trade..."
-                    ></textarea>
+                    <input
+                        type="text"
+                        id="asset"
+                        list="assetList"
+                        placeholder="XAUUSD"
+                        required
+                    >
+
+
+                    <datalist id="assetList">
+
+                        <option value="EUR/USD"></option>
+                        <option value="GBP/USD"></option>
+                        <option value="AUD/USD"></option>
+                        <option value="NZD/USD"></option>
+                        <option value="USD/CAD"></option>
+                        <option value="USD/CHF"></option>
+                        <option value="USD/JPY"></option>
+                        <option value="XAUUSD"></option>
+                        <option value="BTCUSD"></option>
+
+                    </datalist>
+
+                </div>
+
+
+
+                <!-- DATE -->
+
+                <div>
+
+                    <label for="date">
+                        Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="date"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- POSITION -->
+
+                <div>
+
+                    <label for="direction">
+                        Position
+                    </label>
+
+                    <select
+                        id="direction"
+                        required
+                    >
+
+                        <option value="BUY">
+                            Buy
+                        </option>
+
+                        <option value="SELL">
+                            Sell
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- TYPE ORDRE -->
+
+                <div>
+
+                    <label for="orderType">
+                        Type d'ordre
+                    </label>
+
+                    <select
+                        id="orderType"
+                        required
+                    >
+
+                        <option value="Market">
+                            Immediat
+                        </option>
+
+                        <option value="Buy Limit">
+                            Buy Limit
+                        </option>
+
+                        <option value="Sell Limit">
+                            Sell Limit
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- LOT -->
+
+                <div>
+
+                    <label for="lot">
+                        Lot
+                    </label>
+
+                    <input
+                        type="number"
+                        id="lot"
+                        step="0.01"
+                        min="0.01"
+                        placeholder="0.01"
+                        readonly
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- ENTRY -->
+
+                <div>
+
+                    <label for="entry">
+                        Entry
+                    </label>
+
+                    <input
+                        type="number"
+                        id="entry"
+                        step="any"
+                        placeholder="4450.00"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- SL -->
+
+                <div>
+
+                    <label for="sl">
+                        Stop Loss
+                    </label>
+
+                    <input
+                        type="number"
+                        id="sl"
+                        step="any"
+                        placeholder="4445.00"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- TP -->
+
+                <div>
+
+                    <label for="tp">
+                        Take Profit
+                    </label>
+
+                    <input
+                        type="number"
+                        id="tp"
+                        step="any"
+                        placeholder="4460.00"
+                        readonly
+                    >
+
+                </div>
+
+
+
+                <!-- RR -->
+
+                <div>
+
+                    <label for="calculatedRR">
+                        RR
+                    </label>
+
+                    <input
+                        type="text"
+                        id="calculatedRR"
+                        value="0.00"
+                        readonly
+                    >
+
+                </div>
+
+
+
+                <!-- RESULTAT -->
+
+                <div>
+
+                    <label for="result">
+                        Résultat
+                    </label>
+
+                    <select
+                        id="result"
+                        required
+                    >
+
+                        <option value="TP">
+                            TP
+                        </option>
+
+                        <option value="SL">
+                            SL
+                        </option>
+
+                        <option value="BE">
+                            BE
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- SETUP -->
+
+                <div>
+
+                    <label for="setup">
+                        Setup
+                    </label>
+
+                    <select
+                        id="setup"
+                        required
+                    >
+
+                        <option value="LDP+QML">
+                            LDP+QML
+                        </option>
+
+                        <option value="LDP+FIBO 50">
+                            LDP+FIBO 50
+                        </option>
+
+                        <option value="OB">
+                            OB
+                        </option>
+
+                        <option value="BB">
+                            BB
+                        </option>
+
+                        <option value="ZS OA">
+                            ZS OA
+                        </option>
+
+                        <option value="SSM1">
+                            SSM1
+                        </option>
+
+                        <option value="SSM2">
+                            SSM2
+                        </option>
+
+                        <option value="SSM3">
+                            SSM3
+                        </option>
+
+                        <option value="SBM1">
+                            SBM1
+                        </option>
+
+                        <option value="SBM2">
+                            SBM2
+                        </option>
+
+                        <option value="SBM3">
+                            SBM3
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- P/L -->
+
+                <div>
+
+                    <label
+                        for="profit"
+                        id="profitLabel"
+                    >
+                        P/L automatique
+                    </label>
+
+                    <input
+                        type="number"
+                        step="any"
+                        id="profit"
+                        placeholder="Calculé automatiquement"
+                        readonly
+                        required
+                    >
 
                 </div>
 
@@ -1832,13 +2060,40 @@
 
 
 
-            <!-- FOOTER -->
+            <!-- INFO MONEY MANAGEMENT -->
+
+            <div
+                id="tradeMMInfo"
+                class="trade-mm-box form-full"
+            ></div>
+
+
+
+            <!-- COMMENTAIRE -->
+
+            <div class="form-full">
+
+                <label for="comment">
+                    Commentaire
+                </label>
+
+                <textarea
+                    id="comment"
+                    rows="3"
+                    placeholder="Commentaire sur le trade..."
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- ACTIONS -->
 
             <div class="trade-modal-footer">
 
                 <button
                     id="cancelTradeModalBtn"
-                    class="secondary-btn cancel-trade-btn"
+                    class="secondary-btn"
                     type="button"
                 >
                     Annuler
@@ -1847,7 +2102,7 @@
 
                 <button
                     type="submit"
-                    class="primary-btn save-trade-btn"
+                    class="primary-btn"
                 >
                     💾 Enregistrer le trade
                 </button>
@@ -1856,7 +2111,6 @@
 
 
         </form>
-
 
     </div>
 
@@ -1907,8 +2161,6 @@
         <div class="modal-body">
 
 
-            <!-- NOM -->
-
             <div>
 
                 <label for="capitalNameInput">
@@ -1925,8 +2177,6 @@
             </div>
 
 
-
-            <!-- CAPITAL INITIAL -->
 
             <div>
 
@@ -1953,8 +2203,6 @@
 
 
 
-            <!-- RISQUE DE REFERENCE -->
-
             <div>
 
                 <label for="capitalRiskInput">
@@ -1972,8 +2220,6 @@
             </div>
 
 
-
-            <!-- RR CIBLE -->
 
             <div>
 
@@ -1998,29 +2244,19 @@
 
 
 
-            <!-- PREVIEW -->
+            <div class="capital-modal-preview">
 
-            <div
-                class="capital-modal-preview"
-            >
-
-                <div
-                    id="capitalModalRiskPreview"
-                >
+                <div id="capitalModalRiskPreview">
                     Risque : $0.00
                 </div>
 
 
-                <div
-                    id="capitalModalRR"
-                >
+                <div id="capitalModalRR">
                     RR cible : 2.00
                 </div>
 
 
-                <div
-                    id="capitalModalObjective"
-                >
+                <div id="capitalModalObjective">
                     $0.00
                 </div>
 
@@ -2170,10 +2406,86 @@
 
 
 <!-- ==========================================================
-     SCRIPT MODAL AJOUT TRADE
+     GESTION DES PAGES
 =========================================================== -->
 
 <script>
+
+(function () {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    let page =
+        params.get("page") ||
+        "dashboard";
+
+
+    const allowedPages = [
+        "dashboard",
+        "analysis",
+        "archives"
+    ];
+
+
+    if (
+        !allowedPages.includes(page)
+    ) {
+
+        page =
+            "dashboard";
+    }
+
+
+    document.body.dataset.page =
+        page;
+
+
+    document
+        .querySelectorAll(
+            "[data-page-link]"
+        )
+        .forEach(
+            link => {
+
+                const linkPage =
+                    link.dataset.pageLink;
+
+
+                if (
+                    linkPage === page
+                ) {
+
+                    link.classList.add(
+                        "active"
+                    );
+
+                } else {
+
+                    link.classList.remove(
+                        "active"
+                    );
+                }
+
+            }
+        );
+
+})();
+
+</script>
+
+
+
+<!-- ==========================================================
+     MODAL AJOUT TRADE
+=========================================================== -->
+
+<script>
+
+(function () {
 
     function openTradeModal() {
 
@@ -2189,7 +2501,7 @@
 
 
         modal.classList.add(
-            "show"
+            "open"
         );
 
 
@@ -2204,9 +2516,6 @@
         );
 
 
-        /*
-         * On remet la date actuelle si elle est vide.
-         */
         const dateInput =
             document.getElementById(
                 "date"
@@ -2225,13 +2534,9 @@
         }
 
 
-        /*
-         * Recalcul immédiat des valeurs
-         * si app.js est déjà initialisé.
-         */
         if (
             typeof updateAutomaticTradeValues ===
-            "function"
+                "function"
         ) {
 
             updateAutomaticTradeValues();
@@ -2273,7 +2578,7 @@
 
 
         modal.classList.remove(
-            "show"
+            "open"
         );
 
 
@@ -2290,15 +2595,15 @@
 
 
 
-    const openTradeModalBtn =
+    const openButton =
         document.getElementById(
             "openTradeModalBtn"
         );
 
 
-    if (openTradeModalBtn) {
+    if (openButton) {
 
-        openTradeModalBtn.addEventListener(
+        openButton.addEventListener(
             "click",
             openTradeModal
         );
@@ -2306,15 +2611,15 @@
 
 
 
-    const closeTradeModalBtn =
+    const closeButton =
         document.getElementById(
             "closeTradeModalBtn"
         );
 
 
-    if (closeTradeModalBtn) {
+    if (closeButton) {
 
-        closeTradeModalBtn.addEventListener(
+        closeButton.addEventListener(
             "click",
             closeTradeModal
         );
@@ -2322,15 +2627,15 @@
 
 
 
-    const cancelTradeModalBtn =
+    const cancelButton =
         document.getElementById(
             "cancelTradeModalBtn"
         );
 
 
-    if (cancelTradeModalBtn) {
+    if (cancelButton) {
 
-        cancelTradeModalBtn.addEventListener(
+        cancelButton.addEventListener(
             "click",
             closeTradeModal
         );
@@ -2338,21 +2643,21 @@
 
 
 
-    const tradeModal =
+    const modal =
         document.getElementById(
             "tradeModal"
         );
 
 
-    if (tradeModal) {
+    if (modal) {
 
-        tradeModal.addEventListener(
+        modal.addEventListener(
             "click",
             event => {
 
                 if (
                     event.target ===
-                    tradeModal
+                    modal
                 ) {
 
                     closeTradeModal();
@@ -2363,17 +2668,6 @@
     }
 
 
-
-    /*
-     * Le formulaire est toujours géré par app.js.
-     *
-     * Ici nous surveillons le stockage après
-     * la soumission. Si le nombre de trades
-     * augmente réellement, la fenêtre se ferme.
-     *
-     * Cela évite de fermer la fenêtre lorsqu'une
-     * validation du trade échoue.
-     */
 
     const tradeForm =
         document.getElementById(
@@ -2418,8 +2712,7 @@
                             );
 
 
-                        let afterTrades =
-                            [];
+                        let afterTrades = [];
 
 
                         try {
@@ -2444,7 +2737,7 @@
                         }
 
                     },
-                    80
+                    100
                 );
 
             }
@@ -2453,16 +2746,16 @@
 
 
 
-    /*
-     * Fermer avec Échap.
-     */
     document.addEventListener(
         "keydown",
         event => {
 
             if (
-                event.key ===
-                "Escape"
+                event.key === "Escape" &&
+                document
+                    .getElementById("tradeModal")
+                    ?.classList
+                    .contains("open")
             ) {
 
                 closeTradeModal();
@@ -2470,6 +2763,8 @@
 
         }
     );
+
+})();
 
 </script>
 
