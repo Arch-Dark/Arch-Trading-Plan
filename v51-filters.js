@@ -1,7 +1,8 @@
 /* ============================================================
-   V5.7 — FILTRES + STATS + ANALYSE + CLASSEMENT
+   V5.8 — FILTRES + STATS + ANALYSE + CLASSEMENT
    + RECOMMANDATIONS
-   + ANALYSE DU RISQUE ET DE LA REGULARITE
+   + ANALYSE DU RISQUE
+   + CALENDRIER DE PERFORMANCE
    ============================================================ */
 
 (function () {
@@ -133,7 +134,6 @@
         }
 
         const today = new Date();
-
         const day = today.getDay();
 
         const diffToMonday =
@@ -149,7 +149,8 @@
             today.getDate() - diffToMonday
         );
 
-        const nextMonday = new Date(monday);
+        const nextMonday =
+            new Date(monday);
 
         nextMonday.setDate(
             monday.getDate() + 7
@@ -186,7 +187,8 @@
         const today = new Date();
 
         return (
-            tradeDate.getFullYear() === today.getFullYear()
+            tradeDate.getFullYear() ===
+            today.getFullYear()
         );
     }
 
@@ -276,11 +278,16 @@
             <div class="section-header">
                 <div>
                     <h2>🔎 Analyse filtrée</h2>
+
                     <p>
                         Analyse selon la période, l'actif et le setup
                     </p>
                 </div>
             </div>
+
+            <!-- ==================================================
+                 FILTRES
+                 ================================================== -->
 
             <div
                 style="
@@ -365,7 +372,9 @@
                     id="v56BestSetupCard"
                     class="stat-box"
                 >
-                    <span>⭐ Setup à privilégier</span>
+                    <span>
+                        ⭐ Setup à privilégier
+                    </span>
 
                     <strong id="v56BestSetup">
                         -
@@ -387,7 +396,9 @@
                     id="v56BestAssetCard"
                     class="stat-box"
                 >
-                    <span>📈 Actif à surveiller</span>
+                    <span>
+                        📈 Actif à surveiller
+                    </span>
 
                     <strong id="v56BestAsset">
                         -
@@ -409,7 +420,9 @@
                     id="v56AvoidSetupCard"
                     class="stat-box"
                 >
-                    <span>⚠️ Setup à éviter</span>
+                    <span>
+                        ⚠️ Setup à éviter
+                    </span>
 
                     <strong id="v56AvoidSetup">
                         -
@@ -431,7 +444,9 @@
                     id="v56WarningCard"
                     class="stat-box"
                 >
-                    <span>🛡️ Signal général</span>
+                    <span>
+                        🛡️ Signal général
+                    </span>
 
                     <strong id="v56GeneralSignal">
                         -
@@ -463,88 +478,273 @@
 
                 <div class="stat-box">
                     <span>Trades</span>
-                    <strong id="v51Trades">0</strong>
+                    <strong id="v51Trades">
+                        0
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Gagnants</span>
-                    <strong id="v51Wins">0</strong>
+                    <strong id="v51Wins">
+                        0
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Perdants</span>
-                    <strong id="v51Losses">0</strong>
+                    <strong id="v51Losses">
+                        0
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>BE</span>
-                    <strong id="v51BE">0</strong>
+                    <strong id="v51BE">
+                        0
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Winrate</span>
-                    <strong id="v51Winrate">0.0%</strong>
+                    <strong id="v51Winrate">
+                        0.0%
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Profit</span>
-                    <strong id="v51Profit">$0.00</strong>
+                    <strong id="v51Profit">
+                        $0.00
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>RR moyen</span>
-                    <strong id="v51AverageRR">0.00</strong>
+                    <strong id="v51AverageRR">
+                        0.00
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Profit Factor</span>
-                    <strong id="v51ProfitFactor">0.00</strong>
+                    <strong id="v51ProfitFactor">
+                        0.00
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Gain moyen / trade</span>
-                    <strong id="v51AverageTrade">$0.00</strong>
+                    <strong id="v51AverageTrade">
+                        $0.00
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Gain moyen gagnant</span>
-                    <strong id="v51AverageWinner">$0.00</strong>
+                    <strong id="v51AverageWinner">
+                        $0.00
+                    </strong>
                 </div>
 
                 <div class="stat-box">
-                    <span>Perte moyenne perdant</span>
-                    <strong id="v51AverageLoser">$0.00</strong>
+                    <span>
+                        Perte moyenne perdant
+                    </span>
+
+                    <strong id="v51AverageLoser">
+                        $0.00
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Meilleur trade</span>
-                    <strong id="v51BestTrade">$0.00</strong>
+                    <strong id="v51BestTrade">
+                        $0.00
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Pire trade</span>
-                    <strong id="v51WorstTrade">$0.00</strong>
+                    <strong id="v51WorstTrade">
+                        $0.00
+                    </strong>
                 </div>
 
                 <div class="stat-box">
-                    <span>Série gagnante max</span>
-                    <strong id="v51MaxWinStreak">0</strong>
+                    <span>
+                        Série gagnante max
+                    </span>
+
+                    <strong id="v51MaxWinStreak">
+                        0
+                    </strong>
                 </div>
 
                 <div class="stat-box">
-                    <span>Série perdante max</span>
-                    <strong id="v51MaxLossStreak">0</strong>
+                    <span>
+                        Série perdante max
+                    </span>
+
+                    <strong id="v51MaxLossStreak">
+                        0
+                    </strong>
                 </div>
 
                 <div class="stat-box">
                     <span>Drawdown maximal</span>
-                    <strong id="v51MaxDrawdown">$0.00</strong>
+
+                    <strong id="v51MaxDrawdown">
+                        $0.00
+                    </strong>
                 </div>
 
             </div>
 
             <!-- ==================================================
-                 V5.7 — ANALYSE DU RISQUE
+                 ANALYSE RISQUE
+                 ================================================== -->
+
+            <div style="margin-bottom:28px;">
+
+                <div class="section-header">
+                    <div>
+
+                        <h3>
+                            🛡️ Analyse du risque
+                        </h3>
+
+                        <p>
+                            Contrôle de la régularité et du respect du risque
+                        </p>
+
+                    </div>
+                </div>
+
+                <div
+                    class="stats-grid"
+                    style="margin-bottom:20px;"
+                >
+
+                    <div class="stat-box">
+                        <span>Risque moyen</span>
+
+                        <strong id="v57AverageRisk">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Risque minimum</span>
+
+                        <strong id="v57MinimumRisk">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Risque maximum</span>
+
+                        <strong id="v57MaximumRisk">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Risque référence</span>
+
+                        <strong id="v57ReferenceRisk">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Écart moyen</span>
+
+                        <strong id="v57AverageDeviation">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Risque régulier</span>
+
+                        <strong id="v57RiskRegularity">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Trades conformes</span>
+
+                        <strong id="v57CompliantTrades">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Trades hors risque</span>
+
+                        <strong id="v57NonCompliantTrades">
+                            0
+                        </strong>
+                    </div>
+
+                </div>
+
+                <div class="stats-grid">
+
+                    <div class="stat-box">
+                        <span>
+                            RR cible moyen
+                        </span>
+
+                        <strong id="v57TargetRR">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>
+                            RR moyen enregistré
+                        </span>
+
+                        <strong id="v57RecordedRR">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>RR minimum</span>
+
+                        <strong id="v57MinimumRR">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>RR maximum</span>
+
+                        <strong id="v57MaximumRR">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>
+                            RR ≥ 2
+                        </span>
+
+                        <strong id="v57RRAboveTwo">
+                            0%
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ==================================================
+                 V5.8 — CALENDRIER
                  ================================================== -->
 
             <div
@@ -555,118 +755,61 @@
 
                 <div class="section-header">
                     <div>
-                        <h3>🛡️ Analyse du risque</h3>
+
+                        <h3>
+                            🗓️ Calendrier de performance
+                        </h3>
 
                         <p>
-                            Contrôle de la régularité et du respect du risque
+                            Performance quotidienne selon les filtres
                         </p>
+
+                    </div>
+
+                    <div
+                        style="
+                            display:flex;
+                            gap:8px;
+                            align-items:center;
+                        "
+                    >
+
+                        <button
+                            id="v58PreviousMonth"
+                            type="button"
+                            class="secondary-btn"
+                        >
+                            ◀
+                        </button>
+
+                        <strong
+                            id="v58CalendarTitle"
+                            style="
+                                min-width:150px;
+                                text-align:center;
+                            "
+                        >
+                            -
+                        </strong>
+
+                        <button
+                            id="v58NextMonth"
+                            type="button"
+                            class="secondary-btn"
+                        >
+                            ▶
+                        </button>
+
                     </div>
                 </div>
 
                 <div
-                    class="stats-grid"
+                    id="v58Calendar"
                     style="
-                        margin-bottom:20px;
+                        width:100%;
+                        overflow-x:auto;
                     "
                 >
-
-                    <div class="stat-box">
-                        <span>Risque moyen</span>
-                        <strong id="v57AverageRisk">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Risque minimum</span>
-                        <strong id="v57MinimumRisk">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Risque maximum</span>
-                        <strong id="v57MaximumRisk">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Risque référence</span>
-                        <strong id="v57ReferenceRisk">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Écart moyen</span>
-                        <strong id="v57AverageDeviation">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Risque régulier</span>
-                        <strong id="v57RiskRegularity">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Trades conformes</span>
-                        <strong id="v57CompliantTrades">
-                            0
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Trades hors risque</span>
-                        <strong id="v57NonCompliantTrades">
-                            0
-                        </strong>
-                    </div>
-
-                </div>
-
-                <div
-                    class="stats-grid"
-                >
-
-                    <div class="stat-box">
-                        <span>RR cible moyen</span>
-                        <strong id="v57TargetRR">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>RR moyen enregistré</span>
-                        <strong id="v57RecordedRR">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>RR minimum</span>
-                        <strong id="v57MinimumRR">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>RR maximum</span>
-                        <strong id="v57MaximumRR">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>RR ≥ 2</span>
-                        <strong id="v57RRAboveTwo">
-                            0%
-                        </strong>
-                    </div>
-
                 </div>
 
             </div>
@@ -679,7 +822,10 @@
 
                 <div class="section-header">
                     <div>
-                        <h3>🏆 Classement des setups</h3>
+                        <h3>
+                            🏆 Classement des setups
+                        </h3>
+
                         <p>
                             Performance globale
                         </p>
@@ -688,6 +834,7 @@
 
                 <div class="table-wrapper">
                     <table>
+
                         <thead>
                             <tr>
                                 <th>Rang</th>
@@ -703,8 +850,10 @@
 
                         <tbody id="v55SetupRankingBody">
                         </tbody>
+
                     </table>
                 </div>
+
             </div>
 
             <!-- ==================================================
@@ -715,15 +864,21 @@
 
                 <div class="section-header">
                     <div>
-                        <h3>🥇 Classement des actifs</h3>
+
+                        <h3>
+                            🥇 Classement des actifs
+                        </h3>
+
                         <p>
                             Performance globale
                         </p>
+
                     </div>
                 </div>
 
                 <div class="table-wrapper">
                     <table>
+
                         <thead>
                             <tr>
                                 <th>Rang</th>
@@ -739,8 +894,10 @@
 
                         <tbody id="v55AssetRankingBody">
                         </tbody>
+
                     </table>
                 </div>
+
             </div>
 
             <!-- ==================================================
@@ -751,12 +908,15 @@
 
                 <div class="section-header">
                     <div>
-                        <h3>🎯 Analyse détaillée par setup</h3>
+                        <h3>
+                            🎯 Analyse détaillée par setup
+                        </h3>
                     </div>
                 </div>
 
                 <div class="table-wrapper">
                     <table>
+
                         <thead>
                             <tr>
                                 <th>Setup</th>
@@ -775,8 +935,10 @@
 
                         <tbody id="v54SetupBody">
                         </tbody>
+
                     </table>
                 </div>
+
             </div>
 
             <!-- ==================================================
@@ -787,12 +949,15 @@
 
                 <div class="section-header">
                     <div>
-                        <h3>📈 Analyse détaillée par actif</h3>
+                        <h3>
+                            📈 Analyse détaillée par actif
+                        </h3>
                     </div>
                 </div>
 
                 <div class="table-wrapper">
                     <table>
+
                         <thead>
                             <tr>
                                 <th>Actif</th>
@@ -811,8 +976,10 @@
 
                         <tbody id="v54AssetBody">
                         </tbody>
+
                     </table>
                 </div>
+
             </div>
 
             <!-- ==================================================
@@ -863,7 +1030,9 @@
             periodButtons.closest(".card")
         ) {
             const performanceCard =
-                periodButtons.closest(".card");
+                periodButtons.closest(
+                    ".card"
+                );
 
             performanceCard.insertAdjacentElement(
                 "afterend",
@@ -871,7 +1040,9 @@
             );
         } else {
             const main =
-                document.querySelector("main");
+                document.querySelector(
+                    "main"
+                );
 
             if (main) {
                 main.appendChild(
@@ -1258,7 +1429,8 @@
                 0
             );
 
-        let profitFactor = 0;
+        let profitFactor =
+            0;
 
         if (
             grossLoss > 0
@@ -1499,10 +1671,6 @@
         };
     }
 
-    /* ============================================================
-       AFFICHAGE STATISTIQUES
-       ============================================================ */
-
     function displayStats(
         filteredTrades
     ) {
@@ -1636,7 +1804,7 @@
     }
 
     /* ============================================================
-       LECTURE DU RISQUE
+       RISQUE
        ============================================================ */
 
     function getTradeRisk(trade) {
@@ -1650,7 +1818,8 @@
 
         for (
             let i = 0;
-            i < possibleFields.length;
+            i <
+            possibleFields.length;
             i++
         ) {
             const value =
@@ -1681,7 +1850,8 @@
 
         for (
             let i = 0;
-            i < possibleFields.length;
+            i <
+            possibleFields.length;
             i++
         ) {
             const value =
@@ -1725,9 +1895,7 @@
                     );
 
                 if (
-                    Number.isFinite(
-                        value
-                    ) &&
+                    Number.isFinite(value) &&
                     value > 0
                 ) {
                     return value;
@@ -1748,7 +1916,8 @@
 
         for (
             let i = 0;
-            i < possibleFields.length;
+            i <
+            possibleFields.length;
             i++
         ) {
             const value =
@@ -1792,9 +1961,7 @@
                     );
 
                 if (
-                    Number.isFinite(
-                        value
-                    ) &&
+                    Number.isFinite(value) &&
                     value > 0
                 ) {
                     return value;
@@ -1804,10 +1971,6 @@
 
         return null;
     }
-
-    /* ============================================================
-       ANALYSE RISQUE
-       ============================================================ */
 
     function calculateRiskStats(
         filteredTrades
@@ -1870,7 +2033,8 @@
             null;
 
         if (
-            references.length > 0
+            references.length >
+            0
         ) {
             referenceRisk =
                 references.reduce(
@@ -1889,7 +2053,8 @@
         }
 
         const averageRisk =
-            risks.length > 0
+            risks.length >
+            0
                 ? risks.reduce(
                       function (
                           sum,
@@ -1906,14 +2071,16 @@
                 : null;
 
         const minimumRisk =
-            risks.length > 0
+            risks.length >
+            0
                 ? Math.min(
                       ...risks
                   )
                 : null;
 
         const maximumRisk =
-            risks.length > 0
+            risks.length >
+            0
                 ? Math.max(
                       ...risks
                   )
@@ -1921,8 +2088,11 @@
 
         const deviations = [];
 
-        let compliantTrades = 0;
-        let nonCompliantTrades = 0;
+        let compliantTrades =
+            0;
+
+        let nonCompliantTrades =
+            0;
 
         riskRecords.forEach(
             function (record) {
@@ -1965,7 +2135,8 @@
         );
 
         const averageDeviation =
-            deviations.length > 0
+            deviations.length >
+            0
                 ? deviations.reduce(
                       function (
                           sum,
@@ -1990,26 +2161,20 @@
             averageDeviation !==
                 null
         ) {
-            const absoluteDeviation =
-                Math.abs(
-                    averageDeviation
-                );
-
             riskRegularity =
                 Math.max(
                     0,
                     Math.min(
                         100,
                         100 -
-                            absoluteDeviation
+                            Math.abs(
+                                averageDeviation
+                            )
                     )
                 );
         }
 
         return {
-            records:
-                riskRecords,
-
             averageRisk:
                 averageRisk,
 
@@ -2037,7 +2202,7 @@
     }
 
     /* ============================================================
-       ANALYSE RR
+       RR
        ============================================================ */
 
     function calculateRRStats(
@@ -2072,7 +2237,8 @@
                 .filter(
                     function (value) {
                         return (
-                            value !== null &&
+                            value !==
+                                null &&
                             Number.isFinite(
                                 value
                             )
@@ -2081,7 +2247,8 @@
                 );
 
         const averageRR =
-            rrValues.length > 0
+            rrValues.length >
+            0
                 ? rrValues.reduce(
                       function (
                           sum,
@@ -2098,7 +2265,8 @@
                 : null;
 
         const targetRR =
-            targetValues.length > 0
+            targetValues.length >
+            0
                 ? targetValues.reduce(
                       function (
                           sum,
@@ -2115,14 +2283,16 @@
                 : null;
 
         const minimumRR =
-            rrValues.length > 0
+            rrValues.length >
+            0
                 ? Math.min(
                       ...rrValues
                   )
                 : null;
 
         const maximumRR =
-            rrValues.length > 0
+            rrValues.length >
+            0
                 ? Math.max(
                       ...rrValues
                   )
@@ -2131,12 +2301,15 @@
         const rrAboveTwoCount =
             rrValues.filter(
                 function (value) {
-                    return value >= 2;
+                    return (
+                        value >= 2
+                    );
                 }
             ).length;
 
         const rrAboveTwo =
-            rrValues.length > 0
+            rrValues.length >
+            0
                 ? (
                       rrAboveTwoCount /
                       rrValues.length
@@ -2374,7 +2547,9 @@
                     );
 
                 if (
-                    !groups.has(value)
+                    !groups.has(
+                        value
+                    )
                 ) {
                     groups.set(
                         value,
@@ -2409,9 +2584,6 @@
                     name:
                         name,
 
-                    trades:
-                        groupTrades,
-
                     stats:
                         stats,
 
@@ -2433,29 +2605,9 @@
                     );
                 }
 
-                if (
-                    b.stats.totalProfit !==
-                    a.stats.totalProfit
-                ) {
-                    return (
-                        b.stats.totalProfit -
-                        a.stats.totalProfit
-                    );
-                }
-
-                if (
-                    b.stats.winrate !==
-                    a.stats.winrate
-                ) {
-                    return (
-                        b.stats.winrate -
-                        a.stats.winrate
-                    );
-                }
-
                 return (
-                    b.stats.profitFactor -
-                    a.stats.profitFactor
+                    b.stats.totalProfit -
+                    a.stats.totalProfit
                 );
             }
         );
@@ -2494,7 +2646,7 @@
     }
 
     /* ============================================================
-       CLASSEMENT SETUPS
+       CLASSEMENTS
        ============================================================ */
 
     function renderSetupRanking(
@@ -2509,8 +2661,7 @@
             return;
         }
 
-        tbody.innerHTML =
-            "";
+        tbody.innerHTML = "";
 
         const ranking =
             getRankingGroups(
@@ -2619,10 +2770,6 @@
         );
     }
 
-    /* ============================================================
-       CLASSEMENT ACTIFS
-       ============================================================ */
-
     function renderAssetRanking(
         filteredTrades
     ) {
@@ -2635,8 +2782,7 @@
             return;
         }
 
-        tbody.innerHTML =
-            "";
+        tbody.innerHTML = "";
 
         const ranking =
             getRankingGroups(
@@ -2761,8 +2907,7 @@
             return;
         }
 
-        tbody.innerHTML =
-            "";
+        tbody.innerHTML = "";
 
         const setups =
             new Set(
@@ -2939,8 +3084,7 @@
             return;
         }
 
-        tbody.innerHTML =
-            "";
+        tbody.innerHTML = "";
 
         const assets =
             new Set(
@@ -3125,14 +3269,16 @@
             stats.totalTrades >=
             10
         ) {
-            score += 10;
+            score +=
+                10;
         }
 
         if (
             stats.totalTrades >=
             20
         ) {
-            score += 10;
+            score +=
+                10;
         }
 
         if (
@@ -3474,6 +3620,534 @@
     }
 
     /* ============================================================
+       CALENDRIER V5.8
+       ============================================================ */
+
+    let calendarMonth;
+    let calendarYear;
+
+    function initializeCalendarDate() {
+        const today = new Date();
+
+        calendarMonth =
+            today.getMonth();
+
+        calendarYear =
+            today.getFullYear();
+    }
+
+    function getMonthName(
+        month
+    ) {
+        const names = [
+            "Janvier",
+            "Février",
+            "Mars",
+            "Avril",
+            "Mai",
+            "Juin",
+            "Juillet",
+            "Août",
+            "Septembre",
+            "Octobre",
+            "Novembre",
+            "Décembre"
+        ];
+
+        return (
+            names[
+                month
+            ] ||
+            ""
+        );
+    }
+
+    function getTradesForDay(
+        filteredTrades,
+        dateString
+    ) {
+        return filteredTrades.filter(
+            function (trade) {
+                return (
+                    String(
+                        trade.date || ""
+                    ) ===
+                    dateString
+                );
+            }
+        );
+    }
+
+    function getDayPnl(
+        dayTrades
+    ) {
+        return dayTrades.reduce(
+            function (
+                sum,
+                trade
+            ) {
+                return (
+                    sum +
+                    (
+                        Number(
+                            trade.pnl
+                        ) || 0
+                    )
+                );
+            },
+            0
+        );
+    }
+
+    function getDayResult(
+        dayTrades
+    ) {
+        if (
+            dayTrades.length ===
+            0
+        ) {
+            return "";
+        }
+
+        const pnl =
+            getDayPnl(
+                dayTrades
+            );
+
+        if (
+            pnl > 0
+        ) {
+            return "profit";
+        }
+
+        if (
+            pnl < 0
+        ) {
+            return "loss";
+        }
+
+        return "neutral";
+    }
+
+    function formatCalendarNumber(
+        day
+    ) {
+        return String(day).padStart(
+            2,
+            "0"
+        );
+    }
+
+    function getCalendarDateString(
+        year,
+        month,
+        day
+    ) {
+        return (
+            String(year) +
+            "-" +
+            String(
+                month + 1
+            ).padStart(
+                2,
+                "0"
+            ) +
+            "-" +
+            String(day).padStart(
+                2,
+                "0"
+            )
+        );
+    }
+
+    function renderCalendar(
+        filteredTrades
+    ) {
+        const calendar =
+            document.getElementById(
+                "v58Calendar"
+            );
+
+        const title =
+            document.getElementById(
+                "v58CalendarTitle"
+            );
+
+        if (
+            !calendar ||
+            !title
+        ) {
+            return;
+        }
+
+        title.textContent =
+            getMonthName(
+                calendarMonth
+            ) +
+            " " +
+            calendarYear;
+
+        const firstDay =
+            new Date(
+                calendarYear,
+                calendarMonth,
+                1
+            );
+
+        const lastDay =
+            new Date(
+                calendarYear,
+                calendarMonth + 1,
+                0
+            );
+
+        let startDay =
+            firstDay.getDay();
+
+        /*
+         * JavaScript :
+         * Dimanche = 0
+         *
+         * Nous voulons :
+         * Lundi = 0
+         */
+
+        startDay =
+            startDay === 0
+                ? 6
+                : startDay - 1;
+
+        const daysInMonth =
+            lastDay.getDate();
+
+        const weekdayNames = [
+            "Lun",
+            "Mar",
+            "Mer",
+            "Jeu",
+            "Ven",
+            "Sam",
+            "Dim"
+        ];
+
+        let html = `
+            <div
+                style="
+                    min-width:700px;
+                    display:grid;
+                    grid-template-columns:
+                        repeat(7,minmax(90px,1fr));
+                    gap:8px;
+                "
+            >
+        `;
+
+        weekdayNames.forEach(
+            function (name) {
+                html += `
+                    <div
+                        style="
+                            text-align:center;
+                            font-weight:700;
+                            padding:8px 4px;
+                            opacity:.75;
+                        "
+                    >
+                        ${name}
+                    </div>
+                `;
+            }
+        );
+
+        for (
+            let i = 0;
+            i < startDay;
+            i++
+        ) {
+            html += `
+                <div
+                    style="
+                        min-height:100px;
+                        border-radius:10px;
+                        opacity:.25;
+                    "
+                >
+                </div>
+            `;
+        }
+
+        for (
+            let day = 1;
+            day <= daysInMonth;
+            day++
+        ) {
+            const dateString =
+                getCalendarDateString(
+                    calendarYear,
+                    calendarMonth,
+                    day
+                );
+
+            const dayTrades =
+                getTradesForDay(
+                    filteredTrades,
+                    dateString
+                );
+
+            const dayPnl =
+                getDayPnl(
+                    dayTrades
+                );
+
+            const result =
+                getDayResult(
+                    dayTrades
+                );
+
+            const tpCount =
+                dayTrades.filter(
+                    function (trade) {
+                        return (
+                            String(
+                                trade.result ||
+                                    ""
+                            ).toUpperCase() ===
+                            "TP"
+                        );
+                    }
+                ).length;
+
+            const slCount =
+                dayTrades.filter(
+                    function (trade) {
+                        return (
+                            String(
+                                trade.result ||
+                                    ""
+                            ).toUpperCase() ===
+                            "SL"
+                        );
+                    }
+                ).length;
+
+            const beCount =
+                dayTrades.filter(
+                    function (trade) {
+                        return (
+                            String(
+                                trade.result ||
+                                    ""
+                            ).toUpperCase() ===
+                            "BE"
+                        );
+                    }
+                ).length;
+
+            let background =
+                "rgba(255,255,255,0.04)";
+
+            let border =
+                "rgba(255,255,255,0.12)";
+
+            if (
+                result ===
+                "profit"
+            ) {
+                background =
+                    "rgba(34,197,94,0.12)";
+
+                border =
+                    "rgba(34,197,94,0.35)";
+            }
+
+            if (
+                result ===
+                "loss"
+            ) {
+                background =
+                    "rgba(239,68,68,0.12)";
+
+                border =
+                    "rgba(239,68,68,0.35)";
+            }
+
+            if (
+                result ===
+                "neutral"
+            ) {
+                background =
+                    "rgba(148,163,184,0.10)";
+
+                border =
+                    "rgba(148,163,184,0.30)";
+            }
+
+            const pnlText =
+                dayTrades.length >
+                0
+                    ? formatMoney(
+                          dayPnl
+                      )
+                    : "";
+
+            const details =
+                dayTrades.length >
+                0
+                    ? (
+                          dayTrades.length +
+                          " trade" +
+                          (
+                              dayTrades.length >
+                              1
+                                  ? "s"
+                                  : ""
+                          ) +
+                          " • TP " +
+                          tpCount +
+                          " • SL " +
+                          slCount +
+                          " • BE " +
+                          beCount
+                      )
+                    : "";
+
+            html += `
+                <div
+                    style="
+                        min-height:100px;
+                        padding:10px;
+                        border-radius:10px;
+                        border:1px solid ${border};
+                        background:${background};
+                        box-sizing:border-box;
+                    "
+                    title="${escapeValue(
+                        dateString +
+                        (
+                            details
+                                ? " — " +
+                                  details
+                                : ""
+                        )
+                    )}"
+                >
+
+                    <div
+                        style="
+                            display:flex;
+                            justify-content:space-between;
+                            align-items:center;
+                            margin-bottom:8px;
+                        "
+                    >
+
+                        <strong>
+                            ${day}
+                        </strong>
+
+                        ${
+                            dayTrades.length >
+                            0
+                                ? `<span
+                                    style="
+                                        font-size:12px;
+                                        opacity:.75;
+                                    "
+                                  >
+                                    ${
+                                        dayTrades.length
+                                    }
+                                  </span>`
+                                : ""
+                        }
+
+                    </div>
+
+                    ${
+                        dayTrades.length >
+                        0
+                            ? `
+                                <div
+                                    style="
+                                        font-size:15px;
+                                        font-weight:700;
+                                        margin-bottom:6px;
+                                    "
+                                >
+                                    ${pnlText}
+                                </div>
+
+                                <div
+                                    style="
+                                        font-size:11px;
+                                        line-height:1.4;
+                                        opacity:.75;
+                                    "
+                                >
+                                    ${details}
+                                </div>
+                            `
+                            : `
+                                <div
+                                    style="
+                                        font-size:11px;
+                                        opacity:.35;
+                                    "
+                                >
+                                    Aucun trade
+                                </div>
+                            `
+                    }
+
+                </div>
+            `;
+        }
+
+        html += `
+            </div>
+        `;
+
+        calendar.innerHTML =
+            html;
+    }
+
+    function goToPreviousMonth() {
+        calendarMonth--;
+
+        if (
+            calendarMonth <
+            0
+        ) {
+            calendarMonth =
+                11;
+
+            calendarYear--;
+        }
+
+        renderCalendar(
+            getFilteredTrades()
+        );
+    }
+
+    function goToNextMonth() {
+        calendarMonth++;
+
+        if (
+            calendarMonth >
+            11
+        ) {
+            calendarMonth =
+                0;
+
+            calendarYear++;
+        }
+
+        renderCalendar(
+            getFilteredTrades()
+        );
+    }
+
+    /* ============================================================
        GRAPHIQUE
        ============================================================ */
 
@@ -3631,8 +4305,11 @@
             minValue ===
             maxValue
         ) {
-            minValue -= 1;
-            maxValue += 1;
+            minValue -=
+                1;
+
+            maxValue +=
+                1;
         }
 
         const paddingLeft =
@@ -3939,7 +4616,7 @@
        REFRESH
        ============================================================ */
 
-    function refreshV57() {
+    function refreshV58() {
         try {
             createFilterSection();
 
@@ -3976,13 +4653,17 @@
                 filteredTrades
             );
 
+            renderCalendar(
+                filteredTrades
+            );
+
             drawChart(
                 filteredTrades
             );
 
         } catch (error) {
             console.error(
-                "Erreur V5.7 :",
+                "Erreur V5.8 :",
                 error
             );
         }
@@ -4008,11 +4689,21 @@
                 "v51SetupFilter"
             );
 
+        const previousMonth =
+            document.getElementById(
+                "v58PreviousMonth"
+            );
+
+        const nextMonth =
+            document.getElementById(
+                "v58NextMonth"
+            );
+
         if (periodSelect) {
             periodSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV57();
+                    refreshV58();
                 }
             );
         }
@@ -4021,7 +4712,7 @@
             assetSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV57();
+                    refreshV58();
                 }
             );
         }
@@ -4030,7 +4721,25 @@
             setupSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV57();
+                    refreshV58();
+                }
+            );
+        }
+
+        if (previousMonth) {
+            previousMonth.addEventListener(
+                "click",
+                function () {
+                    goToPreviousMonth();
+                }
+            );
+        }
+
+        if (nextMonth) {
+            nextMonth.addEventListener(
+                "click",
+                function () {
+                    goToNextMonth();
                 }
             );
         }
@@ -4040,14 +4749,16 @@
        INITIALISATION
        ============================================================ */
 
-    function initV57() {
+    function initV58() {
+        initializeCalendarDate();
+
         createFilterSection();
 
         populateFilters();
 
         attachEvents();
 
-        refreshV57();
+        refreshV58();
     }
 
     /* ============================================================
@@ -4055,7 +4766,7 @@
        ============================================================ */
 
     window.refreshV51 =
-        refreshV57;
+        refreshV58;
 
     window.getV51FilteredTrades =
         getFilteredTrades;
@@ -4075,6 +4786,9 @@
     window.calculateV57RRStats =
         calculateRRStats;
 
+    window.renderV58Calendar =
+        renderCalendar;
+
     /* ============================================================
        LANCEMENT
        ============================================================ */
@@ -4087,14 +4801,14 @@
             "DOMContentLoaded",
             function () {
                 setTimeout(
-                    initV57,
+                    initV58,
                     500
                 );
             }
         );
     } else {
         setTimeout(
-            initV57,
+            initV58,
             500
         );
     }
@@ -4104,7 +4818,7 @@
        ============================================================ */
 
     setInterval(
-        refreshV57,
+        refreshV58,
         1000
     );
 
