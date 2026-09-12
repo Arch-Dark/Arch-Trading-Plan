@@ -2,89 +2,140 @@
 
 /*
 ============================================================
-V5.1 — ANALYSE FILTRÉE
+V5.2 — ANALYSE FILTRÉE + GRAPHIQUE
 Trading Dashboard
 ============================================================
 
-Filtres disponibles :
+Filtres :
 - Période
 - Actif
 - Setup
 
-Les 3 filtres fonctionnent ensemble.
+Statistiques :
+- Trades
+- Gagnants
+- Perdants
+- BE
+- Winrate
+- Profit
+- RR moyen
 
-Exemple :
-Ce mois + XAUUSD + LDP+QML
+Graphique :
+- évolution du résultat filtré
+- respecte Période + Actif + Setup
+- départ à 0
+- chaque point correspond à un trade
 ============================================================
 */
 
 (function () {
 
+
+    /* ========================================================
+       LISTES
+    ======================================================== */
+
     const FILTER_PERIODS = [
+
         {
             value: "today",
             label: "Aujourd'hui"
         },
+
         {
             value: "week",
             label: "Cette semaine"
         },
+
         {
             value: "month",
             label: "Ce mois"
         },
+
         {
             value: "year",
             label: "Cette année"
         },
+
         {
             value: "all",
             label: "Tout l'historique"
         }
+
     ];
 
 
     const FILTER_ASSETS = [
+
         "Tous les actifs",
+
         "EUR/USD",
+
         "GBP/USD",
+
         "AUD/USD",
+
         "NZD/USD",
+
         "USD/CAD",
+
         "USD/CHF",
+
         "USD/JPY",
+
         "XAUUSD",
+
         "BTCUSD"
+
     ];
 
 
     const FILTER_SETUPS = [
+
         "Tous les setups",
+
         "LDP+QML",
+
         "LDP+FIBO 50",
+
         "OB",
+
         "BB",
+
         "ZS OA",
+
         "SSM1",
+
         "SSM2",
+
         "SSM3",
+
         "SBM1",
+
         "SBM2",
+
         "SBM3"
+
     ];
 
 
+    /* ========================================================
+       ETAT
+    ======================================================== */
+
     let selectedPeriod = "today";
+
     let selectedAsset = "ALL";
+
     let selectedSetup = "ALL";
 
+    let filterChartResizeHandler = null;
 
 
-    /*
-    ============================================================
-    UTILITAIRES
-    ============================================================
-    */
+
+    /* ========================================================
+       UTILITAIRES
+    ======================================================== */
 
     function money(value) {
 
@@ -98,10 +149,15 @@ Ce mois + XAUUSD + LDP+QML
     function escapeHtml(value) {
 
         return String(value ?? "")
+
             .replace(/&/g, "&amp;")
+
             .replace(/</g, "&lt;")
+
             .replace(/>/g, "&gt;")
+
             .replace(/"/g, "&quot;")
+
             .replace(/'/g, "&#039;");
 
     }
@@ -110,8 +166,11 @@ Ce mois + XAUUSD + LDP+QML
     function getAllTrades() {
 
         if (
+
             typeof trades !== "undefined" &&
+
             Array.isArray(trades)
+
         ) {
 
             return trades;
@@ -122,7 +181,11 @@ Ce mois + XAUUSD + LDP+QML
         try {
 
             return JSON.parse(
-                localStorage.getItem("tradingTrades")
+
+                localStorage.getItem(
+                    "tradingTrades"
+                )
+
             ) || [];
 
         } catch {
@@ -137,8 +200,11 @@ Ce mois + XAUUSD + LDP+QML
     function getCurrentCapitalId() {
 
         if (
+
             typeof activeCapital !== "undefined" &&
+
             activeCapital
+
         ) {
 
             return activeCapital.id;
@@ -148,12 +214,13 @@ Ce mois + XAUUSD + LDP+QML
 
         try {
 
-            const capital =
-                JSON.parse(
-                    localStorage.getItem(
-                        "tradingActiveCapital"
-                    )
-                );
+            const capital = JSON.parse(
+
+                localStorage.getItem(
+                    "tradingActiveCapital"
+                )
+
+            );
 
             return capital?.id || null;
 
@@ -173,19 +240,19 @@ Ce mois + XAUUSD + LDP+QML
 
 
         return getAllTrades().filter(
+
             trade =>
                 trade.capitalId === capitalId
+
         );
 
     }
 
 
 
-    /*
-    ============================================================
-    FILTRE PERIODE
-    ============================================================
-    */
+    /* ========================================================
+       PERIODE
+    ======================================================== */
 
     function filterBySelectedPeriod(
         tradeList
@@ -195,24 +262,28 @@ Ce mois + XAUUSD + LDP+QML
             selectedPeriod === "all"
         ) {
 
-            return tradeList;
+            return [...tradeList];
 
         }
 
 
         return tradeList.filter(
+
             trade => {
 
                 if (!trade.date) {
+
                     return false;
+
                 }
 
 
-                const tradeDate =
-                    new Date(
-                        trade.date +
-                        "T00:00:00"
-                    );
+                const tradeDate = new Date(
+
+                    trade.date +
+                    "T00:00:00"
+
+                );
 
 
                 const today =
@@ -230,11 +301,9 @@ Ce mois + XAUUSD + LDP+QML
                 }
 
 
-                /*
-                ============================
-                AUJOURD'HUI
-                ============================
-                */
+                /* =========================
+                   AUJOURD'HUI
+                ========================= */
 
                 if (
                     selectedPeriod ===
@@ -242,24 +311,28 @@ Ce mois + XAUUSD + LDP+QML
                 ) {
 
                     return (
+
                         tradeDate.getFullYear() ===
-                            today.getFullYear() &&
+                            today.getFullYear()
+
+                        &&
 
                         tradeDate.getMonth() ===
-                            today.getMonth() &&
+                            today.getMonth()
+
+                        &&
 
                         tradeDate.getDate() ===
                             today.getDate()
+
                     );
 
                 }
 
 
-                /*
-                ============================
-                CETTE SEMAINE
-                ============================
-                */
+                /* =========================
+                   SEMAINE
+                ========================= */
 
                 if (
                     selectedPeriod ===
@@ -289,8 +362,11 @@ Ce mois + XAUUSD + LDP+QML
 
 
                     monday.setDate(
-                        today.getDate() -
+
+                        today.getDate()
+                        -
                         diffToMonday
+
                     );
 
 
@@ -299,26 +375,31 @@ Ce mois + XAUUSD + LDP+QML
 
 
                     nextMonday.setDate(
-                        monday.getDate() +
-                        7
+
+                        monday.getDate()
+                        + 7
+
                     );
 
 
                     return (
+
                         tradeDate >=
-                            monday &&
+                            monday
+
+                        &&
+
                         tradeDate <
                             nextMonday
+
                     );
 
                 }
 
 
-                /*
-                ============================
-                CE MOIS
-                ============================
-                */
+                /* =========================
+                   MOIS
+                ========================= */
 
                 if (
                     selectedPeriod ===
@@ -326,21 +407,23 @@ Ce mois + XAUUSD + LDP+QML
                 ) {
 
                     return (
+
                         tradeDate.getFullYear() ===
-                            today.getFullYear() &&
+                            today.getFullYear()
+
+                        &&
 
                         tradeDate.getMonth() ===
                             today.getMonth()
+
                     );
 
                 }
 
 
-                /*
-                ============================
-                CETTE ANNEE
-                ============================
-                */
+                /* =========================
+                   ANNEE
+                ========================= */
 
                 if (
                     selectedPeriod ===
@@ -348,8 +431,10 @@ Ce mois + XAUUSD + LDP+QML
                 ) {
 
                     return (
+
                         tradeDate.getFullYear() ===
                         today.getFullYear()
+
                     );
 
                 }
@@ -358,17 +443,16 @@ Ce mois + XAUUSD + LDP+QML
                 return true;
 
             }
+
         );
 
     }
 
 
 
-    /*
-    ============================================================
-    FILTRES COMBINES
-    ============================================================
-    */
+    /* ========================================================
+       FILTRES COMBINES
+    ======================================================== */
 
     function applyCombinedFilters(
         tradeList
@@ -380,40 +464,89 @@ Ce mois + XAUUSD + LDP+QML
             );
 
 
-        /*
-        FILTRE ACTIF
-        */
-
         if (
             selectedAsset !== "ALL"
         ) {
 
-            filtered =
-                filtered.filter(
-                    trade =>
-                        trade.asset ===
-                        selectedAsset
-                );
+            filtered = filtered.filter(
+
+                trade =>
+                    trade.asset ===
+                    selectedAsset
+
+            );
 
         }
 
-
-        /*
-        FILTRE SETUP
-        */
 
         if (
             selectedSetup !== "ALL"
         ) {
 
-            filtered =
-                filtered.filter(
-                    trade =>
-                        trade.setup ===
-                        selectedSetup
-                );
+            filtered = filtered.filter(
+
+                trade =>
+                    trade.setup ===
+                    selectedSetup
+
+            );
 
         }
+
+
+        /*
+        Trier par date puis par enregistrement
+        pour que le graphique soit logique.
+        */
+
+        filtered.sort(
+
+            (a, b) => {
+
+                const dateA =
+                    new Date(
+                        a.date ||
+                        "1970-01-01"
+                    ).getTime();
+
+
+                const dateB =
+                    new Date(
+                        b.date ||
+                        "1970-01-01"
+                    ).getTime();
+
+
+                if (
+                    dateA !== dateB
+                ) {
+
+                    return dateA -
+                        dateB;
+
+                }
+
+
+                const createdA =
+                    new Date(
+                        a.createdAt ||
+                        0
+                    ).getTime();
+
+
+                const createdB =
+                    new Date(
+                        b.createdAt ||
+                        0
+                    ).getTime();
+
+
+                return createdA -
+                    createdB;
+
+            }
+
+        );
 
 
         return filtered;
@@ -422,11 +555,9 @@ Ce mois + XAUUSD + LDP+QML
 
 
 
-    /*
-    ============================================================
-    STATISTIQUES
-    ============================================================
-    */
+    /* ========================================================
+       STATISTIQUES
+    ======================================================== */
 
     function calculateStats(
         tradeList
@@ -438,77 +569,104 @@ Ce mois + XAUUSD + LDP+QML
 
         const winners =
             tradeList.filter(
+
                 trade =>
-                    trade.result === "TP"
+                    trade.result ===
+                    "TP"
+
             ).length;
 
 
         const losers =
             tradeList.filter(
+
                 trade =>
-                    trade.result === "SL"
+                    trade.result ===
+                    "SL"
+
             ).length;
 
 
         const breakevens =
             tradeList.filter(
+
                 trade =>
-                    trade.result === "BE"
+                    trade.result ===
+                    "BE"
+
             ).length;
 
 
         const profit =
             tradeList.reduce(
+
                 (
                     sum,
                     trade
                 ) =>
+
                     sum +
                     (
                         Number(
                             trade.pnl
                         ) || 0
                     ),
+
                 0
+
             );
 
 
         const winrate =
             tradesCount > 0
+
                 ? (
+
                     winners /
                     tradesCount
+
                 ) * 100
+
                 : 0;
 
 
         const rrValues =
             tradeList
+
                 .map(
                     trade =>
                         Number(
                             trade.rr
                         )
                 )
+
                 .filter(
+
                     rr =>
                         Number.isFinite(
                             rr
                         ) &&
                         rr > 0
+
                 );
 
 
         const averageRR =
             rrValues.length > 0
+
                 ? rrValues.reduce(
+
                     (
                         sum,
                         rr
                     ) =>
+
                         sum + rr,
+
                     0
+
                 ) / rrValues.length
+
                 : 0;
 
 
@@ -541,11 +699,9 @@ Ce mois + XAUUSD + LDP+QML
 
 
 
-    /*
-    ============================================================
-    CREATION DE L'INTERFACE
-    ============================================================
-    */
+    /* ========================================================
+       CREATION INTERFACE
+    ======================================================== */
 
     function createFilterInterface() {
 
@@ -653,13 +809,21 @@ Ce mois + XAUUSD + LDP+QML
 
                         ${FILTER_PERIODS
                             .map(
+
                                 period => `
+
                                     <option
                                         value="${period.value}"
                                     >
-                                        ${period.label}
+
+                                        ${escapeHtml(
+                                            period.label
+                                        )}
+
                                     </option>
+
                                 `
+
                             )
                             .join("")
                         }
@@ -686,6 +850,7 @@ Ce mois + XAUUSD + LDP+QML
 
                         ${FILTER_ASSETS
                             .map(
+
                                 asset => `
 
                                     <option
@@ -693,15 +858,20 @@ Ce mois + XAUUSD + LDP+QML
                                             asset ===
                                             "Tous les actifs"
                                                 ? "ALL"
-                                                : asset
+                                                : escapeHtml(
+                                                    asset
+                                                )
                                         }"
                                     >
+
                                         ${escapeHtml(
                                             asset
                                         )}
+
                                     </option>
 
                                 `
+
                             )
                             .join("")
                         }
@@ -728,6 +898,7 @@ Ce mois + XAUUSD + LDP+QML
 
                         ${FILTER_SETUPS
                             .map(
+
                                 setup => `
 
                                     <option
@@ -735,15 +906,20 @@ Ce mois + XAUUSD + LDP+QML
                                             setup ===
                                             "Tous les setups"
                                                 ? "ALL"
-                                                : setup
+                                                : escapeHtml(
+                                                    setup
+                                                )
                                         }"
                                     >
+
                                         ${escapeHtml(
                                             setup
                                         )}
+
                                     </option>
 
                                 `
+
                             )
                             .join("")
                         }
@@ -754,6 +930,7 @@ Ce mois + XAUUSD + LDP+QML
 
 
             </div>
+
 
 
             <!-- RESUME -->
@@ -778,7 +955,7 @@ Ce mois + XAUUSD + LDP+QML
 
 
 
-            <!-- STATISTIQUES -->
+            <!-- STATS -->
 
             <div
                 id="v51Stats"
@@ -899,12 +1076,95 @@ Ce mois + XAUUSD + LDP+QML
 
             </div>
 
+
+
+            <!-- GRAPHIQUE FILTRE -->
+
+            <div
+                style="
+                    margin-top:24px;
+                "
+            >
+
+                <div
+                    style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        gap:12px;
+                        margin-bottom:12px;
+                        flex-wrap:wrap;
+                    "
+                >
+
+                    <div>
+
+                        <h3
+                            style="
+                                margin:0;
+                            "
+                        >
+                            📈 Évolution de la performance filtrée
+                        </h3>
+
+                        <p
+                            style="
+                                margin:5px 0 0;
+                                opacity:0.7;
+                                font-size:0.9rem;
+                            "
+                        >
+                            Résultat cumulé des trades sélectionnés
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="v51ChartContainer"
+                    style="
+                        position:relative;
+                        width:100%;
+                        min-height:320px;
+                    "
+                >
+
+                    <canvas
+                        id="v51PerformanceChart"
+                        style="
+                            width:100%;
+                            height:320px;
+                            display:block;
+                        "
+                    ></canvas>
+
+
+                    <div
+                        id="v51EmptyChart"
+                        style="
+                            position:absolute;
+                            inset:0;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            text-align:center;
+                            opacity:0.7;
+                            padding:20px;
+                        "
+                    >
+                        Aucun trade correspondant
+                        aux filtres sélectionnés.
+                    </div>
+
+                </div>
+
+            </div>
+
+
         `;
 
-
-        /*
-        Insérer la carte après Performance
-        */
 
         const performanceButtons =
             document.querySelector(
@@ -914,9 +1174,11 @@ Ce mois + XAUUSD + LDP+QML
 
         const performanceCard =
             performanceButtons
+
                 ? performanceButtons.closest(
                     ".card"
                 )
+
                 : null;
 
 
@@ -941,7 +1203,9 @@ Ce mois + XAUUSD + LDP+QML
 
 
         /*
+        ===============================
         EVENEMENT PERIODE
+        ===============================
         */
 
         const periodSelect =
@@ -952,8 +1216,14 @@ Ce mois + XAUUSD + LDP+QML
 
         if (periodSelect) {
 
+            periodSelect.value =
+                selectedPeriod;
+
+
             periodSelect.addEventListener(
+
                 "change",
+
                 function () {
 
                     selectedPeriod =
@@ -962,6 +1232,7 @@ Ce mois + XAUUSD + LDP+QML
                     refreshV51();
 
                 }
+
             );
 
         }
@@ -969,7 +1240,9 @@ Ce mois + XAUUSD + LDP+QML
 
 
         /*
+        ===============================
         EVENEMENT ACTIF
+        ===============================
         */
 
         const assetSelect =
@@ -980,8 +1253,14 @@ Ce mois + XAUUSD + LDP+QML
 
         if (assetSelect) {
 
+            assetSelect.value =
+                selectedAsset;
+
+
             assetSelect.addEventListener(
+
                 "change",
+
                 function () {
 
                     selectedAsset =
@@ -990,6 +1269,7 @@ Ce mois + XAUUSD + LDP+QML
                     refreshV51();
 
                 }
+
             );
 
         }
@@ -997,7 +1277,9 @@ Ce mois + XAUUSD + LDP+QML
 
 
         /*
+        ===============================
         EVENEMENT SETUP
+        ===============================
         */
 
         const setupSelect =
@@ -1008,8 +1290,14 @@ Ce mois + XAUUSD + LDP+QML
 
         if (setupSelect) {
 
+            setupSelect.value =
+                selectedSetup;
+
+
             setupSelect.addEventListener(
+
                 "change",
+
                 function () {
 
                     selectedSetup =
@@ -1018,6 +1306,7 @@ Ce mois + XAUUSD + LDP+QML
                     refreshV51();
 
                 }
+
             );
 
         }
@@ -1026,11 +1315,9 @@ Ce mois + XAUUSD + LDP+QML
 
 
 
-    /*
-    ============================================================
-    RESUME DES FILTRES
-    ============================================================
-    */
+    /* ========================================================
+       RESUME
+    ======================================================== */
 
     function updateSummary() {
 
@@ -1049,27 +1336,35 @@ Ce mois + XAUUSD + LDP+QML
 
         const period =
             FILTER_PERIODS.find(
+
                 item =>
                     item.value ===
                     selectedPeriod
+
             );
 
 
         const periodLabel =
             period
+
                 ? period.label
+
                 : "Tout l'historique";
 
 
         const assetLabel =
             selectedAsset === "ALL"
+
                 ? "Tous les actifs"
+
                 : selectedAsset;
 
 
         const setupLabel =
             selectedSetup === "ALL"
+
                 ? "Tous les setups"
+
                 : selectedSetup;
 
 
@@ -1078,6 +1373,7 @@ Ce mois + XAUUSD + LDP+QML
             <strong>
                 Filtres actifs :
             </strong>
+
 
             <span
                 style="
@@ -1091,6 +1387,7 @@ Ce mois + XAUUSD + LDP+QML
                 )}
             </span>
 
+
             <span
                 style="
                     display:inline-block;
@@ -1102,6 +1399,7 @@ Ce mois + XAUUSD + LDP+QML
                     assetLabel
                 )}
             </span>
+
 
             <span
                 style="
@@ -1121,165 +1419,780 @@ Ce mois + XAUUSD + LDP+QML
 
 
 
-    /*
-    ============================================================
-    MISE A JOUR STATISTIQUES
-    ============================================================
-    */
+    /* ========================================================
+       GRAPHIQUE
+    ======================================================== */
 
-    function refreshV51() {
+    function drawFilteredPerformanceChart(
+        tradeList
+    ) {
 
-        const currentTrades =
-            getCurrentCapitalTrades();
-
-
-        const filteredTrades =
-            applyCombinedFilters(
-                currentTrades
-            );
-
-
-        const stats =
-            calculateStats(
-                filteredTrades
-            );
-
-
-
-        const tradesElement =
+        const canvas =
             document.getElementById(
-                "v51Trades"
+                "v51PerformanceChart"
             );
 
 
-        const winnersElement =
+        const emptyMessage =
             document.getElementById(
-                "v51Winners"
+                "v51EmptyChart"
             );
 
 
-        const losersElement =
-            document.getElementById(
-                "v51Losers"
-            );
+        if (
+            !canvas
+        ) {
 
-
-        const beElement =
-            document.getElementById(
-                "v51BE"
-            );
-
-
-        const winrateElement =
-            document.getElementById(
-                "v51Winrate"
-            );
-
-
-        const profitElement =
-            document.getElementById(
-                "v51Profit"
-            );
-
-
-        const rrElement =
-            document.getElementById(
-                "v51RR"
-            );
-
-
-
-        if (tradesElement) {
-
-            tradesElement.textContent =
-                stats.trades;
+            return;
 
         }
 
 
-        if (winnersElement) {
+        /*
+        Pas de trade
+        */
 
-            winnersElement.textContent =
-                stats.winners;
+        if (
+            tradeList.length === 0
+        ) {
 
-        }
-
-
-        if (losersElement) {
-
-            losersElement.textContent =
-                stats.losers;
-
-        }
+            canvas.style.display =
+                "none";
 
 
-        if (beElement) {
+            if (emptyMessage) {
 
-            beElement.textContent =
-                stats.breakevens;
+                emptyMessage.style.display =
+                    "flex";
 
-        }
+            }
 
-
-        if (winrateElement) {
-
-            winrateElement.textContent =
-                stats.winrate.toFixed(1) +
-                "%";
+            return;
 
         }
 
 
-        if (profitElement) {
-
-            profitElement.textContent =
-                money(stats.profit);
-
-        }
+        canvas.style.display =
+            "block";
 
 
-        if (rrElement) {
+        if (emptyMessage) {
 
-            rrElement.textContent =
-                stats.averageRR.toFixed(2);
+            emptyMessage.style.display =
+                "none";
 
         }
 
 
-        updateSummary();
+        const container =
+            document.getElementById(
+                "v51ChartContainer"
+            );
 
-        updateFilteredTables(
-            filteredTrades
+
+        const rect =
+            container
+                ? container.getBoundingClientRect()
+
+                : canvas.getBoundingClientRect();
+
+
+        const dpr =
+            window.devicePixelRatio || 1;
+
+
+        const width =
+            Math.max(
+                rect.width,
+                300
+            );
+
+
+        const height =
+            320;
+
+
+        canvas.width =
+            width * dpr;
+
+
+        canvas.height =
+            height * dpr;
+
+
+        const ctx =
+            canvas.getContext(
+                "2d"
+            );
+
+
+        ctx.setTransform(
+
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0
+
+        );
+
+
+        ctx.clearRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+
+        /*
+        ===============================
+        DONNEES
+        ===============================
+        */
+
+        let cumulative =
+            0;
+
+
+        const values = [
+
+            0
+
+        ];
+
+
+        tradeList.forEach(
+
+            trade => {
+
+                cumulative +=
+                    Number(
+                        trade.pnl
+                    ) || 0;
+
+                values.push(
+                    cumulative
+                );
+
+            }
+
+        );
+
+
+
+        /*
+        ===============================
+        ECHELLE
+        ===============================
+        */
+
+        let minValue =
+            Math.min(
+                ...values
+            );
+
+
+        let maxValue =
+            Math.max(
+                ...values
+            );
+
+
+        if (
+            minValue === maxValue
+        ) {
+
+            minValue -= 1;
+
+            maxValue += 1;
+
+        }
+
+
+        const range =
+            maxValue -
+            minValue;
+
+
+        const extra =
+            Math.max(
+                range * 0.15,
+                1
+            );
+
+
+        minValue -=
+            extra;
+
+
+        maxValue +=
+            extra;
+
+
+
+        /*
+        ===============================
+        DIMENSIONS
+        ===============================
+        */
+
+        const paddingLeft =
+            65;
+
+
+        const paddingRight =
+            20;
+
+
+        const paddingTop =
+            25;
+
+
+        const paddingBottom =
+            45;
+
+
+        const chartWidth =
+            width -
+            paddingLeft -
+            paddingRight;
+
+
+        const chartHeight =
+            height -
+            paddingTop -
+            paddingBottom;
+
+
+
+        /*
+        ===============================
+        GRILLE
+        ===============================
+        */
+
+        const gridLines =
+            5;
+
+
+        ctx.font =
+            "12px Arial";
+
+
+        ctx.textAlign =
+            "right";
+
+
+        ctx.textBaseline =
+            "middle";
+
+
+        for (
+            let i = 0;
+            i <= gridLines;
+            i++
+        ) {
+
+            const ratio =
+                i /
+                gridLines;
+
+
+            const value =
+                maxValue -
+                (
+                    ratio *
+                    (
+                        maxValue -
+                        minValue
+                    )
+                );
+
+
+            const y =
+                paddingTop +
+                (
+                    ratio *
+                    chartHeight
+                );
+
+
+            ctx.beginPath();
+
+
+            ctx.moveTo(
+                paddingLeft,
+                y
+            );
+
+
+            ctx.lineTo(
+                width -
+                paddingRight,
+                y
+            );
+
+
+            ctx.strokeStyle =
+                "rgba(148,163,184,0.20)";
+
+
+            ctx.lineWidth =
+                1;
+
+
+            ctx.stroke();
+
+
+            ctx.fillStyle =
+                "#64748b";
+
+
+            ctx.fillText(
+
+                money(value),
+
+                paddingLeft -
+                8,
+
+                y
+
+            );
+
+        }
+
+
+
+        /*
+        ===============================
+        AXES
+        ===============================
+        */
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            paddingLeft,
+            paddingTop
+        );
+
+
+        ctx.lineTo(
+            paddingLeft,
+            height -
+            paddingBottom
+        );
+
+
+        ctx.lineTo(
+            width -
+            paddingRight,
+            height -
+            paddingBottom
+        );
+
+
+        ctx.strokeStyle =
+            "rgba(100,116,139,0.5)";
+
+
+        ctx.lineWidth =
+            1;
+
+
+        ctx.stroke();
+
+
+
+        /*
+        ===============================
+        POINTS
+        ===============================
+        */
+
+        const points =
+            [];
+
+
+        values.forEach(
+
+            (value, index) => {
+
+                const ratioX =
+                    index /
+                    Math.max(
+                        values.length -
+                        1,
+                        1
+                    );
+
+
+                const ratioY =
+                    (
+                        maxValue -
+                        value
+                    ) /
+                    (
+                        maxValue -
+                        minValue
+                    );
+
+
+                const x =
+                    paddingLeft +
+                    (
+                        ratioX *
+                        chartWidth
+                    );
+
+
+                const y =
+                    paddingTop +
+                    (
+                        ratioY *
+                        chartHeight
+                    );
+
+
+                points.push({
+
+                    x,
+
+                    y,
+
+                    value
+
+                });
+
+            }
+
+        );
+
+
+
+        /*
+        ===============================
+        ZONE ZERO
+        ===============================
+        */
+
+        if (
+            0 >= minValue &&
+            0 <= maxValue
+        ) {
+
+            const zeroRatio =
+                (
+                    maxValue -
+                    0
+                ) /
+                (
+                    maxValue -
+                    minValue
+                );
+
+
+            const zeroY =
+                paddingTop +
+                (
+                    zeroRatio *
+                    chartHeight
+                );
+
+
+            ctx.beginPath();
+
+
+            ctx.moveTo(
+                paddingLeft,
+                zeroY
+            );
+
+
+            ctx.lineTo(
+                width -
+                paddingRight,
+                zeroY
+            );
+
+
+            ctx.setLineDash([
+                5,
+                5
+            ]);
+
+
+            ctx.strokeStyle =
+                "rgba(100,116,139,0.55)";
+
+
+            ctx.stroke();
+
+
+            ctx.setLineDash([]);
+
+        }
+
+
+
+        /*
+        ===============================
+        LIGNE
+        ===============================
+        */
+
+        for (
+            let i = 0;
+            i <
+            points.length - 1;
+            i++
+        ) {
+
+            const current =
+                points[i];
+
+
+            const next =
+                points[i + 1];
+
+
+            const pnl =
+                Number(
+                    tradeList[i].pnl
+                ) || 0;
+
+
+            let lineColor =
+                "#64748b";
+
+
+            if (
+                pnl > 0
+            ) {
+
+                lineColor =
+                    "#16a34a";
+
+            }
+
+
+            if (
+                pnl < 0
+            ) {
+
+                lineColor =
+                    "#dc2626";
+
+            }
+
+
+            if (
+                pnl === 0
+            ) {
+
+                lineColor =
+                    "#64748b";
+
+            }
+
+
+            ctx.beginPath();
+
+
+            ctx.moveTo(
+                current.x,
+                current.y
+            );
+
+
+            ctx.lineTo(
+                next.x,
+                next.y
+            );
+
+
+            ctx.strokeStyle =
+                lineColor;
+
+
+            ctx.lineWidth =
+                3;
+
+
+            ctx.lineCap =
+                "round";
+
+
+            ctx.stroke();
+
+        }
+
+
+
+        /*
+        ===============================
+        POINTS
+        ===============================
+        */
+
+        points.forEach(
+
+            (point, index) => {
+
+                let pointColor =
+                    "#64748b";
+
+
+                if (
+                    index > 0
+                ) {
+
+                    const pnl =
+                        Number(
+                            tradeList[
+                                index - 1
+                            ].pnl
+                        ) || 0;
+
+
+                    if (
+                        pnl > 0
+                    ) {
+
+                        pointColor =
+                            "#16a34a";
+
+                    }
+
+
+                    if (
+                        pnl < 0
+                    ) {
+
+                        pointColor =
+                            "#dc2626";
+
+                    }
+
+                }
+
+
+                ctx.beginPath();
+
+
+                ctx.arc(
+
+                    point.x,
+
+                    point.y,
+
+                    4,
+
+                    0,
+
+                    Math.PI * 2
+
+                );
+
+
+                ctx.fillStyle =
+                    pointColor;
+
+
+                ctx.fill();
+
+
+                ctx.strokeStyle =
+                    "#ffffff";
+
+
+                ctx.lineWidth =
+                    2;
+
+
+                ctx.stroke();
+
+            }
+
+        );
+
+
+
+        /*
+        ===============================
+        LABELS X
+        ===============================
+        */
+
+        ctx.textAlign =
+            "center";
+
+
+        ctx.textBaseline =
+            "top";
+
+
+        points.forEach(
+
+            (point, index) => {
+
+                if (
+
+                    index === 0 ||
+
+                    index ===
+                        points.length - 1 ||
+
+                    points.length <= 10
+
+                ) {
+
+                    ctx.fillStyle =
+                        "#64748b";
+
+
+                    ctx.font =
+                        "11px Arial";
+
+
+                    ctx.fillText(
+
+                        index === 0
+
+                            ? "Départ"
+
+                            : "#" +
+                              index,
+
+                        point.x,
+
+                        height -
+                        paddingBottom +
+                        10
+
+                    );
+
+                }
+
+            }
+
         );
 
     }
 
 
 
-    /*
-    ============================================================
-    TABLEAUX
-    ============================================================
-    */
+    /* ========================================================
+       TABLEAUX
+    ======================================================== */
 
     function updateFilteredTables(
         filteredTrades
     ) {
-
-        /*
-        Lorsque l'actif est choisi,
-        le tableau Setup devient
-        l'analyse des setups de cet actif.
-
-        Lorsque le setup est choisi,
-        le tableau Actif devient
-        l'analyse des actifs avec ce setup.
-
-        Lorsque les deux sont choisis,
-        chacun affiche uniquement
-        la combinaison sélectionnée.
-        */
-
 
         const setupBody =
             document.getElementById(
@@ -1298,16 +2211,6 @@ Ce mois + XAUUSD + LDP+QML
             renderFilteredSetupTable(
                 filteredTrades
             );
-
-        } else if (
-            typeof window.updateSetupTable ===
-            "function"
-        ) {
-
-            /*
-            On laisse le dashboard principal
-            afficher son tableau normal.
-            */
 
         }
 
@@ -1337,11 +2240,9 @@ Ce mois + XAUUSD + LDP+QML
 
 
 
-    /*
-    ============================================================
-    TABLE SETUPS
-    ============================================================
-    */
+    /* ========================================================
+       TABLE SETUPS
+    ======================================================== */
 
     function renderFilteredSetupTable(
         tradeList
@@ -1363,12 +2264,13 @@ Ce mois + XAUUSD + LDP+QML
         const grouped = {};
 
 
-
         tradeList.forEach(
+
             trade => {
 
                 const setup =
-                    trade.setup || "-";
+                    trade.setup ||
+                    "-";
 
 
                 if (
@@ -1381,9 +2283,7 @@ Ce mois + XAUUSD + LDP+QML
 
                         winners: 0,
 
-                        profit: 0,
-
-                        rr: []
+                        profit: 0
 
                     };
 
@@ -1394,7 +2294,8 @@ Ce mois + XAUUSD + LDP+QML
 
 
                 if (
-                    trade.result === "TP"
+                    trade.result ===
+                    "TP"
                 ) {
 
                     grouped[
@@ -1409,31 +2310,12 @@ Ce mois + XAUUSD + LDP+QML
                         trade.pnl
                     ) || 0;
 
-
-                const rr =
-                    Number(
-                        trade.rr
-                    );
-
-
-                if (
-                    Number.isFinite(rr) &&
-                    rr > 0
-                ) {
-
-                    grouped[
-                        setup
-                    ].rr.push(rr);
-
-                }
-
             }
+
         );
 
 
-
         tbody.innerHTML = "";
-
 
 
         const entries =
@@ -1442,9 +2324,9 @@ Ce mois + XAUUSD + LDP+QML
             );
 
 
-
         if (
-            entries.length === 0
+            entries.length ===
+            0
         ) {
 
             tbody.innerHTML = `
@@ -1467,22 +2349,28 @@ Ce mois + XAUUSD + LDP+QML
         }
 
 
-
         entries
+
             .sort(
+
                 (a, b) =>
                     b[1].profit -
                     a[1].profit
+
             )
+
             .forEach(
+
                 ([setup, stats]) => {
 
                     const winrate =
                         stats.trades > 0
+
                             ? (
                                 stats.winners /
                                 stats.trades
                             ) * 100
+
                             : 0;
 
 
@@ -1528,17 +2416,16 @@ Ce mois + XAUUSD + LDP+QML
                     );
 
                 }
+
             );
 
     }
 
 
 
-    /*
-    ============================================================
-    TABLE ACTIFS
-    ============================================================
-    */
+    /* ========================================================
+       TABLE ACTIFS
+    ======================================================== */
 
     function renderFilteredAssetTable(
         tradeList
@@ -1560,12 +2447,13 @@ Ce mois + XAUUSD + LDP+QML
         const grouped = {};
 
 
-
         tradeList.forEach(
+
             trade => {
 
                 const asset =
-                    trade.asset || "-";
+                    trade.asset ||
+                    "-";
 
 
                 if (
@@ -1593,11 +2481,14 @@ Ce mois + XAUUSD + LDP+QML
                 }
 
 
-                grouped[asset].trades++;
+                grouped[
+                    asset
+                ].trades++;
 
 
                 if (
-                    trade.result === "TP"
+                    trade.result ===
+                    "TP"
                 ) {
 
                     grouped[
@@ -1608,7 +2499,8 @@ Ce mois + XAUUSD + LDP+QML
 
 
                 if (
-                    trade.result === "SL"
+                    trade.result ===
+                    "SL"
                 ) {
 
                     grouped[
@@ -1619,7 +2511,8 @@ Ce mois + XAUUSD + LDP+QML
 
 
                 if (
-                    trade.result === "BE"
+                    trade.result ===
+                    "BE"
                 ) {
 
                     grouped[
@@ -1629,16 +2522,22 @@ Ce mois + XAUUSD + LDP+QML
                 }
 
 
-                grouped[asset].profit +=
+                grouped[
+                    asset
+                ].profit +=
                     Number(
                         trade.pnl
                     ) || 0;
 
 
-                grouped[asset].pnl.push(
+                grouped[
+                    asset
+                ].pnl.push(
+
                     Number(
                         trade.pnl
                     ) || 0
+
                 );
 
 
@@ -1649,23 +2548,31 @@ Ce mois + XAUUSD + LDP+QML
 
 
                 if (
-                    Number.isFinite(rr) &&
+
+                    Number.isFinite(
+                        rr
+                    )
+
+                    &&
+
                     rr > 0
+
                 ) {
 
                     grouped[
                         asset
-                    ].rr.push(rr);
+                    ].rr.push(
+                        rr
+                    );
 
                 }
 
             }
+
         );
 
 
-
         tbody.innerHTML = "";
-
 
 
         const entries =
@@ -1674,9 +2581,9 @@ Ce mois + XAUUSD + LDP+QML
             );
 
 
-
         if (
-            entries.length === 0
+            entries.length ===
+            0
         ) {
 
             tbody.innerHTML = `
@@ -1699,52 +2606,67 @@ Ce mois + XAUUSD + LDP+QML
         }
 
 
-
         entries
+
             .sort(
+
                 (a, b) =>
                     b[1].profit -
                     a[1].profit
+
             )
+
             .forEach(
+
                 ([asset, stats]) => {
 
                     const winrate =
                         stats.trades > 0
+
                             ? (
                                 stats.winners /
                                 stats.trades
                             ) * 100
+
                             : 0;
 
 
                     const averageRR =
                         stats.rr.length > 0
+
                             ? stats.rr.reduce(
+
                                 (
                                     sum,
                                     rr
                                 ) =>
                                     sum + rr,
+
                                 0
+
                             ) /
                             stats.rr.length
+
                             : 0;
 
 
                     const best =
                         stats.pnl.length > 0
+
                             ? Math.max(
                                 ...stats.pnl
                             )
+
                             : 0;
 
 
                     const worst =
                         stats.pnl.length > 0
+
                             ? Math.min(
                                 ...stats.pnl
                             )
+
                             : 0;
 
 
@@ -1816,21 +2738,250 @@ Ce mois + XAUUSD + LDP+QML
                     );
 
                 }
+
             );
 
     }
 
 
 
-    /*
-    ============================================================
-    INITIALISATION
-    ============================================================
-    */
+    /* ========================================================
+       REFRESH GLOBAL
+    ======================================================== */
+
+    function refreshV51() {
+
+        const currentTrades =
+            getCurrentCapitalTrades();
+
+
+        const filteredTrades =
+            applyCombinedFilters(
+                currentTrades
+            );
+
+
+        const stats =
+            calculateStats(
+                filteredTrades
+            );
+
+
+
+        /*
+        ===============================
+        STATS
+        ===============================
+        */
+
+        const tradesElement =
+            document.getElementById(
+                "v51Trades"
+            );
+
+
+        const winnersElement =
+            document.getElementById(
+                "v51Winners"
+            );
+
+
+        const losersElement =
+            document.getElementById(
+                "v51Losers"
+            );
+
+
+        const beElement =
+            document.getElementById(
+                "v51BE"
+            );
+
+
+        const winrateElement =
+            document.getElementById(
+                "v51Winrate"
+            );
+
+
+        const profitElement =
+            document.getElementById(
+                "v51Profit"
+            );
+
+
+        const rrElement =
+            document.getElementById(
+                "v51RR"
+            );
+
+
+        if (
+            tradesElement
+        ) {
+
+            tradesElement.textContent =
+                stats.trades;
+
+        }
+
+
+        if (
+            winnersElement
+        ) {
+
+            winnersElement.textContent =
+                stats.winners;
+
+        }
+
+
+        if (
+            losersElement
+        ) {
+
+            losersElement.textContent =
+                stats.losers;
+
+        }
+
+
+        if (
+            beElement
+        ) {
+
+            beElement.textContent =
+                stats.breakevens;
+
+        }
+
+
+        if (
+            winrateElement
+        ) {
+
+            winrateElement.textContent =
+                stats.winrate.toFixed(
+                    1
+                ) +
+                "%";
+
+        }
+
+
+        if (
+            profitElement
+        ) {
+
+            profitElement.textContent =
+                money(
+                    stats.profit
+                );
+
+        }
+
+
+        if (
+            rrElement
+        ) {
+
+            rrElement.textContent =
+                stats.averageRR.toFixed(
+                    2
+                );
+
+        }
+
+
+
+        /*
+        ===============================
+        RESUME
+        ===============================
+        */
+
+        updateSummary();
+
+
+
+        /*
+        ===============================
+        TABLEAUX
+        ===============================
+        */
+
+        updateFilteredTables(
+            filteredTrades
+        );
+
+
+
+        /*
+        ===============================
+        GRAPHIQUE
+        ===============================
+        */
+
+        drawFilteredPerformanceChart(
+            filteredTrades
+        );
+
+    }
+
+
+
+    /* ========================================================
+       REDIMENSIONNEMENT
+    ======================================================== */
+
+    function setupResizeHandler() {
+
+        if (
+            filterChartResizeHandler
+        ) {
+
+            window.removeEventListener(
+                "resize",
+                filterChartResizeHandler
+            );
+
+        }
+
+
+        filterChartResizeHandler =
+            function () {
+
+                const trades =
+                    applyCombinedFilters(
+                        getCurrentCapitalTrades()
+                    );
+
+
+                drawFilteredPerformanceChart(
+                    trades
+                );
+
+            };
+
+
+        window.addEventListener(
+            "resize",
+            filterChartResizeHandler
+        );
+
+    }
+
+
+
+    /* ========================================================
+       INITIALISATION
+    ======================================================== */
 
     function initialize() {
 
         createFilterInterface();
+
+        setupResizeHandler();
 
         refreshV51();
 
@@ -1839,29 +2990,35 @@ Ce mois + XAUUSD + LDP+QML
 
 
     /*
-    On attend que app.js
-    ait terminé son initialisation.
+    Laisser app.js finir
+    son chargement.
     */
 
     setTimeout(
+
         initialize,
+
         500
+
     );
 
 
 
     /*
-    Synchronisation avec
-    l'application principale.
+    Synchronisation.
     */
 
     setInterval(
+
         function () {
 
             refreshV51();
 
         },
+
         1000
+
     );
+
 
 })();
