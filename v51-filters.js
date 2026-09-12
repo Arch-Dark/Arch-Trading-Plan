@@ -1,5 +1,5 @@
 /* ============================================================
-   V5.4 — FILTRES + STATISTIQUES + ANALYSE DETAILLEE
+   V5.5 — FILTRES + STATISTIQUES + ANALYSE + CLASSEMENT
    ============================================================ */
 
 (function () {
@@ -246,7 +246,7 @@
     }
 
     /* ============================================================
-       CREATION DE LA SECTION
+       CREATION SECTION
        ============================================================ */
 
     function createFilterSection() {
@@ -343,7 +343,7 @@
             </div>
 
             <!-- ==================================================
-                 STATISTIQUES GENERALES
+                 STATISTIQUES
                  ================================================== -->
 
             <div
@@ -435,17 +435,86 @@
             </div>
 
             <!-- ==================================================
-                 DETAIL PAR SETUP
+                 CLASSEMENT SETUPS
                  ================================================== -->
 
-            <div style="margin-top:10px;margin-bottom:26px;">
+            <div style="margin-bottom:28px;">
+
+                <div class="section-header">
+                    <div>
+                        <h3>🏆 Classement des setups</h3>
+                        <p>
+                            Classement selon la performance globale
+                        </p>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rang</th>
+                                <th>Setup</th>
+                                <th>Trades</th>
+                                <th>Winrate</th>
+                                <th>Profit</th>
+                                <th>Profit Factor</th>
+                                <th>RR moyen</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="v55SetupRankingBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================================================
+                 CLASSEMENT ACTIFS
+                 ================================================== -->
+
+            <div style="margin-bottom:28px;">
+
+                <div class="section-header">
+                    <div>
+                        <h3>🥇 Classement des actifs</h3>
+                        <p>
+                            Classement selon la performance globale
+                        </p>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rang</th>
+                                <th>Actif</th>
+                                <th>Trades</th>
+                                <th>Winrate</th>
+                                <th>Profit</th>
+                                <th>Profit Factor</th>
+                                <th>RR moyen</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="v55AssetRankingBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================================================
+                 DETAIL SETUPS
+                 ================================================== -->
+
+            <div style="margin-bottom:28px;">
 
                 <div class="section-header">
                     <div>
                         <h3>🎯 Analyse détaillée par setup</h3>
-                        <p>
-                            Comparaison des résultats de chaque stratégie
-                        </p>
                     </div>
                 </div>
 
@@ -474,17 +543,14 @@
             </div>
 
             <!-- ==================================================
-                 DETAIL PAR ACTIF
+                 DETAIL ACTIFS
                  ================================================== -->
 
-            <div style="margin-top:10px;margin-bottom:26px;">
+            <div style="margin-bottom:28px;">
 
                 <div class="section-header">
                     <div>
                         <h3>📈 Analyse détaillée par actif</h3>
-                        <p>
-                            Comparaison des performances par marché
-                        </p>
                     </div>
                 </div>
 
@@ -583,7 +649,7 @@
     }
 
     /* ============================================================
-       FILTRES SELECT
+       REMPLISSAGE DES FILTRES
        ============================================================ */
 
     function populateFilters() {
@@ -639,16 +705,20 @@
         `;
 
         [...assets]
-            .sort(function (a, b) {
-                return String(a).localeCompare(
-                    String(b),
-                    "fr",
-                    {
-                        sensitivity:
-                            "base"
-                    }
-                );
-            })
+            .sort(
+                function (a, b) {
+                    return String(
+                        a
+                    ).localeCompare(
+                        String(b),
+                        "fr",
+                        {
+                            sensitivity:
+                                "base"
+                        }
+                    );
+                }
+            )
             .forEach(
                 function (asset) {
                     const option =
@@ -704,16 +774,20 @@
         `;
 
         [...setups]
-            .sort(function (a, b) {
-                return String(a).localeCompare(
-                    String(b),
-                    "fr",
-                    {
-                        sensitivity:
-                            "base"
-                    }
-                );
-            })
+            .sort(
+                function (a, b) {
+                    return String(
+                        a
+                    ).localeCompare(
+                        String(b),
+                        "fr",
+                        {
+                            sensitivity:
+                                "base"
+                        }
+                    );
+                }
+            )
             .forEach(
                 function (setup) {
                     const option =
@@ -790,26 +864,34 @@
                 period
             );
 
-        if (asset !== "ALL") {
+        if (
+            asset !== "ALL"
+        ) {
             result =
                 result.filter(
                     function (trade) {
                         return String(
                             trade.asset || ""
                         ) ===
-                            String(asset);
+                            String(
+                                asset
+                            );
                     }
                 );
         }
 
-        if (setup !== "ALL") {
+        if (
+            setup !== "ALL"
+        ) {
             result =
                 result.filter(
                     function (trade) {
                         return String(
                             trade.setup || ""
                         ) ===
-                            String(setup);
+                            String(
+                                setup
+                            );
                     }
                 );
         }
@@ -820,7 +902,7 @@
     }
 
     /* ============================================================
-       STATISTIQUES GENERALES
+       STATISTIQUES
        ============================================================ */
 
     function calculateAdvancedStats(
@@ -1027,10 +1109,6 @@
                   )
                 : 0;
 
-        /* --------------------------------------------------------
-           SERIES
-           -------------------------------------------------------- */
-
         let currentWinStreak = 0;
         let maxWinStreak = 0;
 
@@ -1078,10 +1156,6 @@
                 }
             }
         );
-
-        /* --------------------------------------------------------
-           DRAWDOWN
-           -------------------------------------------------------- */
 
         let cumulativeProfit = 0;
         let highestPoint = 0;
@@ -1306,22 +1380,433 @@
     }
 
     /* ============================================================
-       STATISTIQUES POUR UN GROUPE
+       SCORE DE CLASSEMENT
        ============================================================ */
 
-    function calculateGroupStats(
-        groupTrades
+    function calculateRankingScore(
+        stats
     ) {
-        const stats =
-            calculateAdvancedStats(
-                groupTrades
-            );
+        if (
+            !stats ||
+            stats.totalTrades === 0
+        ) {
+            return -Infinity;
+        }
 
-        return stats;
+        /*
+         * Score équilibré :
+         *
+         * 40 % = Profit
+         * 30 % = Winrate
+         * 20 % = Profit Factor
+         * 10 % = RR moyen
+         *
+         * Le score sert uniquement au classement.
+         */
+
+        const profitComponent =
+            stats.totalProfit;
+
+        const winrateComponent =
+            stats.winrate;
+
+        const profitFactorComponent =
+            Number.isFinite(
+                stats.profitFactor
+            )
+                ? stats.profitFactor
+                : 10;
+
+        const rrComponent =
+            stats.averageRR;
+
+        return (
+            profitComponent * 0.40 +
+            winrateComponent * 0.30 +
+            profitFactorComponent * 20 +
+            rrComponent * 10
+        );
+    }
+
+    function getRankingGroups(
+        filteredTrades,
+        field
+    ) {
+        const groups =
+            new Map();
+
+        filteredTrades.forEach(
+            function (trade) {
+                const value =
+                    String(
+                        trade[field] ||
+                            "Non défini"
+                    );
+
+                if (
+                    !groups.has(
+                        value
+                    )
+                ) {
+                    groups.set(
+                        value,
+                        []
+                    );
+                }
+
+                groups
+                    .get(value)
+                    .push(trade);
+            }
+        );
+
+        const ranking = [];
+
+        groups.forEach(
+            function (
+                groupTrades,
+                name
+            ) {
+                const stats =
+                    calculateAdvancedStats(
+                        groupTrades
+                    );
+
+                const score =
+                    calculateRankingScore(
+                        stats
+                    );
+
+                ranking.push({
+                    name:
+                        name,
+
+                    trades:
+                        groupTrades,
+
+                    stats:
+                        stats,
+
+                    score:
+                        score
+                });
+            }
+        );
+
+        ranking.sort(
+            function (a, b) {
+                if (
+                    b.score !==
+                    a.score
+                ) {
+                    return (
+                        b.score -
+                        a.score
+                    );
+                }
+
+                if (
+                    b.stats.totalProfit !==
+                    a.stats.totalProfit
+                ) {
+                    return (
+                        b.stats.totalProfit -
+                        a.stats.totalProfit
+                    );
+                }
+
+                if (
+                    b.stats.winrate !==
+                    a.stats.winrate
+                ) {
+                    return (
+                        b.stats.winrate -
+                        a.stats.winrate
+                    );
+                }
+
+                return (
+                    b.stats.profitFactor -
+                    a.stats.profitFactor
+                );
+            }
+        );
+
+        return ranking;
     }
 
     /* ============================================================
-       TABLEAU DETAILLE PAR SETUP
+       RANG
+       ============================================================ */
+
+    function rankingLabel(
+        position
+    ) {
+        if (position === 0) {
+            return "🥇";
+        }
+
+        if (position === 1) {
+            return "🥈";
+        }
+
+        if (position === 2) {
+            return "🥉";
+        }
+
+        return "#" + (
+            position + 1
+        );
+    }
+
+    /* ============================================================
+       AFFICHAGE CLASSEMENT SETUPS
+       ============================================================ */
+
+    function renderSetupRanking(
+        filteredTrades
+    ) {
+        const tbody =
+            document.getElementById(
+                "v55SetupRankingBody"
+            );
+
+        if (!tbody) {
+            return;
+        }
+
+        tbody.innerHTML = "";
+
+        const ranking =
+            getRankingGroups(
+                filteredTrades,
+                "setup"
+            );
+
+        if (
+            ranking.length ===
+            0
+        ) {
+            tbody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="8"
+                        class="empty-table"
+                    >
+                        Aucun setup à classer.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        ranking.forEach(
+            function (
+                item,
+                index
+            ) {
+                const stats =
+                    item.stats;
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+                const pf =
+                    Number.isFinite(
+                        stats.profitFactor
+                    )
+                        ? stats.profitFactor.toFixed(
+                              2
+                          )
+                        : "∞";
+
+                row.innerHTML = `
+                    <td>
+                        ${rankingLabel(
+                            index
+                        )}
+                    </td>
+
+                    <td>
+                        <strong>
+                            ${escapeValue(
+                                item.name
+                            )}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${stats.totalTrades}
+                    </td>
+
+                    <td>
+                        ${stats.winrate.toFixed(
+                            1
+                        )}%
+                    </td>
+
+                    <td>
+                        ${formatMoney(
+                            stats.totalProfit
+                        )}
+                    </td>
+
+                    <td>
+                        ${pf}
+                    </td>
+
+                    <td>
+                        ${stats.averageRR.toFixed(
+                            2
+                        )}
+                    </td>
+
+                    <td>
+                        ${Number.isFinite(
+                            item.score
+                        )
+                            ? item.score.toFixed(
+                                  2
+                              )
+                            : "-"}
+                    </td>
+                `;
+
+                tbody.appendChild(
+                    row
+                );
+            }
+        );
+    }
+
+    /* ============================================================
+       AFFICHAGE CLASSEMENT ACTIFS
+       ============================================================ */
+
+    function renderAssetRanking(
+        filteredTrades
+    ) {
+        const tbody =
+            document.getElementById(
+                "v55AssetRankingBody"
+            );
+
+        if (!tbody) {
+            return;
+        }
+
+        tbody.innerHTML = "";
+
+        const ranking =
+            getRankingGroups(
+                filteredTrades,
+                "asset"
+            );
+
+        if (
+            ranking.length ===
+            0
+        ) {
+            tbody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="8"
+                        class="empty-table"
+                    >
+                        Aucun actif à classer.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        ranking.forEach(
+            function (
+                item,
+                index
+            ) {
+                const stats =
+                    item.stats;
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+                const pf =
+                    Number.isFinite(
+                        stats.profitFactor
+                    )
+                        ? stats.profitFactor.toFixed(
+                              2
+                          )
+                        : "∞";
+
+                row.innerHTML = `
+                    <td>
+                        ${rankingLabel(
+                            index
+                        )}
+                    </td>
+
+                    <td>
+                        <strong>
+                            ${escapeValue(
+                                item.name
+                            )}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${stats.totalTrades}
+                    </td>
+
+                    <td>
+                        ${stats.winrate.toFixed(
+                            1
+                        )}%
+                    </td>
+
+                    <td>
+                        ${formatMoney(
+                            stats.totalProfit
+                        )}
+                    </td>
+
+                    <td>
+                        ${pf}
+                    </td>
+
+                    <td>
+                        ${stats.averageRR.toFixed(
+                            2
+                        )}
+                    </td>
+
+                    <td>
+                        ${Number.isFinite(
+                            item.score
+                        )
+                            ? item.score.toFixed(
+                                  2
+                              )
+                            : "-"}
+                    </td>
+                `;
+
+                tbody.appendChild(
+                    row
+                );
+            }
+        );
+    }
+
+    /* ============================================================
+       DETAIL SETUPS
        ============================================================ */
 
     function renderSetupAnalysis(
@@ -1355,8 +1840,10 @@
             }
         );
 
-        const sortedSetups =
-            [...setups].sort(
+        let rowsAdded = 0;
+
+        [...setups]
+            .sort(
                 function (a, b) {
                     return String(
                         a
@@ -1369,139 +1856,132 @@
                         }
                     );
                 }
-            );
+            )
+            .forEach(
+                function (setup) {
+                    const groupTrades =
+                        filteredTrades.filter(
+                            function (trade) {
+                                return String(
+                                    trade.setup ||
+                                        ""
+                                ) ===
+                                    String(
+                                        setup
+                                    );
+                            }
+                        );
 
-        let rowsAdded = 0;
+                    if (
+                        groupTrades.length ===
+                        0
+                    ) {
+                        return;
+                    }
 
-        sortedSetups.forEach(
-            function (setup) {
-                const groupTrades =
-                    filteredTrades.filter(
-                        function (trade) {
-                            return String(
-                                trade.setup ||
-                                    ""
-                            ) ===
-                                String(
-                                    setup
-                                );
-                        }
+                    const stats =
+                        calculateAdvancedStats(
+                            groupTrades
+                        );
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+                    const pf =
+                        Number.isFinite(
+                            stats.profitFactor
+                        )
+                            ? stats.profitFactor.toFixed(
+                                  2
+                              )
+                            : "∞";
+
+                    row.innerHTML = `
+                        <td>
+                            ${escapeValue(
+                                setup
+                            )}
+                        </td>
+
+                        <td>
+                            ${stats.totalTrades}
+                        </td>
+
+                        <td>
+                            ${stats.wins}
+                        </td>
+
+                        <td>
+                            ${stats.losses}
+                        </td>
+
+                        <td>
+                            ${stats.be}
+                        </td>
+
+                        <td>
+                            ${stats.winrate.toFixed(
+                                1
+                            )}%
+                        </td>
+
+                        <td>
+                            ${formatMoney(
+                                stats.totalProfit
+                            )}
+                        </td>
+
+                        <td>
+                            ${stats.averageRR.toFixed(
+                                2
+                            )}
+                        </td>
+
+                        <td>
+                            ${pf}
+                        </td>
+
+                        <td>
+                            ${formatMoney(
+                                stats.bestTrade
+                            )}
+                        </td>
+
+                        <td>
+                            ${formatMoney(
+                                stats.worstTrade
+                            )}
+                        </td>
+                    `;
+
+                    tbody.appendChild(
+                        row
                     );
 
-                if (
-                    groupTrades.length ===
-                    0
-                ) {
-                    return;
+                    rowsAdded++;
                 }
-
-                const stats =
-                    calculateGroupStats(
-                        groupTrades
-                    );
-
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-                row.innerHTML = `
-                    <td>
-                        ${escapeValue(
-                            setup
-                        )}
-                    </td>
-
-                    <td>
-                        ${stats.totalTrades}
-                    </td>
-
-                    <td>
-                        ${stats.wins}
-                    </td>
-
-                    <td>
-                        ${stats.losses}
-                    </td>
-
-                    <td>
-                        ${stats.be}
-                    </td>
-
-                    <td>
-                        ${stats.winrate.toFixed(
-                            1
-                        )}%
-                    </td>
-
-                    <td>
-                        ${formatMoney(
-                            stats.totalProfit
-                        )}
-                    </td>
-
-                    <td>
-                        ${stats.averageRR.toFixed(
-                            2
-                        )}
-                    </td>
-
-                    <td>
-                        ${
-                            Number.isFinite(
-                                stats.profitFactor
-                            )
-                                ? stats.profitFactor.toFixed(
-                                      2
-                                  )
-                                : "∞"
-                        }
-                    </td>
-
-                    <td>
-                        ${formatMoney(
-                            stats.bestTrade
-                        )}
-                    </td>
-
-                    <td>
-                        ${formatMoney(
-                            stats.worstTrade
-                        )}
-                    </td>
-                `;
-
-                tbody.appendChild(
-                    row
-                );
-
-                rowsAdded++;
-            }
-        );
-
-        if (rowsAdded === 0) {
-            const row =
-                document.createElement(
-                    "tr"
-                );
-
-            row.innerHTML = `
-                <td
-                    colspan="11"
-                    class="empty-table"
-                >
-                    Aucun setup correspondant aux filtres.
-                </td>
-            `;
-
-            tbody.appendChild(
-                row
             );
+
+        if (
+            rowsAdded === 0
+        ) {
+            tbody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="11"
+                        class="empty-table"
+                    >
+                        Aucun setup correspondant aux filtres.
+                    </td>
+                </tr>
+            `;
         }
     }
 
     /* ============================================================
-       TABLEAU DETAILLE PAR ACTIF
+       DETAIL ACTIFS
        ============================================================ */
 
     function renderAssetAnalysis(
@@ -1535,8 +2015,10 @@
             }
         );
 
-        const sortedAssets =
-            [...assets].sort(
+        let rowsAdded = 0;
+
+        [...assets]
+            .sort(
                 function (a, b) {
                     return String(
                         a
@@ -1549,134 +2031,127 @@
                         }
                     );
                 }
-            );
+            )
+            .forEach(
+                function (asset) {
+                    const groupTrades =
+                        filteredTrades.filter(
+                            function (trade) {
+                                return String(
+                                    trade.asset ||
+                                        ""
+                                ) ===
+                                    String(
+                                        asset
+                                    );
+                            }
+                        );
 
-        let rowsAdded = 0;
+                    if (
+                        groupTrades.length ===
+                        0
+                    ) {
+                        return;
+                    }
 
-        sortedAssets.forEach(
-            function (asset) {
-                const groupTrades =
-                    filteredTrades.filter(
-                        function (trade) {
-                            return String(
-                                trade.asset ||
-                                    ""
-                            ) ===
-                                String(
-                                    asset
-                                );
-                        }
+                    const stats =
+                        calculateAdvancedStats(
+                            groupTrades
+                        );
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+                    const pf =
+                        Number.isFinite(
+                            stats.profitFactor
+                        )
+                            ? stats.profitFactor.toFixed(
+                                  2
+                              )
+                            : "∞";
+
+                    row.innerHTML = `
+                        <td>
+                            ${escapeValue(
+                                asset
+                            )}
+                        </td>
+
+                        <td>
+                            ${stats.totalTrades}
+                        </td>
+
+                        <td>
+                            ${stats.wins}
+                        </td>
+
+                        <td>
+                            ${stats.losses}
+                        </td>
+
+                        <td>
+                            ${stats.be}
+                        </td>
+
+                        <td>
+                            ${stats.winrate.toFixed(
+                                1
+                            )}%
+                        </td>
+
+                        <td>
+                            ${formatMoney(
+                                stats.totalProfit
+                            )}
+                        </td>
+
+                        <td>
+                            ${stats.averageRR.toFixed(
+                                2
+                            )}
+                        </td>
+
+                        <td>
+                            ${pf}
+                        </td>
+
+                        <td>
+                            ${formatMoney(
+                                stats.bestTrade
+                            )}
+                        </td>
+
+                        <td>
+                            ${formatMoney(
+                                stats.worstTrade
+                            )}
+                        </td>
+                    `;
+
+                    tbody.appendChild(
+                        row
                     );
 
-                if (
-                    groupTrades.length ===
-                    0
-                ) {
-                    return;
+                    rowsAdded++;
                 }
-
-                const stats =
-                    calculateGroupStats(
-                        groupTrades
-                    );
-
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-                row.innerHTML = `
-                    <td>
-                        ${escapeValue(
-                            asset
-                        )}
-                    </td>
-
-                    <td>
-                        ${stats.totalTrades}
-                    </td>
-
-                    <td>
-                        ${stats.wins}
-                    </td>
-
-                    <td>
-                        ${stats.losses}
-                    </td>
-
-                    <td>
-                        ${stats.be}
-                    </td>
-
-                    <td>
-                        ${stats.winrate.toFixed(
-                            1
-                        )}%
-                    </td>
-
-                    <td>
-                        ${formatMoney(
-                            stats.totalProfit
-                        )}
-                    </td>
-
-                    <td>
-                        ${stats.averageRR.toFixed(
-                            2
-                        )}
-                    </td>
-
-                    <td>
-                        ${
-                            Number.isFinite(
-                                stats.profitFactor
-                            )
-                                ? stats.profitFactor.toFixed(
-                                      2
-                                  )
-                                : "∞"
-                        }
-                    </td>
-
-                    <td>
-                        ${formatMoney(
-                            stats.bestTrade
-                        )}
-                    </td>
-
-                    <td>
-                        ${formatMoney(
-                            stats.worstTrade
-                        )}
-                    </td>
-                `;
-
-                tbody.appendChild(
-                    row
-                );
-
-                rowsAdded++;
-            }
-        );
-
-        if (rowsAdded === 0) {
-            const row =
-                document.createElement(
-                    "tr"
-                );
-
-            row.innerHTML = `
-                <td
-                    colspan="11"
-                    class="empty-table"
-                >
-                    Aucun actif correspondant aux filtres.
-                </td>
-            `;
-
-            tbody.appendChild(
-                row
             );
+
+        if (
+            rowsAdded === 0
+        ) {
+            tbody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="11"
+                        class="empty-table"
+                    >
+                        Aucun actif correspondant aux filtres.
+                    </td>
+                </tr>
+            `;
         }
     }
 
@@ -1769,7 +2244,8 @@
             Math.max(
                 1,
                 Math.floor(
-                    width * ratio
+                    width *
+                        ratio
                 )
             );
 
@@ -1777,7 +2253,8 @@
             Math.max(
                 1,
                 Math.floor(
-                    height * ratio
+                    height *
+                        ratio
                 )
             );
 
@@ -1806,7 +2283,8 @@
         const values =
             [0];
 
-        let cumulative = 0;
+        let cumulative =
+            0;
 
         filteredTrades.forEach(
             function (trade) {
@@ -1865,7 +2343,9 @@
             maxValue -
             minValue;
 
-        function getX(index) {
+        function getX(
+            index
+        ) {
             if (
                 filteredTrades.length ===
                 0
@@ -1883,7 +2363,9 @@
             );
         }
 
-        function getY(value) {
+        function getY(
+            value
+        ) {
             return (
                 paddingTop +
                 (
@@ -2049,7 +2531,8 @@
 
         for (
             let i = 1;
-            i < values.length;
+            i <
+            values.length;
             i++
         ) {
             const value =
@@ -2135,7 +2618,7 @@
        REFRESH
        ============================================================ */
 
-    function refreshV54() {
+    function refreshV55() {
         try {
             createFilterSection();
 
@@ -2145,6 +2628,14 @@
                 getFilteredTrades();
 
             displayStats(
+                filteredTrades
+            );
+
+            renderSetupRanking(
+                filteredTrades
+            );
+
+            renderAssetRanking(
                 filteredTrades
             );
 
@@ -2159,9 +2650,10 @@
             drawChart(
                 filteredTrades
             );
+
         } catch (error) {
             console.error(
-                "Erreur V5.4 :",
+                "Erreur V5.5 :",
                 error
             );
         }
@@ -2191,7 +2683,7 @@
             periodSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV54();
+                    refreshV55();
                 }
             );
         }
@@ -2200,7 +2692,7 @@
             assetSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV54();
+                    refreshV55();
                 }
             );
         }
@@ -2209,7 +2701,7 @@
             setupSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV54();
+                    refreshV55();
                 }
             );
         }
@@ -2219,14 +2711,14 @@
        INITIALISATION
        ============================================================ */
 
-    function initV54() {
+    function initV55() {
         createFilterSection();
 
         populateFilters();
 
         attachEvents();
 
-        refreshV54();
+        refreshV55();
     }
 
     /* ============================================================
@@ -2234,13 +2726,16 @@
        ============================================================ */
 
     window.refreshV51 =
-        refreshV54;
+        refreshV55;
 
     window.getV51FilteredTrades =
         getFilteredTrades;
 
     window.calculateV51Stats =
         calculateAdvancedStats;
+
+    window.calculateV55RankingScore =
+        calculateRankingScore;
 
     /* ============================================================
        LANCEMENT
@@ -2254,14 +2749,14 @@
             "DOMContentLoaded",
             function () {
                 setTimeout(
-                    initV54,
+                    initV55,
                     500
                 );
             }
         );
     } else {
         setTimeout(
-            initV54,
+            initV55,
             500
         );
     }
@@ -2271,7 +2766,7 @@
        ============================================================ */
 
     setInterval(
-        refreshV54,
+        refreshV55,
         1000
     );
 
