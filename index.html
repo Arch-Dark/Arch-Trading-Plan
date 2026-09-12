@@ -1,547 +1,1916 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Trading Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-<style>
-/* ============================================================
-   NAVIGATION MULTI-PAGES
-   ============================================================ */
-.app-nav {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    padding: 12px 20px;
-    background: rgba(15, 23, 42, 0.94);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.app-nav a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: inherit;
-    font-weight: 600;
-    transition: .2s ease;
-}
-.app-nav a:hover { transform: translateY(-1px); }
-.app-nav a.active {
-    background: rgba(59,130,246,.18);
-    box-shadow: inset 0 0 0 1px rgba(96,165,250,.28);
-}
-.page-title {
-    margin: 8px 0 18px;
-}
-.page-title h2 { margin: 0 0 4px; }
-.page-title p { margin: 0; opacity: .72; }
-.view-only { display: none !important; }
 
-/* Dashboard */
-body[data-page="dashboard"] #dashboardCapitalCard,
-body[data-page="dashboard"] #dashboardChartCard,
-body[data-page="dashboard"] #performanceSummaryCard,
-body[data-page="dashboard"] #dashboardTradeCard,
-body[data-page="dashboard"] #historyCard { display: block; }
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
-/* Analyses */
-body[data-page="analysis"] #analysisPageHeader { display:block; }
-body[data-page="analysis"] #v51FilterCard { display:block !important; }
-body[data-page="analysis"] #performanceSummaryCard { display:none !important; }
 
-/* Performances */
-body[data-page="performance"] #performancePageHeader { display:block; }
-body[data-page="performance"] #setupPerformanceCard,
-body[data-page="performance"] #assetPerformanceCard { display:block; }
-body[data-page="performance"] #performanceSummaryCard { display:none !important; }
+    <!-- ======================================================
+         STYLE SPECIFIQUE AJOUT TRADE
+         ====================================================== -->
 
-/* Archives */
-body[data-page="archives"] #archivesPageHeader { display:block; }
-body[data-page="archives"] #archivesCard { display:block; }
-body[data-page="archives"] #performanceSummaryCard { display:none !important; }
+    <style>
 
-/* Sections masquées par défaut puis activées selon la vue */
-#dashboardCapitalCard,
-#dashboardChartCard,
-#performanceSummaryCard,
-#dashboardTradeCard,
-#historyCard,
-#setupPerformanceCard,
-#assetPerformanceCard,
-#archivesCard,
-#analysisPageHeader,
-#performancePageHeader,
-#archivesPageHeader { display:none; }
+        /* =====================================================
+           BOUTON / CARTE AJOUT TRADE
+           ===================================================== */
 
-/* V51 est créé dynamiquement */
-#v51FilterCard { display:none; }
+        .trade-launcher {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 22px 0;
+        }
 
-/* Bouton principal pour ouvrir le formulaire */
-.trade-launcher-card { display:none; }
-body[data-page="dashboard"] .trade-launcher-card { display:block; }
-.trade-launcher {
-    width: 100%;
-    min-height: 96px;
-    border: 0;
-    border-radius: 16px;
-    cursor: pointer;
-    font-size: 1.05rem;
-    font-weight: 800;
-    letter-spacing: .2px;
-    padding: 20px;
-    background: linear-gradient(135deg, rgba(59,130,246,.20), rgba(34,197,94,.14));
-    box-shadow: 0 12px 32px rgba(0,0,0,.12);
-}
-.trade-launcher small { display:block; margin-top:6px; opacity:.7; font-weight:500; }
 
-/* Modal Trade */
-.modal.trade-modal { display:none; }
-.modal.trade-modal.open { display:flex; }
-.trade-modal .modal-content { width:min(1100px, 96vw); max-height:92vh; overflow:auto; }
+        .add-trade-main-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
 
-/* Navigation / mobile */
-@media (max-width: 760px) {
-    .app-nav { padding: 10px 12px; gap: 6px; }
-    .app-nav a { flex: 1 1 calc(50% - 6px); justify-content:center; font-size:.9rem; }
-    .container { padding-left: 12px; padding-right: 12px; }
-}
-</style>
+            min-width: 205px;
+            height: 52px;
+
+            padding: 0 24px;
+
+            border: none;
+            border-radius: 14px;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            color: #ffffff;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb 0%,
+                    #4f46e5 100%
+                );
+
+            box-shadow:
+                0 8px 24px
+                rgba(37, 99, 235, 0.28);
+
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.18s ease,
+                filter 0.18s ease;
+        }
+
+
+        .add-trade-main-btn:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 12px 30px
+                rgba(37, 99, 235, 0.38);
+
+            filter:
+                brightness(1.06);
+        }
+
+
+        .add-trade-main-btn:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        .add-trade-main-btn .trade-icon {
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 28px;
+            height: 28px;
+
+            border-radius: 9px;
+
+            font-size: 20px;
+
+            background:
+                rgba(255, 255, 255, 0.16);
+        }
+
+
+        .trade-launcher-subtitle {
+
+            margin-top: 8px;
+
+            font-size: 12px;
+
+            text-align: center;
+
+            color: #64748b;
+        }
+
+
+        /* =====================================================
+           MODAL AJOUT TRADE
+           ===================================================== */
+
+        #tradeModal {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 9999;
+
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+
+            background:
+                rgba(15, 23, 42, 0.68);
+
+            backdrop-filter:
+                blur(6px);
+
+            -webkit-backdrop-filter:
+                blur(6px);
+        }
+
+
+        #tradeModal.show {
+
+            display: flex;
+        }
+
+
+        .trade-modal-content {
+
+            width:
+                min(980px, 100%);
+
+            max-height:
+                calc(100vh - 40px);
+
+            overflow-y:
+                auto;
+
+            position: relative;
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 25px 70px
+                rgba(15, 23, 42, 0.38);
+
+            animation:
+                tradeModalIn
+                0.18s ease-out;
+        }
+
+
+        @keyframes tradeModalIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(12px)
+                    scale(0.985);
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+        }
+
+
+        .trade-modal-header {
+
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding: 22px 24px;
+
+            border-bottom:
+                1px solid
+                rgba(148, 163, 184, 0.18);
+        }
+
+
+        .trade-modal-title-area h2 {
+
+            margin:
+                0 0 5px 0;
+        }
+
+
+        .trade-modal-title-area p {
+
+            margin:
+                0;
+
+            font-size:
+                13px;
+
+            color:
+                #64748b;
+        }
+
+
+        .trade-modal-close {
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 40px;
+            height: 40px;
+
+            flex: 0 0 40px;
+
+            border: none;
+
+            border-radius: 11px;
+
+            background:
+                rgba(148, 163, 184, 0.12);
+
+            color:
+                #64748b;
+
+            font-size:
+                18px;
+
+            cursor:
+                pointer;
+
+            transition:
+                background 0.18s ease,
+                color 0.18s ease,
+                transform 0.18s ease;
+        }
+
+
+        .trade-modal-close:hover {
+
+            background:
+                rgba(220, 38, 38, 0.12);
+
+            color:
+                #dc2626;
+
+            transform:
+                rotate(3deg);
+        }
+
+
+        .trade-modal-body {
+
+            padding:
+                24px;
+        }
+
+
+        .trade-modal-section-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            margin:
+                0 0 16px 0;
+
+            font-size:
+                14px;
+
+            font-weight:
+                700;
+
+            color:
+                #334155;
+        }
+
+
+        .trade-modal-section-title .section-dot {
+
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background:
+                #2563eb;
+        }
+
+
+        .trade-modal-body .form-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 16px;
+        }
+
+
+        .trade-modal-body .form-full {
+
+            margin-top:
+                16px;
+        }
+
+
+        .trade-modal-body label {
+
+            display: block;
+
+            margin-bottom:
+                7px;
+
+            font-size:
+                13px;
+
+            font-weight:
+                600;
+        }
+
+
+        .trade-modal-body input,
+        .trade-modal-body select,
+        .trade-modal-body textarea {
+
+            width:
+                100%;
+
+            box-sizing:
+                border-box;
+        }
+
+
+        .trade-mm-box {
+
+            margin-top:
+                18px;
+
+            padding:
+                14px 16px;
+
+            border-radius:
+                13px;
+
+            border:
+                1px solid
+                rgba(37, 99, 235, 0.14);
+
+            background:
+                rgba(37, 99, 235, 0.06);
+
+            font-size:
+                13px;
+
+            line-height:
+                1.55;
+        }
+
+
+        .trade-modal-footer {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            padding:
+                18px 24px 22px;
+
+            border-top:
+                1px solid
+                rgba(148, 163, 184, 0.18);
+        }
+
+
+        .trade-modal-footer .cancel-trade-btn {
+
+            min-width:
+                120px;
+        }
+
+
+        .trade-modal-footer .save-trade-btn {
+
+            min-width:
+                180px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .trade-modal-body .form-grid {
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+
+        @media (max-width: 620px) {
+
+            .trade-launcher {
+
+                margin:
+                    18px 0;
+            }
+
+
+            .add-trade-main-btn {
+
+                min-width:
+                    190px;
+
+                height:
+                    50px;
+
+                padding:
+                    0 20px;
+            }
+
+
+            #tradeModal {
+
+                padding:
+                    10px;
+            }
+
+
+            .trade-modal-content {
+
+                max-height:
+                    calc(100vh - 20px);
+
+                border-radius:
+                    16px;
+            }
+
+
+            .trade-modal-header {
+
+                padding:
+                    18px;
+            }
+
+
+            .trade-modal-body {
+
+                padding:
+                    18px;
+            }
+
+
+            .trade-modal-body .form-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .trade-modal-footer {
+
+                flex-direction:
+                    column-reverse;
+
+                padding:
+                    16px 18px 18px;
+            }
+
+
+            .trade-modal-footer button {
+
+                width:
+                    100%;
+            }
+        }
+
+
+        /* =====================================================
+           THEME CLAIRE
+           ===================================================== */
+
+        body.light-theme
+        .trade-modal-title-area p,
+        body.light-theme
+        .trade-launcher-subtitle {
+
+            color:
+                #64748b;
+        }
+
+
+        body.light-theme
+        .trade-modal-section-title {
+
+            color:
+                #334155;
+        }
+
+    </style>
+
 </head>
+
 
 <body>
 
+
 <header class="topbar">
+
     <div>
-        <h1>Trading Dashboard</h1>
-        <p>Journal & performance de trading</p>
+
+        <h1>
+            Trading Dashboard
+        </h1>
+
+        <p>
+            Journal & performance de trading
+        </p>
+
     </div>
 
-    <button id="themeToggle" class="theme-btn">🌙</button>
+
+    <button
+        id="themeToggle"
+        class="theme-btn"
+        type="button"
+    >
+        🌙
+    </button>
+
 </header>
 
-<nav class="app-nav" aria-label="Navigation principale">
-    <a href="index.html?page=dashboard" data-page-link="dashboard">🏠 Dashboard</a>
-    <a href="index.html?page=analysis" data-page-link="analysis">📊 Analyses & Risque</a>
-    <a href="index.html?page=performance" data-page-link="performance">🎯 Performances</a>
-    <a href="index.html?page=archives" data-page-link="archives">🗄️ Archives</a>
-</nav>
+
 
 <main class="container">
 
-    <div id="analysisPageHeader" class="page-title">
-        <h2>📊 Analyses & Risque</h2>
-        <p>Analyse filtrée, régularité du risque, calendrier et recommandations.</p>
-    </div>
 
-    <div id="performancePageHeader" class="page-title">
-        <h2>🎯 Performances</h2>
-        <p>Comparez vos setups et vos actifs pour identifier vos meilleures performances.</p>
-    </div>
+    <!-- ======================================================
+         CAPITAL ACTIF
+    ======================================================= -->
 
-    <div id="archivesPageHeader" class="page-title">
-        <h2>🗄️ Archives des capitaux</h2>
-        <p>Chaque capital conserve son historique et son évolution indépendamment.</p>
-    </div>
+    <section class="card active-capital-card">
 
-    <!-- CAPITAL ACTIF -->
-    <section id="dashboardCapitalCard" class="card active-capital-card">
         <div class="section-header">
+
             <div>
-                <h2>💰 Capital actif</h2>
-                <p id="activeCapitalName">Capital 1</p>
+
+                <h2>
+                    💰 Capital actif
+                </h2>
+
+                <p id="activeCapitalName">
+                    Capital 1
+                </p>
+
+                <small id="activeCapitalCreatedAt">
+                    Créé le -
+                </small>
+
             </div>
 
+
             <div class="capital-actions">
-                <button id="changeCapitalBtn" class="secondary-btn">
+
+                <button
+                    id="changeCapitalBtn"
+                    class="secondary-btn"
+                    type="button"
+                >
                     Modifier
                 </button>
 
-                <button id="archiveCapitalBtn" class="warning-btn">
+
+                <button
+                    id="archiveCapitalBtn"
+                    class="warning-btn"
+                    type="button"
+                >
                     Archiver
                 </button>
 
-                <button id="newCapitalBtn" class="primary-btn">
+
+                <button
+                    id="newCapitalBtn"
+                    class="primary-btn"
+                    type="button"
+                >
                     Nouveau capital
                 </button>
+
             </div>
+
         </div>
+
 
         <div class="capital-summary">
-            <div class="capital-box">
-                <span>Capital initial</span>
-                <strong id="initialCapital">$0.00</strong>
-            </div>
 
             <div class="capital-box">
-                <span>Solde actuel</span>
-                <strong id="currentBalance">$0.00</strong>
+
+                <span>
+                    Capital initial
+                </span>
+
+                <strong id="initialCapital">
+                    $0.00
+                </strong>
+
             </div>
 
+
             <div class="capital-box">
-                <span>Profit total</span>
-                <strong id="totalProfit">$0.00</strong>
+
+                <span>
+                    Solde actuel
+                </span>
+
+                <strong id="currentBalance">
+                    $0.00
+                </strong>
+
             </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    Profit total
+                </span>
+
+                <strong id="totalProfit">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    Risque de référence
+                </span>
+
+                <strong id="riskReference">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    RR cible
+                </span>
+
+                <strong id="rrTarget">
+                    2.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    Objectif théorique / trade
+                </span>
+
+                <strong id="theoreticalObjective">
+                    $0.00
+                </strong>
+
+            </div>
+
         </div>
+
     </section>
 
 
-    <!-- GRAPHIQUE CAPITAL -->
-    <section id="dashboardChartCard" class="card chart-card">
-        <div class="section-header">
-            <div>
-                <h2>📈 Évolution du capital</h2>
-                <p>Évolution du solde après chaque trade</p>
+
+    <!-- ======================================================
+         BOUTON AJOUT TRADE
+    ======================================================= -->
+
+    <section class="trade-launcher">
+
+        <div>
+
+            <button
+                id="openTradeModalBtn"
+                class="add-trade-main-btn"
+                type="button"
+            >
+
+                <span class="trade-icon">
+                    ＋
+                </span>
+
+                <span>
+                    Ajouter un trade
+                </span>
+
+            </button>
+
+
+            <div class="trade-launcher-subtitle">
+                Enregistrer rapidement un nouveau trade
             </div>
+
         </div>
+
+    </section>
+
+
+
+    <!-- ======================================================
+         GRAPHIQUE CAPITAL
+    ======================================================= -->
+
+    <section class="card chart-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    📈 Évolution du capital
+                </h2>
+
+                <p>
+                    Évolution du solde après chaque trade
+                </p>
+
+            </div>
+
+        </div>
+
 
         <div class="chart-container">
-            <canvas id="capitalChart"></canvas>
 
-            <div id="emptyChartMessage" class="empty-chart-message">
+            <canvas
+                id="capitalChart"
+            ></canvas>
+
+
+            <div
+                id="emptyChartMessage"
+                class="empty-chart-message"
+            >
                 Aucun trade enregistré pour afficher le graphique.
             </div>
+
         </div>
+
     </section>
 
 
-    <!-- PERIODES -->
-    <section id="performanceSummaryCard" class="card">
+
+    <!-- ======================================================
+         PERFORMANCE
+    ======================================================= -->
+
+    <section class="card">
+
         <div class="section-header">
+
             <div>
-                <h2>📊 Performance</h2>
-                <p>Analyse de vos résultats</p>
+
+                <h2>
+                    📊 Performance
+                </h2>
+
+                <p>
+                    Analyse de vos résultats
+                </p>
+
             </div>
+
         </div>
 
+
         <div class="period-buttons">
-            <button class="period-btn active" data-period="today">
+
+            <button
+                class="period-btn active"
+                data-period="today"
+                type="button"
+            >
                 Aujourd'hui
             </button>
 
-            <button class="period-btn" data-period="week">
+
+            <button
+                class="period-btn"
+                data-period="week"
+                type="button"
+            >
                 Cette semaine
             </button>
 
-            <button class="period-btn" data-period="month">
+
+            <button
+                class="period-btn"
+                data-period="month"
+                type="button"
+            >
                 Ce mois
             </button>
 
-            <button class="period-btn" data-period="year">
+
+            <button
+                class="period-btn"
+                data-period="year"
+                type="button"
+            >
                 Cette année
             </button>
 
-            <button class="period-btn" data-period="all">
+
+            <button
+                class="period-btn"
+                data-period="all"
+                type="button"
+            >
                 Tout l'historique
             </button>
+
         </div>
+
 
         <div class="stats-grid">
 
-            <div class="stat-box">
-                <span>Capital / Solde</span>
-                <strong id="statBalance">$0.00</strong>
-            </div>
 
             <div class="stat-box">
-                <span>Profit total</span>
-                <strong id="statProfit">$0.00</strong>
+
+                <span>
+                    Capital / Solde
+                </span>
+
+                <strong id="statBalance">
+                    $0.00
+                </strong>
+
             </div>
 
-            <div class="stat-box">
-                <span>Winrate</span>
-                <strong id="statWinrate">0%</strong>
-            </div>
 
             <div class="stat-box">
-                <span>RR moyen</span>
-                <strong id="statAverageRR">0.00</strong>
+
+                <span>
+                    Profit total
+                </span>
+
+                <strong id="statProfit">
+                    $0.00
+                </strong>
+
             </div>
 
-            <div class="stat-box">
-                <span>Nombre de trades</span>
-                <strong id="statTrades">0</strong>
-            </div>
 
             <div class="stat-box">
-                <span>Meilleur setup</span>
-                <strong id="statBestSetup">-</strong>
+
+                <span>
+                    Winrate
+                </span>
+
+                <strong id="statWinrate">
+                    0%
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    RR moyen
+                </span>
+
+                <strong id="statAverageRR">
+                    0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Nombre de trades
+                </span>
+
+                <strong id="statTrades">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Meilleur setup
+                </span>
+
+                <strong id="statBestSetup">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Dernier trade
+                </span>
+
+                <strong id="statLastTrade">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Profit Factor
+                </span>
+
+                <strong id="statProfitFactor">
+                    0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Gain moyen / trade
+                </span>
+
+                <strong id="statAverageTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Gain moyen gagnant
+                </span>
+
+                <strong id="statAverageWin">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Perte moyenne perdant
+                </span>
+
+                <strong id="statAverageLoss">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Meilleur trade
+                </span>
+
+                <strong id="statBestTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Pire trade
+                </span>
+
+                <strong id="statWorstTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Série gagnante max
+                </span>
+
+                <strong id="statMaxWinStreak">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Série perdante max
+                </span>
+
+                <strong id="statMaxLossStreak">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Drawdown maximal
+                </span>
+
+                <strong id="statMaxDrawdown">
+                    $0.00
+                </strong>
+
             </div>
 
         </div>
+
     </section>
 
 
-    <!-- AJOUT TRADE : OUVERTURE MODALE -->
-    <section id="dashboardTradeCard" class="card trade-launcher-card">
-        <button id="openTradeModalBtn" class="trade-launcher" type="button">
-            ➕ Ajouter un trade
-            <small>Ouvrir le formulaire d'enregistrement</small>
-        </button>
-    </section>
 
+    <!-- ======================================================
+         PERFORMANCE DES SETUPS
+    ======================================================= -->
 
-    <!-- PERFORMANCE DES SETUPS -->
-    <section id="setupPerformanceCard" class="card">
+    <section class="card">
+
         <div class="section-header">
+
             <div>
-                <h2>🎯 Performance des setups</h2>
-                <p>Résultats par stratégie</p>
+
+                <h2>
+                    🎯 Performance des setups
+                </h2>
+
+                <p>
+                    Résultats par stratégie
+                </p>
+
             </div>
+
         </div>
+
 
         <div class="table-wrapper">
+
             <table>
+
                 <thead>
+
                     <tr>
-                        <th>Setup</th>
-                        <th>Trades</th>
-                        <th>Gagnants</th>
-                        <th>Winrate</th>
-                        <th>Profit</th>
+
+                        <th>
+                            Setup
+                        </th>
+
+                        <th>
+                            Trades
+                        </th>
+
+                        <th>
+                            Gagnants
+                        </th>
+
+                        <th>
+                            Winrate
+                        </th>
+
+                        <th>
+                            Profit
+                        </th>
+
                     </tr>
+
                 </thead>
+
 
                 <tbody id="setupTableBody">
                 </tbody>
+
             </table>
+
         </div>
+
     </section>
 
 
 
+    <!-- ======================================================
+         PERFORMANCE PAR ACTIF
+    ======================================================= -->
 
-    <!-- PERFORMANCE PAR ACTIF -->
-    <section id="assetPerformanceCard" class="card">
+    <section class="card">
+
         <div class="section-header">
+
             <div>
-                <h2>📈 Performance par actif</h2>
-                <p>Résultats détaillés pour chaque actif.</p>
+
+                <h2>
+                    🌍 Performance par actif
+                </h2>
+
+                <p>
+                    Résultats détaillés par actif
+                </p>
+
             </div>
+
         </div>
+
 
         <div class="table-wrapper">
+
             <table>
+
                 <thead>
+
                     <tr>
-                        <th>Actif</th>
-                        <th>Trades</th>
-                        <th>Gagnants</th>
-                        <th>Perdants</th>
-                        <th>BE</th>
-                        <th>Winrate</th>
-                        <th>Profit</th>
-                        <th>RR moyen</th>
-                        <th>Meilleur</th>
-                        <th>Pire</th>
+
+                        <th>
+                            Actif
+                        </th>
+
+                        <th>
+                            Trades
+                        </th>
+
+                        <th>
+                            Gagnants
+                        </th>
+
+                        <th>
+                            Perdants
+                        </th>
+
+                        <th>
+                            BE
+                        </th>
+
+                        <th>
+                            Winrate
+                        </th>
+
+                        <th>
+                            Profit
+                        </th>
+
+                        <th>
+                            RR moyen
+                        </th>
+
+                        <th>
+                            Meilleur
+                        </th>
+
+                        <th>
+                            Pire
+                        </th>
+
                     </tr>
+
                 </thead>
-                <tbody id="assetTableBody"></tbody>
+
+
+                <tbody id="assetTableBody">
+                </tbody>
+
             </table>
+
         </div>
+
     </section>
 
-    <!-- HISTORIQUE -->
-    <section id="historyCard" class="card">
+
+
+    <!-- ======================================================
+         HISTORIQUE
+    ======================================================= -->
+
+    <section class="card">
+
         <div class="section-header">
+
             <div>
-                <h2>📜 Historique des trades</h2>
-                <p>Tous les trades du capital actif</p>
+
+                <h2>
+                    📜 Historique des trades
+                </h2>
+
+                <p>
+                    Tous les trades du capital actif
+                </p>
+
             </div>
 
-            <button id="clearBtn" class="danger-btn">
+
+            <button
+                id="clearBtn"
+                class="danger-btn"
+                type="button"
+            >
                 Effacer les trades
             </button>
+
         </div>
 
+
         <div class="table-wrapper">
+
             <table>
+
                 <thead>
+
                     <tr>
-                        <th>Date</th>
-                        <th>Actif</th>
-                        <th>Position</th>
-                        <th>Lot</th>
-                        <th>Entry</th>
-                        <th>SL</th>
-                        <th>TP</th>
-                        <th>RR</th>
-                        <th>Setup</th>
-                        <th>Résultat</th>
-                        <th>P/L</th>
-                        <th>Action</th>
+
+                        <th>
+                            Date du trade
+                        </th>
+
+                        <th>
+                            Enregistré le
+                        </th>
+
+                        <th>
+                            Actif
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Lot
+                        </th>
+
+                        <th>
+                            Entry
+                        </th>
+
+                        <th>
+                            SL
+                        </th>
+
+                        <th>
+                            TP
+                        </th>
+
+                        <th>
+                            RR
+                        </th>
+
+                        <th>
+                            Pips
+                        </th>
+
+                        <th>
+                            Setup
+                        </th>
+
+                        <th>
+                            Résultat
+                        </th>
+
+                        <th>
+                            P/L
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
                     </tr>
+
                 </thead>
+
 
                 <tbody id="historyBody">
                 </tbody>
+
             </table>
+
         </div>
+
     </section>
 
 
-    <!-- ARCHIVES -->
-    <section id="archivesCard" class="card">
+
+    <!-- ======================================================
+         ARCHIVES
+    ======================================================= -->
+
+    <section class="card">
+
         <div class="section-header">
+
             <div>
-                <h2>🗄️ Archives des capitaux</h2>
-                <p>Historique indépendant de chaque capital</p>
+
+                <h2>
+                    🗄️ Archives des capitaux
+                </h2>
+
+                <p>
+                    Historique indépendant de chaque capital
+                </p>
+
             </div>
+
         </div>
 
-        <div id="archivesList" class="archives-list">
-        </div>
+
+        <div
+            id="archivesList"
+            class="archives-list"
+        ></div>
+
     </section>
+
 
 </main>
 
 
 
+<!-- ==========================================================
+     MODAL AJOUT TRADE
+=========================================================== -->
 
-<!-- MODAL AJOUT TRADE -->
-<div id="tradeModal" class="modal trade-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div>
-                <h2>➕ Ajouter un trade</h2>
-                <p>Enregistrez votre trade manuellement</p>
-            </div>
-            <button id="closeTradeModalBtn" class="close-btn" type="button">✕</button>
-        </div>
+<div
+    id="tradeModal"
+    class="trade-modal"
+    aria-hidden="true"
+>
 
-        <div class="modal-body">
-            <form id="tradeForm">
-                <div class="form-grid">
-                    <div>
-                        <label for="asset">Actif</label>
-                        <input type="text" id="asset" placeholder="XAUUSD" required>
-                    </div>
+    <div
+        class="trade-modal-content card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tradeModalTitle"
+    >
 
-                    <div>
-                        <label for="date">Date</label>
-                        <input type="date" id="date" required>
-                    </div>
 
-                    <div>
-                        <label for="direction">Position</label>
-                        <select id="direction" required>
-                            <option value="BUY">Buy</option>
-                            <option value="SELL">Sell</option>
-                        </select>
-                    </div>
+        <!-- HEADER -->
 
-                    <div>
-                        <label for="orderType">Type d'ordre</label>
-                        <select id="orderType" required>
-                            <option value="Market">Immediat</option>
-                            <option value="Buy Limit">Buy Limit</option>
-                            <option value="Sell Limit">Sell Limit</option>
-                        </select>
-                    </div>
+        <div class="trade-modal-header">
 
-                    <div>
-                        <label for="lot">Lot</label>
-                        <input type="number" id="lot" step="0.01" min="0.01" placeholder="0.01" required>
-                    </div>
+            <div class="trade-modal-title-area">
 
-                    <div>
-                        <label for="entry">Entry</label>
-                        <input type="number" id="entry" step="any" placeholder="4450.00" required>
-                    </div>
+                <h2 id="tradeModalTitle">
+                    ➕ Ajouter un trade
+                </h2>
 
-                    <div>
-                        <label for="sl">Stop Loss</label>
-                        <input type="number" id="sl" step="any" placeholder="4445.00">
-                    </div>
+                <p>
+                    Enregistrez votre trade manuellement
+                </p>
 
-                    <div>
-                        <label for="tp">Take Profit</label>
-                        <input type="number" id="tp" step="any" placeholder="4460.00">
-                    </div>
-
-                    <div>
-                        <label for="calculatedRR">RR</label>
-                        <input type="text" id="calculatedRR" value="0.00" readonly>
-                    </div>
-
-                    <div>
-                        <label for="result">Résultat</label>
-                        <select id="result" required>
-                            <option value="TP">TP</option>
-                            <option value="SL">SL</option>
-                            <option value="BE">BE</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="setup">Setup</label>
-                        <select id="setup" required>
-                            <option value="LDP+QML">LDP+QML</option>
-                            <option value="LDP+FIBO 50">LDP+FIBO 50</option>
-                            <option value="OB">OB</option>
-                            <option value="BB">BB</option>
-                            <option value="ZS OA">ZS OA</option>
-                            <option value="SSM1">SSM1</option>
-                            <option value="SSM2">SSM2</option>
-                            <option value="SSM3">SSM3</option>
-                            <option value="SBM1">SBM1</option>
-                            <option value="SBM2">SBM2</option>
-                            <option value="SBM3">SBM3</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="profit">P/L réel du trade</label>
-                        <input type="number" id="profit" step="any" placeholder="20 ou -10" required>
-                    </div>
-                </div>
-
-                <div id="tradeMMInfo" class="form-full" aria-live="polite"></div>
-
-                <div id="beProfitGroup" class="form-full" style="display:none;">
-                    <label for="beProfit">P/L réel du BE (manuel)</label>
-                    <input type="number" id="beProfit" step="any" placeholder="Exemple : -0.20">
-                </div>
-
-                <div class="form-full">
-                    <label for="comment">Commentaire</label>
-                    <textarea id="comment" rows="3" placeholder="Commentaire sur le trade..."></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="primary-btn">Enregistrer le trade</button>
-                    <button id="cancelTradeModalBtn" type="button" class="secondary-btn">Annuler</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL NOUVEAU CAPITAL -->
-<div id="capitalModal" class="modal">
-
-    <div class="modal-content">
-
-        <div class="modal-header">
-            <div>
-                <h2 id="capitalModalTitle">Nouveau capital</h2>
-                <p>Créer ou modifier un capital</p>
             </div>
 
-            <button id="cancelCapitalBtn" class="close-btn">
+
+            <button
+                id="closeTradeModalBtn"
+                class="trade-modal-close"
+                type="button"
+                aria-label="Fermer"
+            >
                 ✕
             </button>
+
         </div>
+
+
+
+        <!-- FORMULAIRE -->
+
+        <form id="tradeForm">
+
+
+            <div class="trade-modal-body">
+
+
+                <!-- SECTION INFORMATIONS -->
+
+                <div class="trade-modal-section-title">
+
+                    <span class="section-dot"></span>
+
+                    Informations du trade
+
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <!-- ACTIF -->
+
+                    <div>
+
+                        <label for="asset">
+                            Actif
+                        </label>
+
+                        <input
+                            type="text"
+                            id="asset"
+                            list="assetList"
+                            placeholder="XAUUSD"
+                            required
+                        >
+
+
+                        <datalist id="assetList">
+
+                            <option value="EUR/USD"></option>
+                            <option value="GBP/USD"></option>
+                            <option value="AUD/USD"></option>
+                            <option value="NZD/USD"></option>
+                            <option value="USD/CAD"></option>
+                            <option value="USD/CHF"></option>
+                            <option value="USD/JPY"></option>
+                            <option value="XAUUSD"></option>
+                            <option value="BTCUSD"></option>
+
+                        </datalist>
+
+                    </div>
+
+
+
+                    <!-- DATE -->
+
+                    <div>
+
+                        <label for="date">
+                            Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="date"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- POSITION -->
+
+                    <div>
+
+                        <label for="direction">
+                            Position
+                        </label>
+
+                        <select
+                            id="direction"
+                            required
+                        >
+
+                            <option value="BUY">
+                                Buy
+                            </option>
+
+                            <option value="SELL">
+                                Sell
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- TYPE ORDRE -->
+
+                    <div>
+
+                        <label for="orderType">
+                            Type d'ordre
+                        </label>
+
+                        <select
+                            id="orderType"
+                            required
+                        >
+
+                            <option value="Market">
+                                Immediat
+                            </option>
+
+                            <option value="Buy Limit">
+                                Buy Limit
+                            </option>
+
+                            <option value="Sell Limit">
+                                Sell Limit
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- LOT -->
+
+                    <div>
+
+                        <label for="lot">
+                            Lot
+                        </label>
+
+                        <input
+                            type="number"
+                            id="lot"
+                            step="0.01"
+                            min="0.01"
+                            placeholder="0.01"
+                            readonly
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- ENTRY -->
+
+                    <div>
+
+                        <label for="entry">
+                            Entry
+                        </label>
+
+                        <input
+                            type="number"
+                            id="entry"
+                            step="any"
+                            placeholder="4450.00"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- SL -->
+
+                    <div>
+
+                        <label for="sl">
+                            Stop Loss
+                        </label>
+
+                        <input
+                            type="number"
+                            id="sl"
+                            step="any"
+                            placeholder="4445.00"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- TP -->
+
+                    <div>
+
+                        <label for="tp">
+                            Take Profit
+                        </label>
+
+                        <input
+                            type="number"
+                            id="tp"
+                            step="any"
+                            placeholder="4460.00"
+                            readonly
+                        >
+
+                    </div>
+
+
+
+                    <!-- RR -->
+
+                    <div>
+
+                        <label for="calculatedRR">
+                            RR
+                        </label>
+
+                        <input
+                            type="text"
+                            id="calculatedRR"
+                            value="0.00"
+                            readonly
+                        >
+
+                    </div>
+
+
+
+                    <!-- RESULTAT -->
+
+                    <div>
+
+                        <label for="result">
+                            Résultat
+                        </label>
+
+                        <select
+                            id="result"
+                            required
+                        >
+
+                            <option value="TP">
+                                TP
+                            </option>
+
+                            <option value="SL">
+                                SL
+                            </option>
+
+                            <option value="BE">
+                                BE
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- SETUP -->
+
+                    <div>
+
+                        <label for="setup">
+                            Setup
+                        </label>
+
+                        <select
+                            id="setup"
+                            required
+                        >
+
+                            <option value="LDP+QML">
+                                LDP+QML
+                            </option>
+
+                            <option value="LDP+FIBO 50">
+                                LDP+FIBO 50
+                            </option>
+
+                            <option value="OB">
+                                OB
+                            </option>
+
+                            <option value="BB">
+                                BB
+                            </option>
+
+                            <option value="ZS OA">
+                                ZS OA
+                            </option>
+
+                            <option value="SSM1">
+                                SSM1
+                            </option>
+
+                            <option value="SSM2">
+                                SSM2
+                            </option>
+
+                            <option value="SSM3">
+                                SSM3
+                            </option>
+
+                            <option value="SBM1">
+                                SBM1
+                            </option>
+
+                            <option value="SBM2">
+                                SBM2
+                            </option>
+
+                            <option value="SBM3">
+                                SBM3
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- P/L -->
+
+                    <div>
+
+                        <label
+                            for="profit"
+                            id="profitLabel"
+                        >
+                            P/L automatique
+                        </label>
+
+                        <input
+                            type="number"
+                            step="any"
+                            id="profit"
+                            placeholder="Calculé automatiquement"
+                            readonly
+                            required
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- INFO MONEY MANAGEMENT -->
+
+                <div
+                    id="tradeMMInfo"
+                    class="trade-mm-box form-full"
+                ></div>
+
+
+
+                <!-- COMMENTAIRE -->
+
+                <div class="form-full">
+
+                    <label for="comment">
+                        Commentaire
+                    </label>
+
+                    <textarea
+                        id="comment"
+                        rows="3"
+                        placeholder="Commentaire sur le trade..."
+                    ></textarea>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- FOOTER -->
+
+            <div class="trade-modal-footer">
+
+                <button
+                    id="cancelTradeModalBtn"
+                    class="secondary-btn cancel-trade-btn"
+                    type="button"
+                >
+                    Annuler
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-btn save-trade-btn"
+                >
+                    💾 Enregistrer le trade
+                </button>
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ==========================================================
+     MODAL CAPITAL
+=========================================================== -->
+
+<div
+    id="capitalModal"
+    class="modal"
+    data-mode="new"
+>
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="capitalModalTitle">
+                    Nouveau capital
+                </h2>
+
+                <p>
+                    Créer ou modifier un capital
+                </p>
+
+            </div>
+
+
+            <button
+                id="cancelCapitalBtn"
+                class="close-btn"
+                type="button"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
 
         <div class="modal-body">
 
+
+            <!-- NOM -->
+
             <div>
+
                 <label for="capitalNameInput">
                     Nom du capital
                 </label>
@@ -550,10 +1919,17 @@ body[data-page="dashboard"] .trade-launcher-card { display:block; }
                     type="text"
                     id="capitalNameInput"
                     placeholder="Capital 1"
+                    autocomplete="off"
                 >
+
             </div>
 
+
+
+            <!-- CAPITAL INITIAL -->
+
             <div>
+
                 <label for="capitalAmountInput">
                     Capital initial
                 </label>
@@ -563,60 +1939,142 @@ body[data-page="dashboard"] .trade-launcher-card { display:block; }
                     step="any"
                     id="capitalAmountInput"
                     placeholder="100"
+                    min="0"
                 >
+
+                <small
+                    id="capitalAmountHelp"
+                    class="form-help"
+                >
+                    Le capital initial sera verrouillé après le premier trade.
+                </small>
+
             </div>
+
+
+
+            <!-- RISQUE DE REFERENCE -->
 
             <div>
-                <label for="capitalRiskInput">Risque de référence / trade ($)</label>
-                <input type="number" step="any" id="capitalRiskInput" placeholder="1">
-                <small id="capitalAmountHelp" style="display:block;margin-top:6px;opacity:.7;"></small>
+
+                <label for="capitalRiskInput">
+                    Risque de référence par trade
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="capitalRiskInput"
+                    placeholder="Exemple : 2.50"
+                    min="0.01"
+                >
+
             </div>
+
+
+
+            <!-- RR CIBLE -->
 
             <div>
-                <label for="capitalRRInput">RR cible</label>
-                <input type="number" step="0.10" min="2" id="capitalRRInput" placeholder="2.00">
-                <small style="display:block;margin-top:6px;opacity:.7;">Minimum autorisé : 2.00</small>
+
+                <label for="capitalRRInput">
+                    RR cible
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    id="capitalRRInput"
+                    placeholder="2.00"
+                    min="2"
+                    value="2.00"
+                >
+
+                <small class="form-help">
+                    Le RR cible minimum est 2.00.
+                </small>
+
             </div>
 
-            <div class="form-full">
-                <div id="capitalModalRiskPreview" style="margin-bottom:6px;"></div>
-                <div id="capitalModalRR" style="margin-bottom:6px;"></div>
-                <strong id="capitalModalObjective"></strong>
+
+
+            <!-- PREVIEW -->
+
+            <div
+                class="capital-modal-preview"
+            >
+
+                <div
+                    id="capitalModalRiskPreview"
+                >
+                    Risque : $0.00
+                </div>
+
+
+                <div
+                    id="capitalModalRR"
+                >
+                    RR cible : 2.00
+                </div>
+
+
+                <div
+                    id="capitalModalObjective"
+                >
+                    $0.00
+                </div>
+
             </div>
+
 
         </div>
+
+
 
         <div class="modal-actions">
 
             <button
                 id="cancelCapitalBtn2"
                 class="secondary-btn"
+                type="button"
             >
                 Annuler
             </button>
 
+
             <button
                 id="saveCapitalBtn"
                 class="primary-btn"
+                type="button"
             >
                 Enregistrer
             </button>
 
         </div>
 
+
     </div>
 
 </div>
 
 
-<!-- MODAL GRAPHIQUE ARCHIVE -->
-<div id="archiveChartModal" class="modal">
+
+<!-- ==========================================================
+     MODAL GRAPHIQUE ARCHIVE
+=========================================================== -->
+
+<div
+    id="archiveChartModal"
+    class="modal"
+>
 
     <div class="modal-content archive-chart-modal-content">
+
 
         <div class="modal-header">
 
             <div>
+
                 <h2 id="archiveChartTitle">
                     Graphique du capital
                 </h2>
@@ -624,112 +2082,398 @@ body[data-page="dashboard"] .trade-launcher-card { display:block; }
                 <p id="archiveChartSubtitle">
                     Évolution du capital archivé
                 </p>
+
             </div>
 
-            <button id="closeArchiveChartBtn" class="close-btn">
+
+            <button
+                id="closeArchiveChartBtn"
+                class="close-btn"
+                type="button"
+            >
                 ✕
             </button>
 
         </div>
 
 
+
         <div class="archive-chart-info">
 
+
             <div>
-                <span>Capital initial</span>
+
+                <span>
+                    Capital initial
+                </span>
+
                 <strong id="archiveChartInitial">
                     $0.00
                 </strong>
+
             </div>
 
+
             <div>
-                <span>Capital final</span>
+
+                <span>
+                    Capital final
+                </span>
+
                 <strong id="archiveChartFinal">
                     $0.00
                 </strong>
+
             </div>
 
+
             <div>
-                <span>Profit total</span>
+
+                <span>
+                    Profit total
+                </span>
+
                 <strong id="archiveChartProfit">
                     $0.00
                 </strong>
+
             </div>
 
+
         </div>
+
 
 
         <div class="chart-container archive-chart-container">
 
-            <canvas id="archiveChart"></canvas>
+            <canvas
+                id="archiveChart"
+            ></canvas>
 
         </div>
+
 
     </div>
 
 </div>
 
 
+
+<!-- ==========================================================
+     SCRIPTS
+=========================================================== -->
+
 <script src="app.js"></script>
+
 <script src="v51-filters.js"></script>
 
+
+
+<!-- ==========================================================
+     SCRIPT MODAL AJOUT TRADE
+=========================================================== -->
+
 <script>
-(function () {
-    const allowedPages = ["dashboard", "analysis", "performance", "archives"];
-    const params = new URLSearchParams(window.location.search);
-    const requested = params.get("page");
-    const page = allowedPages.includes(requested) ? requested : "dashboard";
-
-    document.body.dataset.page = page;
-
-    document.querySelectorAll("[data-page-link]").forEach(link => {
-        link.classList.toggle("active", link.dataset.pageLink === page);
-    });
 
     function openTradeModal() {
-        const modal = document.getElementById("tradeModal");
-        if (!modal) return;
-        modal.classList.add("open");
-        modal.style.display = "flex";
-        document.body.classList.add("modal-open");
+
+        const modal =
+            document.getElementById(
+                "tradeModal"
+            );
+
+
+        if (!modal) {
+            return;
+        }
+
+
+        modal.classList.add(
+            "show"
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+        document.body.classList.add(
+            "trade-modal-open"
+        );
+
+
+        /*
+         * On remet la date actuelle si elle est vide.
+         */
+        const dateInput =
+            document.getElementById(
+                "date"
+            );
+
+
+        if (
+            dateInput &&
+            !dateInput.value &&
+            typeof getTodayDate ===
+                "function"
+        ) {
+
+            dateInput.value =
+                getTodayDate();
+        }
+
+
+        /*
+         * Recalcul immédiat des valeurs
+         * si app.js est déjà initialisé.
+         */
+        if (
+            typeof updateAutomaticTradeValues ===
+            "function"
+        ) {
+
+            updateAutomaticTradeValues();
+        }
+
+
+        setTimeout(
+            () => {
+
+                const assetInput =
+                    document.getElementById(
+                        "asset"
+                    );
+
+
+                if (assetInput) {
+
+                    assetInput.focus();
+                }
+
+            },
+            80
+        );
     }
+
+
 
     function closeTradeModal() {
-        const modal = document.getElementById("tradeModal");
-        if (!modal) return;
-        modal.classList.remove("open");
-        modal.style.display = "none";
-        document.body.classList.remove("modal-open");
+
+        const modal =
+            document.getElementById(
+                "tradeModal"
+            );
+
+
+        if (!modal) {
+            return;
+        }
+
+
+        modal.classList.remove(
+            "show"
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        document.body.classList.remove(
+            "trade-modal-open"
+        );
     }
 
-    document.addEventListener("click", function (event) {
-        const target = event.target.closest("#openTradeModalBtn, #closeTradeModalBtn, #cancelTradeModalBtn");
-        if (!target) return;
-        if (target.id === "openTradeModalBtn") openTradeModal();
-        else closeTradeModal();
-    });
 
-    const tradeModal = document.getElementById("tradeModal");
+
+    const openTradeModalBtn =
+        document.getElementById(
+            "openTradeModalBtn"
+        );
+
+
+    if (openTradeModalBtn) {
+
+        openTradeModalBtn.addEventListener(
+            "click",
+            openTradeModal
+        );
+    }
+
+
+
+    const closeTradeModalBtn =
+        document.getElementById(
+            "closeTradeModalBtn"
+        );
+
+
+    if (closeTradeModalBtn) {
+
+        closeTradeModalBtn.addEventListener(
+            "click",
+            closeTradeModal
+        );
+    }
+
+
+
+    const cancelTradeModalBtn =
+        document.getElementById(
+            "cancelTradeModalBtn"
+        );
+
+
+    if (cancelTradeModalBtn) {
+
+        cancelTradeModalBtn.addEventListener(
+            "click",
+            closeTradeModal
+        );
+    }
+
+
+
+    const tradeModal =
+        document.getElementById(
+            "tradeModal"
+        );
+
+
     if (tradeModal) {
-        tradeModal.addEventListener("click", event => {
-            if (event.target === tradeModal) closeTradeModal();
-        });
+
+        tradeModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    tradeModal
+                ) {
+
+                    closeTradeModal();
+                }
+
+            }
+        );
     }
 
-    document.addEventListener("keydown", event => {
-        if (event.key === "Escape") closeTradeModal();
-    });
 
-    // Si app.js ferme ou réinitialise le formulaire après enregistrement,
-    // on referme automatiquement la fenêtre.
-    const tradeForm = document.getElementById("tradeForm");
+
+    /*
+     * Le formulaire est toujours géré par app.js.
+     *
+     * Ici nous surveillons le stockage après
+     * la soumission. Si le nombre de trades
+     * augmente réellement, la fenêtre se ferme.
+     *
+     * Cela évite de fermer la fenêtre lorsqu'une
+     * validation du trade échoue.
+     */
+
+    const tradeForm =
+        document.getElementById(
+            "tradeForm"
+        );
+
+
     if (tradeForm) {
-        tradeForm.addEventListener("submit", function () {
-            setTimeout(closeTradeModal, 50);
-        }, true);
+
+        tradeForm.addEventListener(
+            "submit",
+            () => {
+
+                const beforeRaw =
+                    localStorage.getItem(
+                        "tradingTrades"
+                    );
+
+
+                let beforeTrades = [];
+
+
+                try {
+
+                    beforeTrades =
+                        JSON.parse(
+                            beforeRaw
+                        ) || [];
+
+                } catch {
+
+                    beforeTrades = [];
+                }
+
+
+                setTimeout(
+                    () => {
+
+                        const afterRaw =
+                            localStorage.getItem(
+                                "tradingTrades"
+                            );
+
+
+                        let afterTrades =
+                            [];
+
+
+                        try {
+
+                            afterTrades =
+                                JSON.parse(
+                                    afterRaw
+                                ) || [];
+
+                        } catch {
+
+                            afterTrades = [];
+                        }
+
+
+                        if (
+                            afterTrades.length >
+                            beforeTrades.length
+                        ) {
+
+                            closeTradeModal();
+                        }
+
+                    },
+                    80
+                );
+
+            }
+        );
     }
-})();
+
+
+
+    /*
+     * Fermer avec Échap.
+     */
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Escape"
+            ) {
+
+                closeTradeModal();
+            }
+
+        }
+    );
+
 </script>
 
+
 </body>
+
 </html>
