@@ -179,6 +179,53 @@
 <body>
 
 
+<!-- =========================================================
+     INITIALISATION DE LA PAGE
+     
+     IMPORTANT :
+     Cette partie doit être exécutée AVANT app.js.
+
+     Elle ne supprime aucune donnée.
+     Elle ne modifie aucun localStorage.
+     ========================================================= -->
+
+<script>
+
+(function () {
+
+    const allowedPages = [
+        "dashboard",
+        "analysis",
+        "performance",
+        "archives"
+    ];
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const requestedPage =
+        params.get("page");
+
+    const page =
+        allowedPages.includes(
+            requestedPage
+        )
+        ? requestedPage
+        : "dashboard";
+
+    document.body.dataset.page =
+        page;
+
+    window.__TRADING_DASHBOARD_PAGE__ =
+        page;
+
+})();
+
+</script>
+
+
 <header class="topbar">
 
     <div>
@@ -1641,68 +1688,6 @@
 
 
 <!-- =========================================================
-     PAGE AVANT APP.JS
-     ========================================================= -->
-
-<script>
-
-(function () {
-
-    const allowedPages = [
-        "dashboard",
-        "analysis",
-        "performance",
-        "archives"
-    ];
-
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-
-    const requestedPage =
-        params.get("page");
-
-
-    const page =
-        allowedPages.includes(
-            requestedPage
-        )
-        ? requestedPage
-        : "dashboard";
-
-
-    /*
-       IMPORTANT :
-       On définit la page avant le démarrage
-       de app.js.
-    */
-
-    document.body.dataset.page =
-        page;
-
-
-    document
-        .querySelectorAll(
-            "[data-page-link]"
-        )
-        .forEach(link => {
-
-            link.classList.toggle(
-                "active",
-                link.dataset.pageLink === page
-            );
-
-        });
-
-})();
-
-</script>
-
-
-<!-- =========================================================
      APP.JS
      ========================================================= -->
 
@@ -1714,6 +1699,58 @@
      ========================================================= -->
 
 <script src="v51-filters.js"></script>
+
+
+<!-- =========================================================
+     NAVIGATION ACTIVE
+     ========================================================= -->
+
+<script>
+
+(function () {
+
+    function initializeNavigation() {
+
+        const page =
+            window.__TRADING_DASHBOARD_PAGE__ ||
+            document.body.dataset.page ||
+            "dashboard";
+
+        document
+            .querySelectorAll(
+                "[data-page-link]"
+            )
+            .forEach(link => {
+
+                link.classList.toggle(
+                    "active",
+                    link.dataset.pageLink === page
+                );
+
+            });
+
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initializeNavigation
+        );
+
+    } else {
+
+        initializeNavigation();
+
+    }
+
+})();
+
+</script>
 
 
 <!-- =========================================================
