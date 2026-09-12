@@ -20,19 +20,14 @@
 
 <main class="container">
 
-    <!-- ========================= -->
     <!-- CAPITAL ACTIF -->
-    <!-- ========================= -->
-
     <section class="card active-capital-card">
 
         <div class="section-header">
 
             <div>
                 <h2>💰 Capital actif</h2>
-
                 <p id="activeCapitalName">Capital 1</p>
-
                 <small id="activeCapitalCreatedAt">
                     Créé le -
                 </small>
@@ -93,10 +88,7 @@
     </section>
 
 
-    <!-- ========================= -->
     <!-- GRAPHIQUE CAPITAL -->
-    <!-- ========================= -->
-
     <section class="card chart-card">
 
         <div class="section-header">
@@ -121,10 +113,7 @@
     </section>
 
 
-    <!-- ========================= -->
     <!-- PERFORMANCE -->
-    <!-- ========================= -->
-
     <section class="card">
 
         <div class="section-header">
@@ -248,10 +237,7 @@
     </section>
 
 
-    <!-- ========================= -->
     <!-- AJOUT TRADE -->
-    <!-- ========================= -->
-
     <section class="card">
 
         <div class="section-header">
@@ -404,7 +390,6 @@
                     <label for="setup">Setup</label>
 
                     <select id="setup" required>
-
                         <option value="LDP+QML">LDP+QML</option>
                         <option value="LDP+FIBO 50">LDP+FIBO 50</option>
                         <option value="OB">OB</option>
@@ -416,19 +401,22 @@
                         <option value="SBM1">SBM1</option>
                         <option value="SBM2">SBM2</option>
                         <option value="SBM3">SBM3</option>
-
                     </select>
 
                 </div>
 
 
                 <div>
-                    <label for="profit">P/L automatique</label>
+                    <label for="profit" id="profitLabel">
+                        P/L automatique
+                    </label>
 
                     <input
-                        type="text"
+                        type="number"
+                        step="any"
                         id="profit"
                         readonly
+                        placeholder="Calculé automatiquement"
                     >
                 </div>
 
@@ -471,10 +459,7 @@
     </section>
 
 
-    <!-- ========================= -->
-    <!-- PERFORMANCE PAR SETUP -->
-    <!-- ========================= -->
-
+    <!-- PERFORMANCE SETUPS -->
     <section class="card">
 
         <div class="section-header">
@@ -491,7 +476,6 @@
             <table>
 
                 <thead>
-
                     <tr>
                         <th>Setup</th>
                         <th>Trades</th>
@@ -499,7 +483,6 @@
                         <th>Winrate</th>
                         <th>Profit</th>
                     </tr>
-
                 </thead>
 
                 <tbody id="setupTableBody"></tbody>
@@ -511,10 +494,7 @@
     </section>
 
 
-    <!-- ========================= -->
-    <!-- V4 : PERFORMANCE PAR ACTIF -->
-    <!-- ========================= -->
-
+    <!-- PERFORMANCE ACTIFS -->
     <section class="card">
 
         <div class="section-header">
@@ -556,10 +536,7 @@
     </section>
 
 
-    <!-- ========================= -->
     <!-- HISTORIQUE -->
-    <!-- ========================= -->
-
     <section class="card">
 
         <div class="section-header">
@@ -613,10 +590,7 @@
     </section>
 
 
-    <!-- ========================= -->
     <!-- ARCHIVES -->
-    <!-- ========================= -->
-
     <section class="card">
 
         <div class="section-header">
@@ -635,10 +609,7 @@
 </main>
 
 
-<!-- ========================= -->
 <!-- MODAL CAPITAL -->
-<!-- ========================= -->
-
 <div id="capitalModal" class="modal">
 
     <div class="modal-content">
@@ -646,7 +617,6 @@
         <div class="modal-header">
 
             <div>
-
                 <h2 id="capitalModalTitle">
                     Nouveau capital
                 </h2>
@@ -654,7 +624,6 @@
                 <p>
                     Créer ou modifier un capital
                 </p>
-
             </div>
 
             <button
@@ -784,10 +753,7 @@
 </div>
 
 
-<!-- ========================= -->
 <!-- MODAL GRAPHIQUE ARCHIVE -->
-<!-- ========================= -->
-
 <div id="archiveChartModal" class="modal">
 
     <div class="modal-content archive-chart-modal-content">
