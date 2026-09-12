@@ -1,6 +1,7 @@
 /* ============================================================
-   V5.6 — FILTRES + STATS + ANALYSE + CLASSEMENT
-   + RECOMMANDATIONS AUTOMATIQUES
+   V5.7 — FILTRES + STATS + ANALYSE + CLASSEMENT
+   + RECOMMANDATIONS
+   + ANALYSE DU RISQUE ET DE LA REGULARITE
    ============================================================ */
 
 (function () {
@@ -35,6 +36,8 @@
         "XAUUSD",
         "BTCUSD"
     ];
+
+    const RISK_TOLERANCE = 0.10;
 
     let chartResizeAttached = false;
 
@@ -130,6 +133,7 @@
         }
 
         const today = new Date();
+
         const day = today.getDay();
 
         const diffToMonday =
@@ -246,7 +250,7 @@
     }
 
     /* ============================================================
-       CREATION DE LA SECTION
+       CREATION SECTION
        ============================================================ */
 
     function createFilterSection() {
@@ -362,6 +366,7 @@
                     class="stat-box"
                 >
                     <span>⭐ Setup à privilégier</span>
+
                     <strong id="v56BestSetup">
                         -
                     </strong>
@@ -383,6 +388,7 @@
                     class="stat-box"
                 >
                     <span>📈 Actif à surveiller</span>
+
                     <strong id="v56BestAsset">
                         -
                     </strong>
@@ -404,6 +410,7 @@
                     class="stat-box"
                 >
                     <span>⚠️ Setup à éviter</span>
+
                     <strong id="v56AvoidSetup">
                         -
                     </strong>
@@ -425,6 +432,7 @@
                     class="stat-box"
                 >
                     <span>🛡️ Signal général</span>
+
                     <strong id="v56GeneralSignal">
                         -
                     </strong>
@@ -444,7 +452,7 @@
             </div>
 
             <!-- ==================================================
-                 STATISTIQUES
+                 STATISTIQUES GENERALES
                  ================================================== -->
 
             <div
@@ -531,6 +539,134 @@
                 <div class="stat-box">
                     <span>Drawdown maximal</span>
                     <strong id="v51MaxDrawdown">$0.00</strong>
+                </div>
+
+            </div>
+
+            <!-- ==================================================
+                 V5.7 — ANALYSE DU RISQUE
+                 ================================================== -->
+
+            <div
+                style="
+                    margin-bottom:28px;
+                "
+            >
+
+                <div class="section-header">
+                    <div>
+                        <h3>🛡️ Analyse du risque</h3>
+
+                        <p>
+                            Contrôle de la régularité et du respect du risque
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="stats-grid"
+                    style="
+                        margin-bottom:20px;
+                    "
+                >
+
+                    <div class="stat-box">
+                        <span>Risque moyen</span>
+                        <strong id="v57AverageRisk">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Risque minimum</span>
+                        <strong id="v57MinimumRisk">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Risque maximum</span>
+                        <strong id="v57MaximumRisk">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Risque référence</span>
+                        <strong id="v57ReferenceRisk">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Écart moyen</span>
+                        <strong id="v57AverageDeviation">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Risque régulier</span>
+                        <strong id="v57RiskRegularity">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Trades conformes</span>
+                        <strong id="v57CompliantTrades">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>Trades hors risque</span>
+                        <strong id="v57NonCompliantTrades">
+                            0
+                        </strong>
+                    </div>
+
+                </div>
+
+                <div
+                    class="stats-grid"
+                >
+
+                    <div class="stat-box">
+                        <span>RR cible moyen</span>
+                        <strong id="v57TargetRR">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>RR moyen enregistré</span>
+                        <strong id="v57RecordedRR">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>RR minimum</span>
+                        <strong id="v57MinimumRR">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>RR maximum</span>
+                        <strong id="v57MaximumRR">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="stat-box">
+                        <span>RR ≥ 2</span>
+                        <strong id="v57RRAboveTwo">
+                            0%
+                        </strong>
+                    </div>
+
                 </div>
 
             </div>
@@ -727,9 +863,7 @@
             periodButtons.closest(".card")
         ) {
             const performanceCard =
-                periodButtons.closest(
-                    ".card"
-                );
+                periodButtons.closest(".card");
 
             performanceCard.insertAdjacentElement(
                 "afterend",
@@ -1366,7 +1500,7 @@
     }
 
     /* ============================================================
-       AFFICHAGE STATS
+       AFFICHAGE STATISTIQUES
        ============================================================ */
 
     function displayStats(
@@ -1502,7 +1636,687 @@
     }
 
     /* ============================================================
-       SCORE
+       LECTURE DU RISQUE
+       ============================================================ */
+
+    function getTradeRisk(trade) {
+        const possibleFields = [
+            "actualRisk",
+            "riskAmount",
+            "risk",
+            "tradeRisk",
+            "riskReferenceUsed"
+        ];
+
+        for (
+            let i = 0;
+            i < possibleFields.length;
+            i++
+        ) {
+            const value =
+                Number(
+                    trade[
+                        possibleFields[i]
+                    ]
+                );
+
+            if (
+                Number.isFinite(value) &&
+                value > 0
+            ) {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    function getReferenceRisk(trade) {
+        const possibleFields = [
+            "riskReference",
+            "referenceRisk",
+            "riskTarget",
+            "plannedRisk"
+        ];
+
+        for (
+            let i = 0;
+            i < possibleFields.length;
+            i++
+        ) {
+            const value =
+                Number(
+                    trade[
+                        possibleFields[i]
+                    ]
+                );
+
+            if (
+                Number.isFinite(value) &&
+                value > 0
+            ) {
+                return value;
+            }
+        }
+
+        if (
+            typeof activeCapital !==
+                "undefined" &&
+            activeCapital
+        ) {
+            const capitalFields = [
+                "riskReference",
+                "risk",
+                "riskPerTrade",
+                "riskAmount"
+            ];
+
+            for (
+                let i = 0;
+                i <
+                capitalFields.length;
+                i++
+            ) {
+                const value =
+                    Number(
+                        activeCapital[
+                            capitalFields[i]
+                        ]
+                    );
+
+                if (
+                    Number.isFinite(
+                        value
+                    ) &&
+                    value > 0
+                ) {
+                    return value;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    function getTradeTargetRR(trade) {
+        const possibleFields = [
+            "targetRR",
+            "rrTarget",
+            "plannedRR",
+            "objectifRR"
+        ];
+
+        for (
+            let i = 0;
+            i < possibleFields.length;
+            i++
+        ) {
+            const value =
+                Number(
+                    trade[
+                        possibleFields[i]
+                    ]
+                );
+
+            if (
+                Number.isFinite(value) &&
+                value > 0
+            ) {
+                return value;
+            }
+        }
+
+        if (
+            typeof activeCapital !==
+                "undefined" &&
+            activeCapital
+        ) {
+            const capitalFields = [
+                "targetRR",
+                "rr",
+                "rrTarget",
+                "objectiveRR"
+            ];
+
+            for (
+                let i = 0;
+                i <
+                capitalFields.length;
+                i++
+            ) {
+                const value =
+                    Number(
+                        activeCapital[
+                            capitalFields[i]
+                        ]
+                    );
+
+                if (
+                    Number.isFinite(
+                        value
+                    ) &&
+                    value > 0
+                ) {
+                    return value;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /* ============================================================
+       ANALYSE RISQUE
+       ============================================================ */
+
+    function calculateRiskStats(
+        filteredTrades
+    ) {
+        const riskRecords = [];
+
+        filteredTrades.forEach(
+            function (trade) {
+                const risk =
+                    getTradeRisk(
+                        trade
+                    );
+
+                const reference =
+                    getReferenceRisk(
+                        trade
+                    );
+
+                if (
+                    risk !== null
+                ) {
+                    riskRecords.push({
+                        risk:
+                            risk,
+
+                        reference:
+                            reference
+                    });
+                }
+            }
+        );
+
+        const risks =
+            riskRecords.map(
+                function (item) {
+                    return item.risk;
+                }
+            );
+
+        const references =
+            riskRecords
+                .map(
+                    function (item) {
+                        return item.reference;
+                    }
+                )
+                .filter(
+                    function (value) {
+                        return (
+                            value !==
+                                null &&
+                            Number.isFinite(
+                                value
+                            )
+                        );
+                    }
+                );
+
+        let referenceRisk =
+            null;
+
+        if (
+            references.length > 0
+        ) {
+            referenceRisk =
+                references.reduce(
+                    function (
+                        sum,
+                        value
+                    ) {
+                        return (
+                            sum +
+                            value
+                        );
+                    },
+                    0
+                ) /
+                references.length;
+        }
+
+        const averageRisk =
+            risks.length > 0
+                ? risks.reduce(
+                      function (
+                          sum,
+                          value
+                      ) {
+                          return (
+                              sum +
+                              value
+                          );
+                      },
+                      0
+                  ) /
+                  risks.length
+                : null;
+
+        const minimumRisk =
+            risks.length > 0
+                ? Math.min(
+                      ...risks
+                  )
+                : null;
+
+        const maximumRisk =
+            risks.length > 0
+                ? Math.max(
+                      ...risks
+                  )
+                : null;
+
+        const deviations = [];
+
+        let compliantTrades = 0;
+        let nonCompliantTrades = 0;
+
+        riskRecords.forEach(
+            function (record) {
+                if (
+                    record.reference ===
+                        null ||
+                    !Number.isFinite(
+                        record.reference
+                    )
+                ) {
+                    return;
+                }
+
+                const deviation =
+                    (
+                        (
+                            record.risk -
+                            record.reference
+                        ) /
+                        record.reference
+                    ) *
+                    100;
+
+                deviations.push(
+                    deviation
+                );
+
+                if (
+                    Math.abs(
+                        deviation
+                    ) <=
+                    RISK_TOLERANCE *
+                        100
+                ) {
+                    compliantTrades++;
+                } else {
+                    nonCompliantTrades++;
+                }
+            }
+        );
+
+        const averageDeviation =
+            deviations.length > 0
+                ? deviations.reduce(
+                      function (
+                          sum,
+                          value
+                      ) {
+                          return (
+                              sum +
+                              value
+                          );
+                      },
+                      0
+                  ) /
+                  deviations.length
+                : null;
+
+        let riskRegularity =
+            null;
+
+        if (
+            averageRisk !==
+                null &&
+            averageDeviation !==
+                null
+        ) {
+            const absoluteDeviation =
+                Math.abs(
+                    averageDeviation
+                );
+
+            riskRegularity =
+                Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        100 -
+                            absoluteDeviation
+                    )
+                );
+        }
+
+        return {
+            records:
+                riskRecords,
+
+            averageRisk:
+                averageRisk,
+
+            minimumRisk:
+                minimumRisk,
+
+            maximumRisk:
+                maximumRisk,
+
+            referenceRisk:
+                referenceRisk,
+
+            averageDeviation:
+                averageDeviation,
+
+            riskRegularity:
+                riskRegularity,
+
+            compliantTrades:
+                compliantTrades,
+
+            nonCompliantTrades:
+                nonCompliantTrades
+        };
+    }
+
+    /* ============================================================
+       ANALYSE RR
+       ============================================================ */
+
+    function calculateRRStats(
+        filteredTrades
+    ) {
+        const rrValues =
+            filteredTrades
+                .map(
+                    function (trade) {
+                        return Number(
+                            trade.rr
+                        );
+                    }
+                )
+                .filter(
+                    function (value) {
+                        return Number.isFinite(
+                            value
+                        );
+                    }
+                );
+
+        const targetValues =
+            filteredTrades
+                .map(
+                    function (trade) {
+                        return getTradeTargetRR(
+                            trade
+                        );
+                    }
+                )
+                .filter(
+                    function (value) {
+                        return (
+                            value !== null &&
+                            Number.isFinite(
+                                value
+                            )
+                        );
+                    }
+                );
+
+        const averageRR =
+            rrValues.length > 0
+                ? rrValues.reduce(
+                      function (
+                          sum,
+                          value
+                      ) {
+                          return (
+                              sum +
+                              value
+                          );
+                      },
+                      0
+                  ) /
+                  rrValues.length
+                : null;
+
+        const targetRR =
+            targetValues.length > 0
+                ? targetValues.reduce(
+                      function (
+                          sum,
+                          value
+                      ) {
+                          return (
+                              sum +
+                              value
+                          );
+                      },
+                      0
+                  ) /
+                  targetValues.length
+                : null;
+
+        const minimumRR =
+            rrValues.length > 0
+                ? Math.min(
+                      ...rrValues
+                  )
+                : null;
+
+        const maximumRR =
+            rrValues.length > 0
+                ? Math.max(
+                      ...rrValues
+                  )
+                : null;
+
+        const rrAboveTwoCount =
+            rrValues.filter(
+                function (value) {
+                    return value >= 2;
+                }
+            ).length;
+
+        const rrAboveTwo =
+            rrValues.length > 0
+                ? (
+                      rrAboveTwoCount /
+                      rrValues.length
+                  ) *
+                  100
+                : 0;
+
+        return {
+            averageRR:
+                averageRR,
+
+            targetRR:
+                targetRR,
+
+            minimumRR:
+                minimumRR,
+
+            maximumRR:
+                maximumRR,
+
+            rrAboveTwo:
+                rrAboveTwo
+        };
+    }
+
+    function displayRiskStats(
+        filteredTrades
+    ) {
+        const riskStats =
+            calculateRiskStats(
+                filteredTrades
+            );
+
+        const rrStats =
+            calculateRRStats(
+                filteredTrades
+            );
+
+        function setText(
+            id,
+            value
+        ) {
+            const element =
+                document.getElementById(
+                    id
+                );
+
+            if (element) {
+                element.textContent =
+                    value;
+            }
+        }
+
+        setText(
+            "v57AverageRisk",
+            riskStats.averageRisk !==
+                null
+                ? formatMoney(
+                      riskStats.averageRisk
+                  )
+                : "-"
+        );
+
+        setText(
+            "v57MinimumRisk",
+            riskStats.minimumRisk !==
+                null
+                ? formatMoney(
+                      riskStats.minimumRisk
+                  )
+                : "-"
+        );
+
+        setText(
+            "v57MaximumRisk",
+            riskStats.maximumRisk !==
+                null
+                ? formatMoney(
+                      riskStats.maximumRisk
+                  )
+                : "-"
+        );
+
+        setText(
+            "v57ReferenceRisk",
+            riskStats.referenceRisk !==
+                null
+                ? formatMoney(
+                      riskStats.referenceRisk
+                  )
+                : "-"
+        );
+
+        setText(
+            "v57AverageDeviation",
+            riskStats.averageDeviation !==
+                null
+                ? riskStats.averageDeviation.toFixed(
+                      1
+                  ) +
+                      "%"
+                : "-"
+        );
+
+        setText(
+            "v57RiskRegularity",
+            riskStats.riskRegularity !==
+                null
+                ? riskStats.riskRegularity.toFixed(
+                      1
+                  ) +
+                      "%"
+                : "-"
+        );
+
+        setText(
+            "v57CompliantTrades",
+            String(
+                riskStats.compliantTrades
+            )
+        );
+
+        setText(
+            "v57NonCompliantTrades",
+            String(
+                riskStats.nonCompliantTrades
+            )
+        );
+
+        setText(
+            "v57TargetRR",
+            rrStats.targetRR !==
+                null
+                ? rrStats.targetRR.toFixed(
+                      2
+                  )
+                : "-"
+        );
+
+        setText(
+            "v57RecordedRR",
+            rrStats.averageRR !==
+                null
+                ? rrStats.averageRR.toFixed(
+                      2
+                  )
+                : "-"
+        );
+
+        setText(
+            "v57MinimumRR",
+            rrStats.minimumRR !==
+                null
+                ? rrStats.minimumRR.toFixed(
+                      2
+                  )
+                : "-"
+        );
+
+        setText(
+            "v57MaximumRR",
+            rrStats.maximumRR !==
+                null
+                ? rrStats.maximumRR.toFixed(
+                      2
+                  )
+                : "-"
+        );
+
+        setText(
+            "v57RRAboveTwo",
+            rrStats.rrAboveTwo.toFixed(
+                1
+            ) +
+                "%"
+        );
+    }
+
+    /* ============================================================
+       SCORE CLASSEMENT
        ============================================================ */
 
     function calculateRankingScore(
@@ -1533,11 +2347,14 @@
             stats.averageRR;
 
         return (
-            profitComponent * 0.40 +
-            winrateComponent * 0.30 +
+            profitComponent *
+                0.40 +
+            winrateComponent *
+                0.30 +
             profitFactorComponent *
                 20 +
-            rrComponent * 10
+            rrComponent *
+                10
         );
     }
 
@@ -1557,9 +2374,7 @@
                     );
 
                 if (
-                    !groups.has(
-                        value
-                    )
+                    !groups.has(value)
                 ) {
                     groups.set(
                         value,
@@ -1648,10 +2463,6 @@
         return ranking;
     }
 
-    /* ============================================================
-       CLASSEMENT
-       ============================================================ */
-
     function rankingLabel(
         position
     ) {
@@ -1681,6 +2492,10 @@
                 position + 1
             );
     }
+
+    /* ============================================================
+       CLASSEMENT SETUPS
+       ============================================================ */
 
     function renderSetupRanking(
         filteredTrades
@@ -1785,13 +2600,15 @@
                     </td>
 
                     <td>
-                        ${Number.isFinite(
-                            item.score
-                        )
-                            ? item.score.toFixed(
-                                  2
-                              )
-                            : "-"}
+                        ${
+                            Number.isFinite(
+                                item.score
+                            )
+                                ? item.score.toFixed(
+                                      2
+                                  )
+                                : "-"
+                        }
                     </td>
                 `;
 
@@ -1801,6 +2618,10 @@
             }
         );
     }
+
+    /* ============================================================
+       CLASSEMENT ACTIFS
+       ============================================================ */
 
     function renderAssetRanking(
         filteredTrades
@@ -1905,13 +2726,15 @@
                     </td>
 
                     <td>
-                        ${Number.isFinite(
-                            item.score
-                        )
-                            ? item.score.toFixed(
-                                  2
-                              )
-                            : "-"}
+                        ${
+                            Number.isFinite(
+                                item.score
+                            )
+                                ? item.score.toFixed(
+                                      2
+                                  )
+                                : "-"
+                        }
                     </td>
                 `;
 
@@ -1923,7 +2746,7 @@
     }
 
     /* ============================================================
-       ANALYSE DETAILLEE SETUPS
+       DETAIL SETUPS
        ============================================================ */
 
     function renderSetupAnalysis(
@@ -2101,7 +2924,7 @@
     }
 
     /* ============================================================
-       ANALYSE DETAILLEE ACTIFS
+       DETAIL ACTIFS
        ============================================================ */
 
     function renderAssetAnalysis(
@@ -2298,11 +3121,6 @@
                 stats
             );
 
-        /*
-         * Bonus pour un historique
-         * suffisamment représentatif.
-         */
-
         if (
             stats.totalTrades >=
             10
@@ -2316,11 +3134,6 @@
         ) {
             score += 10;
         }
-
-        /*
-         * Pénalité en cas de très forte
-         * série de pertes.
-         */
 
         if (
             stats.maxLossStreak >=
@@ -2350,7 +3163,9 @@
                     );
 
                 if (
-                    !groups.has(name)
+                    !groups.has(
+                        name
+                    )
                 ) {
                     groups.set(
                         name,
@@ -2442,10 +3257,6 @@
                 "asset"
             );
 
-        /*
-         * Setup à privilégier
-         */
-
         if (
             setupGroups.length >
             0
@@ -2483,10 +3294,6 @@
             );
         }
 
-        /*
-         * Actif à surveiller
-         */
-
         if (
             assetGroups.length >
             0
@@ -2523,12 +3330,6 @@
                 "Pas assez de données (minimum 3 trades)"
             );
         }
-
-        /*
-         * Setup à éviter
-         *
-         * On cherche le plus faible score.
-         */
 
         const avoidCandidates =
             setupGroups
@@ -2578,10 +3379,6 @@
                 "Pas assez de données"
             );
         }
-
-        /*
-         * Signal général
-         */
 
         const globalStats =
             calculateAdvancedStats(
@@ -3142,7 +3939,7 @@
        REFRESH
        ============================================================ */
 
-    function refreshV56() {
+    function refreshV57() {
         try {
             createFilterSection();
 
@@ -3156,6 +3953,10 @@
             );
 
             displayStats(
+                filteredTrades
+            );
+
+            displayRiskStats(
                 filteredTrades
             );
 
@@ -3181,7 +3982,7 @@
 
         } catch (error) {
             console.error(
-                "Erreur V5.6 :",
+                "Erreur V5.7 :",
                 error
             );
         }
@@ -3211,7 +4012,7 @@
             periodSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV56();
+                    refreshV57();
                 }
             );
         }
@@ -3220,7 +4021,7 @@
             assetSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV56();
+                    refreshV57();
                 }
             );
         }
@@ -3229,7 +4030,7 @@
             setupSelect.addEventListener(
                 "change",
                 function () {
-                    refreshV56();
+                    refreshV57();
                 }
             );
         }
@@ -3239,14 +4040,14 @@
        INITIALISATION
        ============================================================ */
 
-    function initV56() {
+    function initV57() {
         createFilterSection();
 
         populateFilters();
 
         attachEvents();
 
-        refreshV56();
+        refreshV57();
     }
 
     /* ============================================================
@@ -3254,7 +4055,7 @@
        ============================================================ */
 
     window.refreshV51 =
-        refreshV56;
+        refreshV57;
 
     window.getV51FilteredTrades =
         getFilteredTrades;
@@ -3268,6 +4069,12 @@
     window.calculateV56RecommendationScore =
         calculateRecommendationScore;
 
+    window.calculateV57RiskStats =
+        calculateRiskStats;
+
+    window.calculateV57RRStats =
+        calculateRRStats;
+
     /* ============================================================
        LANCEMENT
        ============================================================ */
@@ -3280,24 +4087,24 @@
             "DOMContentLoaded",
             function () {
                 setTimeout(
-                    initV56,
+                    initV57,
                     500
                 );
             }
         );
     } else {
         setTimeout(
-            initV56,
+            initV57,
             500
         );
     }
 
     /* ============================================================
-       ACTUALISATION
+       ACTUALISATION AUTOMATIQUE
        ============================================================ */
 
     setInterval(
-        refreshV56,
+        refreshV57,
         1000
     );
 
