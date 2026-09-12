@@ -161,26 +161,11 @@ function escapeHtml(value) {
     return String(
         value ?? ""
     )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
@@ -497,7 +482,7 @@ function getCapitalObjective(
 
 
 /* ==========================================================
-   P/L AUTOMATIQUE
+   P/L
 ========================================================== */
 
 function calculateAutomaticPnL(
@@ -616,7 +601,7 @@ function updateAutomaticPnL() {
 
 
 /* ==========================================================
-   VALEUR DU PIP
+   VALEUR PIP
 ========================================================== */
 
 function getPipValuePerLotUSD(
@@ -645,7 +630,7 @@ function getPipValuePerLotUSD(
 
     if (
         spec.type ===
-            "forex" &&
+        "forex" &&
         spec.pipValuePerLot
     ) {
 
@@ -1450,7 +1435,7 @@ function updateAutomaticTradeValues() {
 
 
 /* ==========================================================
-   STOCKAGE
+   STOCKAGE / MIGRATION
 ========================================================== */
 
 function saveTrades() {
@@ -1494,10 +1479,6 @@ function saveActiveCapital() {
     }
 }
 
-
-/* ==========================================================
-   MIGRATION
-========================================================== */
 
 function migrateCapital(
     capital
@@ -1569,7 +1550,8 @@ function migrateCapital(
         risk * rr;
 
     if (
-        !capital.createdAt
+        capital.createdAt ===
+        undefined
     ) {
 
         capital.createdAt =
@@ -1741,14 +1723,9 @@ function loadData() {
                         );
                 }
 
-                /*
-                 * IMPORTANT :
-                 * On ne crée PAS de createdAt
-                 * artificiel pour les anciens trades.
-                 */
                 if (
                     migrated.createdAt ===
-                        undefined
+                    undefined
                 ) {
 
                     migrated.createdAt =
@@ -1961,10 +1938,6 @@ function archiveCurrentCapital(
         );
     }
 
-    /*
-     * Les trades restent toujours dans
-     * la mémoire historique générale.
-     */
     activeCapital = null;
 
     saveArchives();
@@ -2209,10 +2182,6 @@ function saveCapitalModification() {
     activeCapital.objectivePerTrade =
         risk * rr;
 
-    /*
-     * Dès qu'il existe des trades,
-     * le capital initial ne change plus.
-     */
     if (
         existingTrades.length === 0
     ) {
@@ -2333,10 +2302,6 @@ function saveArchiveModification() {
     archive.objectivePerTrade =
         risk * rr;
 
-    /*
-     * Dates, capital initial et trades
-     * historiques sont conservés.
-     */
     archives[
         archiveIndex
     ] = archive;
@@ -2605,7 +2570,8 @@ function updateCapitalModalPreview() {
         );
 
     const objective =
-        risk * rr;
+        risk *
+        rr;
 
     if (
         riskPreview
@@ -2746,7 +2712,8 @@ function renderActiveCapital() {
         );
 
     const objective =
-        risk * rr;
+        risk *
+        rr;
 
     if (name) {
 
@@ -3024,6 +2991,7 @@ function renderArchives() {
             )
             .join("");
 
+
     container
         .querySelectorAll(
             ".archive-edit-btn"
@@ -3044,6 +3012,7 @@ function renderArchives() {
                 );
             }
         );
+
 
     container
         .querySelectorAll(
@@ -3233,16 +3202,12 @@ function getFilteredTrades() {
 
 
 /* ==========================================================
-   DERNIER TRADE
+   STATISTIQUES AVANCÉES
 ========================================================== */
 
-function getLastTrade(
+function sortTradesChronologically(
     list
 ) {
-
-    if (!list.length) {
-        return null;
-    }
 
     return [...list].sort(
         (
@@ -3250,14 +3215,36 @@ function getLastTrade(
             b
         ) => {
 
-            const aTime =
+            const dateA =
+                String(
+                    a.date || ""
+                );
+
+            const dateB =
+                String(
+                    b.date || ""
+                );
+
+            if (
+                dateA !==
+                dateB
+            ) {
+
+                return (
+                    dateA.localeCompare(
+                        dateB
+                    )
+                );
+            }
+
+            const timeA =
                 a.createdAt
                     ? new Date(
                         a.createdAt
                     ).getTime()
                     : 0;
 
-            const bTime =
+            const timeB =
                 b.createdAt
                     ? new Date(
                         b.createdAt
@@ -3265,20 +3252,389 @@ function getLastTrade(
                     : 0;
 
             return (
-                bTime -
-                aTime
+                timeA -
+                timeB
             );
         }
-    )[0];
+    );
 }
 
+
+function calculateProfitFactor(
+    list
+) {
+
+    let grossProfit = 0;
+    let grossLoss = 0;
+
+    list.forEach(
+        trade => {
+
+            const pnl =
+                parseNumber(
+                    trade.pnl
+                );
+
+            if (
+                pnl > 0
+            ) {
+
+                grossProfit += pnl;
+
+            } else if (
+                pnl < 0
+            ) {
+
+                grossLoss +=
+                    Math.abs(pnl);
+            }
+        }
+    );
+
+    if (
+        grossLoss <= 0
+    ) {
+
+        return grossProfit > 0
+            ? Infinity
+            : 0;
+    }
+
+    return (
+        grossProfit /
+        grossLoss
+    );
+}
+
+
+function calculateAverageTrade(
+    list
+) {
+
+    if (!list.length) {
+        return 0;
+    }
+
+    const total =
+        list.reduce(
+            (
+                sum,
+                trade
+            ) =>
+                sum +
+                parseNumber(
+                    trade.pnl
+                ),
+            0
+        );
+
+    return (
+        total /
+        list.length
+    );
+}
+
+
+function calculateAverageWin(
+    list
+) {
+
+    const winners =
+        list
+            .map(
+                trade =>
+                    parseNumber(
+                        trade.pnl
+                    )
+            )
+            .filter(
+                pnl =>
+                    pnl > 0
+            );
+
+    if (!winners.length) {
+        return 0;
+    }
+
+    return (
+        winners.reduce(
+            (
+                sum,
+                pnl
+            ) =>
+                sum + pnl,
+            0
+        ) /
+        winners.length
+    );
+}
+
+
+function calculateAverageLoss(
+    list
+) {
+
+    const losses =
+        list
+            .map(
+                trade =>
+                    parseNumber(
+                        trade.pnl
+                    )
+            )
+            .filter(
+                pnl =>
+                    pnl < 0
+            );
+
+    if (!losses.length) {
+        return 0;
+    }
+
+    return (
+        losses.reduce(
+            (
+                sum,
+                pnl
+            ) =>
+                sum + pnl,
+            0
+        ) /
+        losses.length
+    );
+}
+
+
+function calculateBestTrade(
+    list
+) {
+
+    if (!list.length) {
+        return 0;
+    }
+
+    return Math.max(
+        ...list.map(
+            trade =>
+                parseNumber(
+                    trade.pnl
+                )
+        )
+    );
+}
+
+
+function calculateWorstTrade(
+    list
+) {
+
+    if (!list.length) {
+        return 0;
+    }
+
+    return Math.min(
+        ...list.map(
+            trade =>
+                parseNumber(
+                    trade.pnl
+                )
+        )
+    );
+}
+
+
+function calculateMaxWinStreak(
+    list
+) {
+
+    const sorted =
+        sortTradesChronologically(
+            list
+        );
+
+    let current = 0;
+    let maximum = 0;
+
+    sorted.forEach(
+        trade => {
+
+            if (
+                String(
+                    trade.result
+                ).toUpperCase() ===
+                "TP"
+            ) {
+
+                current++;
+
+                if (
+                    current >
+                    maximum
+                ) {
+
+                    maximum =
+                        current;
+                }
+
+            } else {
+
+                current = 0;
+            }
+        }
+    );
+
+    return maximum;
+}
+
+
+function calculateMaxLossStreak(
+    list
+) {
+
+    const sorted =
+        sortTradesChronologically(
+            list
+        );
+
+    let current = 0;
+    let maximum = 0;
+
+    sorted.forEach(
+        trade => {
+
+            if (
+                String(
+                    trade.result
+                ).toUpperCase() ===
+                "SL"
+            ) {
+
+                current++;
+
+                if (
+                    current >
+                    maximum
+                ) {
+
+                    maximum =
+                        current;
+                }
+
+            } else {
+
+                current = 0;
+            }
+        }
+    );
+
+    return maximum;
+}
+
+
+function calculateMaxDrawdown(
+    list
+) {
+
+    if (
+        !list.length ||
+        !activeCapital
+    ) {
+
+        return 0;
+    }
+
+    const sorted =
+        sortTradesChronologically(
+            list
+        );
+
+    /*
+     * Pour une période donnée, on part du capital
+     * initial du capital actif.
+     *
+     * Cela donne une mesure simple et cohérente
+     * de la baisse du capital à l'intérieur
+     * de la période sélectionnée.
+     */
+    let balance =
+        parseNumber(
+            activeCapital.initialCapital
+        );
+
+    let peak =
+        balance;
+
+    let maxDrawdown =
+        0;
+
+    sorted.forEach(
+        trade => {
+
+            balance +=
+                parseNumber(
+                    trade.pnl
+                );
+
+            if (
+                balance >
+                peak
+            ) {
+
+                peak =
+                    balance;
+            }
+
+            const drawdown =
+                peak -
+                balance;
+
+            if (
+                drawdown >
+                maxDrawdown
+            ) {
+
+                maxDrawdown =
+                    drawdown;
+            }
+        }
+    );
+
+    return maxDrawdown;
+}
+
+
+function formatProfitFactor(
+    value
+) {
+
+    if (
+        value === Infinity
+    ) {
+
+        return "∞";
+    }
+
+    return Number.isFinite(
+        value
+    )
+        ? value.toFixed(2)
+        : "0.00";
+}
+
+
+/* ==========================================================
+   DERNIER TRADE
+========================================================== */
 
 function getLastKnownTrade() {
 
     const activeTrades =
         getActiveCapitalTrades();
 
-    if (!activeTrades.length) {
+    if (
+        !activeTrades.length
+    ) {
+
         return null;
     }
 
@@ -3314,10 +3670,12 @@ function getLastKnownTrade() {
             }
 
             return String(
-                b.date || ""
+                b.date ||
+                ""
             ).localeCompare(
                 String(
-                    a.date || ""
+                    a.date ||
+                    ""
                 )
             );
         }
@@ -3333,7 +3691,10 @@ function calculateAverageRR(
     list
 ) {
 
-    if (!list.length) {
+    if (
+        !list.length
+    ) {
+
         return 0;
     }
 
@@ -3367,7 +3728,10 @@ function calculateWinrate(
     list
 ) {
 
-    if (!list.length) {
+    if (
+        !list.length
+    ) {
+
         return 0;
     }
 
@@ -3525,6 +3889,52 @@ function renderPerformance() {
             "statLastTrade"
         );
 
+    const profitFactorElement =
+        document.getElementById(
+            "statProfitFactor"
+        );
+
+    const averageTradeElement =
+        document.getElementById(
+            "statAverageTrade"
+        );
+
+    const averageWinElement =
+        document.getElementById(
+            "statAverageWin"
+        );
+
+    const averageLossElement =
+        document.getElementById(
+            "statAverageLoss"
+        );
+
+    const bestTradeElement =
+        document.getElementById(
+            "statBestTrade"
+        );
+
+    const worstTradeElement =
+        document.getElementById(
+            "statWorstTrade"
+        );
+
+    const maxWinStreakElement =
+        document.getElementById(
+            "statMaxWinStreak"
+        );
+
+    const maxLossStreakElement =
+        document.getElementById(
+            "statMaxLossStreak"
+        );
+
+    const maxDrawdownElement =
+        document.getElementById(
+            "statMaxDrawdown"
+        );
+
+
     if (
         balanceElement
     ) {
@@ -3539,6 +3949,7 @@ function renderPerformance() {
             );
     }
 
+
     if (
         profitElement
     ) {
@@ -3548,6 +3959,7 @@ function renderPerformance() {
                 totalProfit
             );
     }
+
 
     if (
         winrateElement
@@ -3562,6 +3974,7 @@ function renderPerformance() {
             )}%`;
     }
 
+
     if (
         averageRRElement
     ) {
@@ -3571,6 +3984,7 @@ function renderPerformance() {
                 list
             ).toFixed(2);
     }
+
 
     if (
         tradesElement
@@ -3582,6 +3996,7 @@ function renderPerformance() {
             );
     }
 
+
     if (
         bestSetupElement
     ) {
@@ -3591,6 +4006,7 @@ function renderPerformance() {
                 list
             );
     }
+
 
     if (
         lastTradeElement
@@ -3615,6 +4031,123 @@ function renderPerformance() {
                 "-";
         }
     }
+
+
+    if (
+        profitFactorElement
+    ) {
+
+        profitFactorElement.textContent =
+            formatProfitFactor(
+                calculateProfitFactor(
+                    list
+                )
+            );
+    }
+
+
+    if (
+        averageTradeElement
+    ) {
+
+        averageTradeElement.textContent =
+            money(
+                calculateAverageTrade(
+                    list
+                )
+            );
+    }
+
+
+    if (
+        averageWinElement
+    ) {
+
+        averageWinElement.textContent =
+            money(
+                calculateAverageWin(
+                    list
+                )
+            );
+    }
+
+
+    if (
+        averageLossElement
+    ) {
+
+        averageLossElement.textContent =
+            money(
+                calculateAverageLoss(
+                    list
+                )
+            );
+    }
+
+
+    if (
+        bestTradeElement
+    ) {
+
+        bestTradeElement.textContent =
+            money(
+                calculateBestTrade(
+                    list
+                )
+            );
+    }
+
+
+    if (
+        worstTradeElement
+    ) {
+
+        worstTradeElement.textContent =
+            money(
+                calculateWorstTrade(
+                    list
+                )
+            );
+    }
+
+
+    if (
+        maxWinStreakElement
+    ) {
+
+        maxWinStreakElement.textContent =
+            String(
+                calculateMaxWinStreak(
+                    list
+                )
+            );
+    }
+
+
+    if (
+        maxLossStreakElement
+    ) {
+
+        maxLossStreakElement.textContent =
+            String(
+                calculateMaxLossStreak(
+                    list
+                )
+            );
+    }
+
+
+    if (
+        maxDrawdownElement
+    ) {
+
+        maxDrawdownElement.textContent =
+            money(
+                calculateMaxDrawdown(
+                    list
+                )
+            );
+    }
 }
 
 
@@ -3636,7 +4169,9 @@ function renderSetupTable() {
     const list =
         getFilteredTrades();
 
-    if (!list.length) {
+    if (
+        !list.length
+    ) {
 
         body.innerHTML = `
             <tr>
@@ -4109,9 +4644,7 @@ function clearActiveCapitalTrades() {
     const activeTrades =
         getActiveCapitalTrades();
 
-    if (
-        !activeTrades.length
-    ) {
+    if (!activeTrades.length) {
 
         alert(
             "Aucun trade à effacer."
@@ -4390,12 +4923,6 @@ function addTrade(
             exit
         );
 
-    /*
-     * Horodatage automatique.
-     *
-     * La valeur est enregistrée en ISO,
-     * puis affichée en Madagascar / UTC+3.
-     */
     const createdAt =
         new Date()
             .toISOString();
@@ -4745,7 +5272,8 @@ function drawCapitalChart(
     }
 
     const range =
-        max - min;
+        max -
+        min;
 
     const xStep =
         points.length > 1
@@ -4785,7 +5313,8 @@ function drawCapitalChart(
     ctx.strokeStyle =
         "rgba(128,128,128,0.25)";
 
-    ctx.lineWidth = 1;
+    ctx.lineWidth =
+        1;
 
     ctx.stroke();
 
@@ -4951,7 +5480,9 @@ function renderCapitalChart() {
     const hasTrades =
         points.length > 1;
 
-    if (emptyMessage) {
+    if (
+        emptyMessage
+    ) {
 
         emptyMessage.style.display =
             hasTrades
