@@ -1,292 +1,262 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Trading Dashboard</title>
-    <link rel="stylesheet" href="style.css">
 
-<style>
-/* ============================================================
-   NAVIGATION MULTI-PAGES
-   ============================================================ */
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
-.app-nav {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    padding: 12px 20px;
-    background: rgba(15, 23, 42, 0.94);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-}
+    <style>
 
-.app-nav a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: inherit;
-    font-weight: 600;
-    transition: .2s ease;
-}
+        /* =========================================================
+           NAVIGATION
+           ========================================================= */
 
-.app-nav a:hover {
-    transform: translateY(-1px);
-}
+        .app-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 0;
+            margin-bottom: 20px;
+        }
 
-.app-nav a.active {
-    background: rgba(59,130,246,.18);
-    box-shadow: inset 0 0 0 1px rgba(96,165,250,.28);
-}
+        .app-nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: inherit;
+            font-weight: 700;
+            transition: 0.2s ease;
+        }
 
-.page-title {
-    margin: 8px 0 18px;
-}
+        .app-nav a:hover {
+            transform: translateY(-1px);
+        }
 
-.page-title h2 {
-    margin: 0 0 4px;
-}
+        .app-nav a.active {
+            background: rgba(59, 130, 246, 0.15);
+            box-shadow:
+                inset 0 0 0 1px
+                rgba(59, 130, 246, 0.30);
+        }
 
-.page-title p {
-    margin: 0;
-    opacity: .72;
-}
 
-/* ============================================================
-   AFFICHAGE DES PAGES
-   ============================================================ */
+        /* =========================================================
+           TITRES DES PAGES
+           ========================================================= */
 
-#dashboardCapitalCard,
-#dashboardChartCard,
-#performanceSummaryCard,
-#dashboardTradeCard,
-#historyCard,
-#setupPerformanceCard,
-#assetPerformanceCard,
-#archivesCard,
-#analysisPageHeader,
-#performancePageHeader,
-#archivesPageHeader {
-    display: none;
-}
+        .page-title {
+            margin-bottom: 20px;
+        }
 
-#v51FilterCard {
-    display: none;
-}
+        .page-title h2 {
+            margin: 0 0 5px;
+        }
 
-/* =========================
-   DASHBOARD
-   ========================= */
+        .page-title p {
+            margin: 0;
+            opacity: 0.70;
+        }
 
-body[data-page="dashboard"] #dashboardCapitalCard,
-body[data-page="dashboard"] #dashboardChartCard,
-body[data-page="dashboard"] #performanceSummaryCard,
-body[data-page="dashboard"] #dashboardTradeCard,
-body[data-page="dashboard"] #historyCard {
-    display: block;
-}
 
-/* =========================
-   ANALYSES
-   ========================= */
+        /* =========================================================
+           SECTIONS
+           ========================================================= */
 
-body[data-page="analysis"] #analysisPageHeader {
-    display: block;
-}
+        .page-section {
+            display: none;
+        }
 
-body[data-page="analysis"] #v51FilterCard {
-    display: block !important;
-}
+        body[data-page="dashboard"] .dashboard-section {
+            display: block;
+        }
 
-body[data-page="analysis"] #performanceSummaryCard {
-    display: none !important;
-}
+        body[data-page="analysis"] .analysis-section {
+            display: block;
+        }
 
-/* =========================
-   PERFORMANCES
-   ========================= */
+        body[data-page="performance"] .performance-section {
+            display: block;
+        }
 
-body[data-page="performance"] #performancePageHeader {
-    display: block;
-}
+        body[data-page="archives"] .archives-section {
+            display: block;
+        }
 
-body[data-page="performance"] #setupPerformanceCard,
-body[data-page="performance"] #assetPerformanceCard {
-    display: block;
-}
 
-body[data-page="performance"] #performanceSummaryCard {
-    display: none !important;
-}
+        /* =========================================================
+           FILTRE V5.8
+           ========================================================= */
 
-/* =========================
-   ARCHIVES
-   ========================= */
+        #v51FilterCard {
+            display: none;
+        }
 
-body[data-page="archives"] #archivesPageHeader {
-    display: block;
-}
+        body[data-page="analysis"] #v51FilterCard {
+            display: block !important;
+        }
 
-body[data-page="archives"] #archivesCard {
-    display: block;
-}
 
-body[data-page="archives"] #performanceSummaryCard {
-    display: none !important;
-}
+        /* =========================================================
+           BOUTON AJOUT TRADE
+           ========================================================= */
 
-/* ============================================================
-   BOUTON AJOUT TRADE
-   ============================================================ */
+        .trade-launcher {
+            width: 100%;
+            min-height: 90px;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            padding: 20px;
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
 
-.trade-launcher-card {
-    display: none;
-}
+        .trade-launcher small {
+            display: block;
+            margin-top: 6px;
+            opacity: 0.70;
+            font-weight: 500;
+        }
 
-body[data-page="dashboard"] .trade-launcher-card {
-    display: block;
-}
 
-.trade-launcher {
-    width: 100%;
-    min-height: 96px;
-    border: 0;
-    border-radius: 16px;
-    cursor: pointer;
-    font-size: 1.05rem;
-    font-weight: 800;
-    letter-spacing: .2px;
-    padding: 20px;
-    background:
-        linear-gradient(
-            135deg,
-            rgba(59,130,246,.20),
-            rgba(34,197,94,.14)
-        );
-    box-shadow:
-        0 12px 32px rgba(0,0,0,.12);
-}
+        /* =========================================================
+           MODALE TRADE
+           ========================================================= */
 
-.trade-launcher small {
-    display: block;
-    margin-top: 6px;
-    opacity: .7;
-    font-weight: 500;
-}
+        .trade-modal {
+            display: none;
+        }
 
-/* ============================================================
-   MODALE TRADE
-   ============================================================ */
+        .trade-modal.open {
+            display: flex;
+        }
 
-.modal.trade-modal {
-    display: none;
-}
+        .trade-modal .modal-content {
+            width: min(1100px, 96vw);
+            max-height: 92vh;
+            overflow-y: auto;
+        }
 
-.modal.trade-modal.open {
-    display: flex;
-}
 
-.trade-modal .modal-content {
-    width: min(1100px, 96vw);
-    max-height: 92vh;
-    overflow: auto;
-}
+        /* =========================================================
+           MOBILE
+           ========================================================= */
 
-/* ============================================================
-   MOBILE
-   ============================================================ */
+        @media (max-width: 760px) {
 
-@media (max-width: 760px) {
+            .app-nav {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
 
-    .app-nav {
-        padding: 10px 12px;
-        gap: 6px;
-    }
+            .app-nav a {
+                justify-content: center;
+                font-size: 0.90rem;
+            }
 
-    .app-nav a {
-        flex: 1 1 calc(50% - 6px);
-        justify-content: center;
-        font-size: .9rem;
-    }
+        }
 
-    .container {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-}
-</style>
+    </style>
 
 </head>
 
+
 <body>
+
 
 <header class="topbar">
 
     <div>
-        <h1>Trading Dashboard</h1>
-        <p>Journal & performance de trading</p>
+
+        <h1>
+            Trading Dashboard
+        </h1>
+
+        <p>
+            Journal & performance de trading
+        </p>
+
     </div>
 
-    <button id="themeToggle" class="theme-btn">
+
+    <button
+        id="themeToggle"
+        class="theme-btn"
+    >
         🌙
     </button>
 
 </header>
 
 
-<!-- ============================================================
-     NAVIGATION
-     ============================================================ -->
-
-<nav class="app-nav" aria-label="Navigation principale">
-
-    <a
-        href="index.html?page=dashboard"
-        data-page-link="dashboard"
-    >
-        🏠 Dashboard
-    </a>
-
-    <a
-        href="index.html?page=analysis"
-        data-page-link="analysis"
-    >
-        📊 Analyses & Risque
-    </a>
-
-    <a
-        href="index.html?page=performance"
-        data-page-link="performance"
-    >
-        🎯 Performances
-    </a>
-
-    <a
-        href="index.html?page=archives"
-        data-page-link="archives"
-    >
-        🗄️ Archives
-    </a>
-
-</nav>
-
-
 <main class="container">
 
 
-    <!-- ========================================================
-         TITRE PAGE ANALYSES
-         ======================================================== -->
+    <!-- =========================================================
+         NAVIGATION
+         ========================================================= -->
 
-    <div
+    <nav
+        class="app-nav"
+        aria-label="Navigation principale"
+    >
+
+        <a
+            href="index.html?page=dashboard"
+            data-page-link="dashboard"
+        >
+            🏠 Dashboard
+        </a>
+
+
+        <a
+            href="index.html?page=analysis"
+            data-page-link="analysis"
+        >
+            📊 Analyses & Risque
+        </a>
+
+
+        <a
+            href="index.html?page=performance"
+            data-page-link="performance"
+        >
+            🎯 Performances
+        </a>
+
+
+        <a
+            href="index.html?page=archives"
+            data-page-link="archives"
+        >
+            🗄️ Archives
+        </a>
+
+    </nav>
+
+
+    <!-- =========================================================
+         TITRE ANALYSES
+         ========================================================= -->
+
+    <section
         id="analysisPageHeader"
-        class="page-title"
+        class="page-title analysis-section"
     >
 
         <h2>
@@ -294,20 +264,20 @@ body[data-page="dashboard"] .trade-launcher-card {
         </h2>
 
         <p>
-            Analyse filtrée, régularité du risque,
+            Analyse filtrée, risque, régularité,
             calendrier et recommandations.
         </p>
 
-    </div>
+    </section>
 
 
-    <!-- ========================================================
-         TITRE PAGE PERFORMANCES
-         ======================================================== -->
+    <!-- =========================================================
+         TITRE PERFORMANCES
+         ========================================================= -->
 
-    <div
+    <section
         id="performancePageHeader"
-        class="page-title"
+        class="page-title performance-section"
     >
 
         <h2>
@@ -315,20 +285,20 @@ body[data-page="dashboard"] .trade-launcher-card {
         </h2>
 
         <p>
-            Comparez vos setups et vos actifs
-            pour identifier vos meilleures performances.
+            Comparez les performances
+            de vos setups et de vos actifs.
         </p>
 
-    </div>
+    </section>
 
 
-    <!-- ========================================================
-         TITRE PAGE ARCHIVES
-         ======================================================== -->
+    <!-- =========================================================
+         TITRE ARCHIVES
+         ========================================================= -->
 
-    <div
+    <section
         id="archivesPageHeader"
-        class="page-title"
+        class="page-title archives-section"
     >
 
         <h2>
@@ -336,20 +306,18 @@ body[data-page="dashboard"] .trade-launcher-card {
         </h2>
 
         <p>
-            Chaque capital conserve son historique
-            et son évolution indépendamment.
+            Historique indépendant de chaque capital.
         </p>
 
-    </div>
+    </section>
 
 
-    <!-- ========================================================
+    <!-- =========================================================
          CAPITAL ACTIF
-         ======================================================== -->
+         ========================================================= -->
 
     <section
-        id="dashboardCapitalCard"
-        class="card active-capital-card"
+        class="card dashboard-section"
     >
 
         <div class="section-header">
@@ -399,6 +367,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
         <div class="capital-summary">
 
+
             <div class="capital-box">
 
                 <span>
@@ -442,13 +411,12 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- ========================================================
+    <!-- =========================================================
          GRAPHIQUE CAPITAL
-         ======================================================== -->
+         ========================================================= -->
 
     <section
-        id="dashboardChartCard"
-        class="card chart-card"
+        class="card chart-card dashboard-section"
     >
 
         <div class="section-header">
@@ -488,13 +456,13 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- ========================================================
+    <!-- =========================================================
          PERFORMANCE GENERALE
-         ======================================================== -->
+         ========================================================= -->
 
     <section
         id="performanceSummaryCard"
-        class="card"
+        class="card dashboard-section"
     >
 
         <div class="section-header">
@@ -515,6 +483,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
         <div class="period-buttons">
+
 
             <button
                 class="period-btn active"
@@ -643,18 +612,17 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- ========================================================
-         AJOUT TRADE
-         ======================================================== -->
+    <!-- =========================================================
+         AJOUTER UN TRADE
+         ========================================================= -->
 
     <section
-        id="dashboardTradeCard"
-        class="card trade-launcher-card"
+        class="card dashboard-section"
     >
 
         <button
             id="openTradeModalBtn"
-            class="trade-launcher"
+            class="trade-launcher primary-btn"
             type="button"
         >
 
@@ -669,13 +637,13 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- ========================================================
-         PERFORMANCE DES SETUPS
-         ======================================================== -->
+    <!-- =========================================================
+         PERFORMANCE SETUPS
+         ========================================================= -->
 
     <section
         id="setupPerformanceCard"
-        class="card"
+        class="card performance-section"
     >
 
         <div class="section-header">
@@ -739,13 +707,13 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- ========================================================
-         PERFORMANCE PAR ACTIF
-         ======================================================== -->
+    <!-- =========================================================
+         PERFORMANCE ACTIFS
+         ========================================================= -->
 
     <section
         id="assetPerformanceCard"
-        class="card"
+        class="card performance-section"
     >
 
         <div class="section-header">
@@ -829,13 +797,13 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- ========================================================
-         HISTORIQUE DES TRADES
-         ======================================================== -->
+    <!-- =========================================================
+         HISTORIQUE
+         ========================================================= -->
 
     <section
         id="historyCard"
-        class="card"
+        class="card dashboard-section"
     >
 
         <div class="section-header">
@@ -935,13 +903,13 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- ========================================================
+    <!-- =========================================================
          ARCHIVES
-         ======================================================== -->
+         ========================================================= -->
 
     <section
         id="archivesCard"
-        class="card"
+        class="card archives-section"
     >
 
         <div class="section-header">
@@ -968,19 +936,93 @@ body[data-page="dashboard"] .trade-launcher-card {
 
     </section>
 
+
+    <!-- =========================================================
+         SUPPORT V51 / V5.8
+         ========================================================= -->
+
+    <section
+        class="card analysis-section"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    📊 Analyse filtrée
+                </h2>
+
+                <p>
+                    Analyse avancée V5.8.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="period-buttons">
+
+            <button
+                class="period-btn active"
+                data-period="today"
+            >
+                Aujourd'hui
+            </button>
+
+
+            <button
+                class="period-btn"
+                data-period="week"
+            >
+                Cette semaine
+            </button>
+
+
+            <button
+                class="period-btn"
+                data-period="month"
+            >
+                Ce mois
+            </button>
+
+
+            <button
+                class="period-btn"
+                data-period="year"
+            >
+                Cette année
+            </button>
+
+
+            <button
+                class="period-btn"
+                data-period="all"
+            >
+                Tout l'historique
+            </button>
+
+        </div>
+
+    </section>
+
+
 </main>
 
 
-<!-- ============================================================
-     MODAL AJOUT TRADE
-     ============================================================ -->
+<!-- =========================================================
+     MODALE AJOUT TRADE
+     ========================================================= -->
 
 <div
     id="tradeModal"
     class="modal trade-modal"
 >
 
+
     <div class="modal-content">
+
 
         <div class="modal-header">
 
@@ -1010,13 +1052,14 @@ body[data-page="dashboard"] .trade-launcher-card {
 
         <div class="modal-body">
 
-            <form id="tradeForm">
+
+            <form
+                id="tradeForm"
+            >
 
 
                 <div class="form-grid">
 
-
-                    <!-- ACTIF -->
 
                     <div>
 
@@ -1034,8 +1077,6 @@ body[data-page="dashboard"] .trade-launcher-card {
                     </div>
 
 
-                    <!-- DATE -->
-
                     <div>
 
                         <label for="date">
@@ -1050,8 +1091,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     </div>
 
-
-                    <!-- POSITION -->
 
                     <div>
 
@@ -1076,8 +1115,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     </div>
 
-
-                    <!-- TYPE ORDRE -->
 
                     <div>
 
@@ -1107,8 +1144,6 @@ body[data-page="dashboard"] .trade-launcher-card {
                     </div>
 
 
-                    <!-- LOT -->
-
                     <div>
 
                         <label for="lot">
@@ -1127,8 +1162,6 @@ body[data-page="dashboard"] .trade-launcher-card {
                     </div>
 
 
-                    <!-- ENTRY -->
-
                     <div>
 
                         <label for="entry">
@@ -1146,8 +1179,6 @@ body[data-page="dashboard"] .trade-launcher-card {
                     </div>
 
 
-                    <!-- SL -->
-
                     <div>
 
                         <label for="sl">
@@ -1163,8 +1194,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     </div>
 
-
-                    <!-- TP -->
 
                     <div>
 
@@ -1182,8 +1211,6 @@ body[data-page="dashboard"] .trade-launcher-card {
                     </div>
 
 
-                    <!-- RR -->
-
                     <div>
 
                         <label for="calculatedRR">
@@ -1199,8 +1226,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     </div>
 
-
-                    <!-- RESULTAT -->
 
                     <div>
 
@@ -1229,8 +1254,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     </div>
 
-
-                    <!-- SETUP -->
 
                     <div>
 
@@ -1292,12 +1315,10 @@ body[data-page="dashboard"] .trade-launcher-card {
                     </div>
 
 
-                    <!-- P/L -->
-
                     <div>
 
                         <label for="profit">
-                            P/L réel du trade
+                            P/L
                         </label>
 
                         <input
@@ -1313,38 +1334,11 @@ body[data-page="dashboard"] .trade-launcher-card {
                 </div>
 
 
-                <!-- INFORMATIONS MONEY MANAGEMENT -->
-
                 <div
                     id="tradeMMInfo"
                     class="form-full"
-                    aria-live="polite"
                 ></div>
 
-
-                <!-- BE -->
-
-                <div
-                    id="beProfitGroup"
-                    class="form-full"
-                    style="display:none;"
-                >
-
-                    <label for="beProfit">
-                        P/L réel du BE (manuel)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="beProfit"
-                        step="any"
-                        placeholder="Exemple : -0.20"
-                    >
-
-                </div>
-
-
-                <!-- COMMENTAIRE -->
 
                 <div class="form-full">
 
@@ -1361,9 +1355,8 @@ body[data-page="dashboard"] .trade-launcher-card {
                 </div>
 
 
-                <!-- ACTIONS -->
-
                 <div class="form-actions">
+
 
                     <button
                         type="submit"
@@ -1392,14 +1385,15 @@ body[data-page="dashboard"] .trade-launcher-card {
 </div>
 
 
-<!-- ============================================================
-     MODAL NOUVEAU / MODIFIER CAPITAL
-     ============================================================ -->
+<!-- =========================================================
+     MODALE CAPITAL
+     ========================================================= -->
 
 <div
     id="capitalModal"
     class="modal"
 >
+
 
     <div class="modal-content">
 
@@ -1422,6 +1416,7 @@ body[data-page="dashboard"] .trade-launcher-card {
             <button
                 id="cancelCapitalBtn"
                 class="close-btn"
+                type="button"
             >
                 ✕
             </button>
@@ -1431,8 +1426,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
         <div class="modal-body">
 
-
-            <!-- NOM CAPITAL -->
 
             <div>
 
@@ -1448,8 +1441,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             </div>
 
-
-            <!-- CAPITAL INITIAL -->
 
             <div>
 
@@ -1467,12 +1458,15 @@ body[data-page="dashboard"] .trade-launcher-card {
             </div>
 
 
-            <!-- RISQUE -->
+            <div
+                id="capitalAmountHelp"
+            ></div>
+
 
             <div>
 
                 <label for="capitalRiskInput">
-                    Risque de référence / trade ($)
+                    Risque de référence
                 </label>
 
                 <input
@@ -1482,19 +1476,8 @@ body[data-page="dashboard"] .trade-launcher-card {
                     placeholder="1"
                 >
 
-                <small
-                    id="capitalAmountHelp"
-                    style="
-                        display:block;
-                        margin-top:6px;
-                        opacity:.7;
-                    "
-                ></small>
-
             </div>
 
-
-            <!-- RR -->
 
             <div>
 
@@ -1510,40 +1493,22 @@ body[data-page="dashboard"] .trade-launcher-card {
                     placeholder="2.00"
                 >
 
-                <small
-                    style="
-                        display:block;
-                        margin-top:6px;
-                        opacity:.7;
-                    "
-                >
-                    Minimum autorisé : 2.00
-                </small>
-
             </div>
 
 
-            <!-- PREVISUALISATION -->
-
-            <div class="form-full">
-
-                <div
-                    id="capitalModalRiskPreview"
-                    style="margin-bottom:6px;"
-                ></div>
+            <div
+                id="capitalModalRiskPreview"
+            ></div>
 
 
-                <div
-                    id="capitalModalRR"
-                    style="margin-bottom:6px;"
-                ></div>
+            <div
+                id="capitalModalRR"
+            ></div>
 
 
-                <strong
-                    id="capitalModalObjective"
-                ></strong>
-
-            </div>
+            <div
+                id="capitalModalObjective"
+            ></div>
 
         </div>
 
@@ -1554,6 +1519,7 @@ body[data-page="dashboard"] .trade-launcher-card {
             <button
                 id="cancelCapitalBtn2"
                 class="secondary-btn"
+                type="button"
             >
                 Annuler
             </button>
@@ -1562,6 +1528,7 @@ body[data-page="dashboard"] .trade-launcher-card {
             <button
                 id="saveCapitalBtn"
                 class="primary-btn"
+                type="button"
             >
                 Enregistrer
             </button>
@@ -1573,14 +1540,15 @@ body[data-page="dashboard"] .trade-launcher-card {
 </div>
 
 
-<!-- ============================================================
-     MODAL GRAPHIQUE ARCHIVE
-     ============================================================ -->
+<!-- =========================================================
+     MODALE GRAPHIQUE ARCHIVE
+     ========================================================= -->
 
 <div
     id="archiveChartModal"
     class="modal"
 >
+
 
     <div
         class="modal-content archive-chart-modal-content"
@@ -1605,14 +1573,13 @@ body[data-page="dashboard"] .trade-launcher-card {
             <button
                 id="closeArchiveChartBtn"
                 class="close-btn"
+                type="button"
             >
                 ✕
             </button>
 
         </div>
 
-
-        <!-- INFOS ARCHIVE -->
 
         <div class="archive-chart-info">
 
@@ -1658,8 +1625,6 @@ body[data-page="dashboard"] .trade-launcher-card {
         </div>
 
 
-        <!-- GRAPHIQUE -->
-
         <div
             class="chart-container archive-chart-container"
         >
@@ -1675,26 +1640,13 @@ body[data-page="dashboard"] .trade-launcher-card {
 </div>
 
 
-<!-- ============================================================
-     JAVASCRIPT PRINCIPAL
-     ============================================================ -->
-
-<script src="app.js"></script>
-
-<script src="v51-filters.js"></script>
-
-
-<!-- ============================================================
-     ROUTAGE / NAVIGATION DES PAGES
-     ============================================================ -->
+<!-- =========================================================
+     PAGE AVANT APP.JS
+     ========================================================= -->
 
 <script>
 
 (function () {
-
-    /* ========================================================
-       PAGES AUTORISÉES
-       ======================================================== */
 
     const allowedPages = [
         "dashboard",
@@ -1704,39 +1656,38 @@ body[data-page="dashboard"] .trade-launcher-card {
     ];
 
 
-    /* ========================================================
-       LECTURE URL
-       ======================================================== */
-
     const params =
         new URLSearchParams(
             window.location.search
         );
 
 
-    const requested =
+    const requestedPage =
         params.get("page");
 
 
     const page =
-        allowedPages.includes(requested)
-            ? requested
-            : "dashboard";
+        allowedPages.includes(
+            requestedPage
+        )
+        ? requestedPage
+        : "dashboard";
 
 
-    /* ========================================================
-       APPLIQUER PAGE AU BODY
-       ======================================================== */
+    /*
+       IMPORTANT :
+       On définit la page avant le démarrage
+       de app.js.
+    */
 
-    document.body.dataset.page = page;
+    document.body.dataset.page =
+        page;
 
-
-    /* ========================================================
-       NAVIGATION ACTIVE
-       ======================================================== */
 
     document
-        .querySelectorAll("[data-page-link]")
+        .querySelectorAll(
+            "[data-page-link]"
+        )
         .forEach(link => {
 
             link.classList.toggle(
@@ -1746,10 +1697,33 @@ body[data-page="dashboard"] .trade-launcher-card {
 
         });
 
+})();
 
-    /* ========================================================
-       OUVRIR MODALE TRADE
-       ======================================================== */
+</script>
+
+
+<!-- =========================================================
+     APP.JS
+     ========================================================= -->
+
+<script src="app.js"></script>
+
+
+<!-- =========================================================
+     V5.8
+     ========================================================= -->
+
+<script src="v51-filters.js"></script>
+
+
+<!-- =========================================================
+     MODALE AJOUT TRADE
+     ========================================================= -->
+
+<script>
+
+(function () {
+
 
     function openTradeModal() {
 
@@ -1764,20 +1738,12 @@ body[data-page="dashboard"] .trade-launcher-card {
         }
 
 
-        modal.classList.add("open");
-
-        modal.style.display = "flex";
-
-        document.body.classList.add(
-            "modal-open"
+        modal.classList.add(
+            "open"
         );
 
     }
 
-
-    /* ========================================================
-       FERMER MODALE TRADE
-       ======================================================== */
 
     function closeTradeModal() {
 
@@ -1792,20 +1758,12 @@ body[data-page="dashboard"] .trade-launcher-card {
         }
 
 
-        modal.classList.remove("open");
-
-        modal.style.display = "none";
-
-        document.body.classList.remove(
-            "modal-open"
+        modal.classList.remove(
+            "open"
         );
 
     }
 
-
-    /* ========================================================
-       BOUTONS MODALE TRADE
-       ======================================================== */
 
     document.addEventListener(
         "click",
@@ -1839,25 +1797,21 @@ body[data-page="dashboard"] .trade-launcher-card {
     );
 
 
-    /* ========================================================
-       CLIQUER A L'EXTÉRIEUR DE LA MODALE
-       ======================================================== */
-
-    const tradeModal =
+    const modal =
         document.getElementById(
             "tradeModal"
         );
 
 
-    if (tradeModal) {
+    if (modal) {
 
-        tradeModal.addEventListener(
+        modal.addEventListener(
             "click",
-            event => {
+            function (event) {
 
                 if (
                     event.target ===
-                    tradeModal
+                    modal
                 ) {
 
                     closeTradeModal();
@@ -1870,13 +1824,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     }
 
 
-    /* ========================================================
-       TOUCHE ESC
-       ======================================================== */
-
     document.addEventListener(
         "keydown",
-        event => {
+        function (event) {
 
             if (
                 event.key ===
@@ -1891,25 +1841,21 @@ body[data-page="dashboard"] .trade-launcher-card {
     );
 
 
-    /* ========================================================
-       FERMETURE APRES ENREGISTREMENT
-       ======================================================== */
-
-    const tradeForm =
+    const form =
         document.getElementById(
             "tradeForm"
         );
 
 
-    if (tradeForm) {
+    if (form) {
 
-        tradeForm.addEventListener(
+        form.addEventListener(
             "submit",
             function () {
 
                 setTimeout(
                     closeTradeModal,
-                    50
+                    100
                 );
 
             },
@@ -1924,4 +1870,5 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
 </body>
+
 </html>
