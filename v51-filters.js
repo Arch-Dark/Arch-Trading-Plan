@@ -2,23 +2,47 @@
 
 /*
 ============================================================
-V5.1 — FILTRES COMBINÉS
+V5.1 — ANALYSE FILTRÉE
 Trading Dashboard
 ============================================================
 
-Fonctionnalités :
-- Filtre période
-- Filtre actif
-- Filtre setup
-- Combinaison des 3 filtres
-- Recalcul automatique des statistiques
-- Recalcul performance setup
-- Recalcul performance actif
-- Aucun changement aux données enregistrées
+Filtres disponibles :
+- Période
+- Actif
+- Setup
+
+Les 3 filtres fonctionnent ensemble.
+
+Exemple :
+Ce mois + XAUUSD + LDP+QML
 ============================================================
 */
 
 (function () {
+
+    const FILTER_PERIODS = [
+        {
+            value: "today",
+            label: "Aujourd'hui"
+        },
+        {
+            value: "week",
+            label: "Cette semaine"
+        },
+        {
+            value: "month",
+            label: "Ce mois"
+        },
+        {
+            value: "year",
+            label: "Cette année"
+        },
+        {
+            value: "all",
+            label: "Tout l'historique"
+        }
+    ];
+
 
     const FILTER_ASSETS = [
         "Tous les actifs",
@@ -32,6 +56,7 @@ Fonctionnalités :
         "XAUUSD",
         "BTCUSD"
     ];
+
 
     const FILTER_SETUPS = [
         "Tous les setups",
@@ -48,8 +73,12 @@ Fonctionnalités :
         "SBM3"
     ];
 
+
+    let selectedPeriod = "today";
     let selectedAsset = "ALL";
     let selectedSetup = "ALL";
+
+
 
     /*
     ============================================================
@@ -62,7 +91,9 @@ Fonctionnalités :
         const number = Number(value) || 0;
 
         return "$" + number.toFixed(2);
+
     }
+
 
     function escapeHtml(value) {
 
@@ -72,13 +103,21 @@ Fonctionnalités :
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
+
     }
+
 
     function getAllTrades() {
 
-        if (typeof trades !== "undefined" && Array.isArray(trades)) {
+        if (
+            typeof trades !== "undefined" &&
+            Array.isArray(trades)
+        ) {
+
             return trades;
+
         }
+
 
         try {
 
@@ -89,8 +128,11 @@ Fonctionnalités :
         } catch {
 
             return [];
+
         }
+
     }
+
 
     function getCurrentCapitalId() {
 
@@ -98,14 +140,19 @@ Fonctionnalités :
             typeof activeCapital !== "undefined" &&
             activeCapital
         ) {
+
             return activeCapital.id;
+
         }
+
 
         try {
 
             const capital =
                 JSON.parse(
-                    localStorage.getItem("tradingActiveCapital")
+                    localStorage.getItem(
+                        "tradingActiveCapital"
+                    )
                 );
 
             return capital?.id || null;
@@ -113,18 +160,26 @@ Fonctionnalités :
         } catch {
 
             return null;
+
         }
+
     }
+
 
     function getCurrentCapitalTrades() {
 
         const capitalId =
             getCurrentCapitalId();
 
+
         return getAllTrades().filter(
-            trade => trade.capitalId === capitalId
+            trade =>
+                trade.capitalId === capitalId
         );
+
     }
+
+
 
     /*
     ============================================================
@@ -132,58 +187,240 @@ Fonctionnalités :
     ============================================================
     */
 
-    function periodFilter(tradeList) {
+    function filterBySelectedPeriod(
+        tradeList
+    ) {
 
         if (
-            typeof filterByPeriod === "function"
-        ) {
-
-            return filterByPeriod(
-                tradeList
-            );
-        }
-
-        if (
-            typeof currentPeriod === "undefined" ||
-            currentPeriod === "all"
+            selectedPeriod === "all"
         ) {
 
             return tradeList;
+
         }
 
-        return tradeList;
+
+        return tradeList.filter(
+            trade => {
+
+                if (!trade.date) {
+                    return false;
+                }
+
+
+                const tradeDate =
+                    new Date(
+                        trade.date +
+                        "T00:00:00"
+                    );
+
+
+                const today =
+                    new Date();
+
+
+                if (
+                    Number.isNaN(
+                        tradeDate.getTime()
+                    )
+                ) {
+
+                    return false;
+
+                }
+
+
+                /*
+                ============================
+                AUJOURD'HUI
+                ============================
+                */
+
+                if (
+                    selectedPeriod ===
+                    "today"
+                ) {
+
+                    return (
+                        tradeDate.getFullYear() ===
+                            today.getFullYear() &&
+
+                        tradeDate.getMonth() ===
+                            today.getMonth() &&
+
+                        tradeDate.getDate() ===
+                            today.getDate()
+                    );
+
+                }
+
+
+                /*
+                ============================
+                CETTE SEMAINE
+                ============================
+                */
+
+                if (
+                    selectedPeriod ===
+                    "week"
+                ) {
+
+                    const day =
+                        today.getDay();
+
+
+                    const diffToMonday =
+                        day === 0
+                            ? 6
+                            : day - 1;
+
+
+                    const monday =
+                        new Date(today);
+
+
+                    monday.setHours(
+                        0,
+                        0,
+                        0,
+                        0
+                    );
+
+
+                    monday.setDate(
+                        today.getDate() -
+                        diffToMonday
+                    );
+
+
+                    const nextMonday =
+                        new Date(monday);
+
+
+                    nextMonday.setDate(
+                        monday.getDate() +
+                        7
+                    );
+
+
+                    return (
+                        tradeDate >=
+                            monday &&
+                        tradeDate <
+                            nextMonday
+                    );
+
+                }
+
+
+                /*
+                ============================
+                CE MOIS
+                ============================
+                */
+
+                if (
+                    selectedPeriod ===
+                    "month"
+                ) {
+
+                    return (
+                        tradeDate.getFullYear() ===
+                            today.getFullYear() &&
+
+                        tradeDate.getMonth() ===
+                            today.getMonth()
+                    );
+
+                }
+
+
+                /*
+                ============================
+                CETTE ANNEE
+                ============================
+                */
+
+                if (
+                    selectedPeriod ===
+                    "year"
+                ) {
+
+                    return (
+                        tradeDate.getFullYear() ===
+                        today.getFullYear()
+                    );
+
+                }
+
+
+                return true;
+
+            }
+        );
+
     }
+
+
 
     /*
     ============================================================
-    FILTRE ACTIF + SETUP
+    FILTRES COMBINES
     ============================================================
     */
 
-    function applyCombinedFilters(tradeList) {
+    function applyCombinedFilters(
+        tradeList
+    ) {
 
-        let filtered = periodFilter(
-            tradeList
-        );
-
-        if (selectedAsset !== "ALL") {
-
-            filtered = filtered.filter(
-                trade =>
-                    trade.asset === selectedAsset
+        let filtered =
+            filterBySelectedPeriod(
+                tradeList
             );
+
+
+        /*
+        FILTRE ACTIF
+        */
+
+        if (
+            selectedAsset !== "ALL"
+        ) {
+
+            filtered =
+                filtered.filter(
+                    trade =>
+                        trade.asset ===
+                        selectedAsset
+                );
+
         }
 
-        if (selectedSetup !== "ALL") {
 
-            filtered = filtered.filter(
-                trade =>
-                    trade.setup === selectedSetup
-            );
+        /*
+        FILTRE SETUP
+        */
+
+        if (
+            selectedSetup !== "ALL"
+        ) {
+
+            filtered =
+                filtered.filter(
+                    trade =>
+                        trade.setup ===
+                        selectedSetup
+                );
+
         }
+
 
         return filtered;
+
     }
+
+
 
     /*
     ============================================================
@@ -191,69 +428,122 @@ Fonctionnalités :
     ============================================================
     */
 
-    function calculateStats(tradeList) {
+    function calculateStats(
+        tradeList
+    ) {
 
         const tradesCount =
             tradeList.length;
 
+
         const winners =
             tradeList.filter(
-                trade => trade.result === "TP"
+                trade =>
+                    trade.result === "TP"
             ).length;
+
 
         const losers =
             tradeList.filter(
-                trade => trade.result === "SL"
+                trade =>
+                    trade.result === "SL"
             ).length;
+
 
         const breakevens =
             tradeList.filter(
-                trade => trade.result === "BE"
+                trade =>
+                    trade.result === "BE"
             ).length;
+
 
         const profit =
             tradeList.reduce(
-                (sum, trade) =>
-                    sum + (Number(trade.pnl) || 0),
+                (
+                    sum,
+                    trade
+                ) =>
+                    sum +
+                    (
+                        Number(
+                            trade.pnl
+                        ) || 0
+                    ),
                 0
             );
 
+
         const winrate =
             tradesCount > 0
-                ? (winners / tradesCount) * 100
+                ? (
+                    winners /
+                    tradesCount
+                ) * 100
                 : 0;
+
 
         const rrValues =
             tradeList
-                .map(trade => Number(trade.rr))
+                .map(
+                    trade =>
+                        Number(
+                            trade.rr
+                        )
+                )
                 .filter(
                     rr =>
-                        Number.isFinite(rr) &&
+                        Number.isFinite(
+                            rr
+                        ) &&
                         rr > 0
                 );
+
 
         const averageRR =
             rrValues.length > 0
                 ? rrValues.reduce(
-                    (sum, rr) => sum + rr,
+                    (
+                        sum,
+                        rr
+                    ) =>
+                        sum + rr,
                     0
                 ) / rrValues.length
                 : 0;
 
+
         return {
-            trades: tradesCount,
-            winners,
-            losers,
-            breakevens,
-            profit,
-            winrate,
-            averageRR
+
+            trades:
+                tradesCount,
+
+            winners:
+                winners,
+
+            losers:
+                losers,
+
+            breakevens:
+                breakevens,
+
+            profit:
+                profit,
+
+            winrate:
+                winrate,
+
+            averageRR:
+                averageRR
+
         };
+
     }
+
+
 
     /*
     ============================================================
-    INTERFACE FILTRES
+    CREATION DE L'INTERFACE
     ============================================================
     */
 
@@ -264,37 +554,51 @@ Fonctionnalités :
                 "v51Filters"
             )
         ) {
+
             return;
+
         }
 
-        const performanceSection =
-            document.querySelector(
-                "#setupTableBody"
+
+        const setupBody =
+            document.getElementById(
+                "setupTableBody"
             );
 
-        if (!performanceSection) {
+
+        if (!setupBody) {
+
             return;
+
         }
 
-        const table =
-            performanceSection.closest(
+
+        const setupCard =
+            setupBody.closest(
                 ".card"
             );
 
-        if (!table) {
+
+        if (!setupCard) {
+
             return;
+
         }
+
 
         const filterCard =
             document.createElement(
                 "section"
             );
 
+
         filterCard.className =
             "card v51-filter-card";
 
+
         filterCard.id =
             "v51Filters";
+
 
         filterCard.innerHTML = `
 
@@ -314,11 +618,65 @@ Fonctionnalités :
 
             </div>
 
-            <div class="v51-filter-grid">
+
+            <div
+                class="v51-filter-grid"
+                style="
+                    display:grid;
+                    grid-template-columns:
+                        repeat(
+                            auto-fit,
+                            minmax(
+                                180px,
+                                1fr
+                            )
+                        );
+                    gap:16px;
+                    margin-bottom:20px;
+                "
+            >
+
+
+                <!-- PERIODE -->
 
                 <div>
 
-                    <label for="v51AssetFilter">
+                    <label
+                        for="v51PeriodFilter"
+                    >
+                        Période
+                    </label>
+
+                    <select
+                        id="v51PeriodFilter"
+                    >
+
+                        ${FILTER_PERIODS
+                            .map(
+                                period => `
+                                    <option
+                                        value="${period.value}"
+                                    >
+                                        ${period.label}
+                                    </option>
+                                `
+                            )
+                            .join("")
+                        }
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- ACTIF -->
+
+                <div>
+
+                    <label
+                        for="v51AssetFilter"
+                    >
                         Actif
                     </label>
 
@@ -326,29 +684,41 @@ Fonctionnalités :
                         id="v51AssetFilter"
                     >
 
-                        ${FILTER_ASSETS.map(
-                            asset => `
+                        ${FILTER_ASSETS
+                            .map(
+                                asset => `
 
-                            <option
-                                value="${
-                                    asset === "Tous les actifs"
-                                        ? "ALL"
-                                        : escapeHtml(asset)
-                                }"
-                            >
-                                ${escapeHtml(asset)}
-                            </option>
+                                    <option
+                                        value="${
+                                            asset ===
+                                            "Tous les actifs"
+                                                ? "ALL"
+                                                : asset
+                                        }"
+                                    >
+                                        ${escapeHtml(
+                                            asset
+                                        )}
+                                    </option>
 
-                        `
-                        ).join("")}
+                                `
+                            )
+                            .join("")
+                        }
 
                     </select>
 
                 </div>
 
+
+
+                <!-- SETUP -->
+
                 <div>
 
-                    <label for="v51SetupFilter">
+                    <label
+                        for="v51SetupFilter"
+                    >
                         Setup
                     </label>
 
@@ -356,38 +726,65 @@ Fonctionnalités :
                         id="v51SetupFilter"
                     >
 
-                        ${FILTER_SETUPS.map(
-                            setup => `
+                        ${FILTER_SETUPS
+                            .map(
+                                setup => `
 
-                            <option
-                                value="${
-                                    setup === "Tous les setups"
-                                        ? "ALL"
-                                        : escapeHtml(setup)
-                                }"
-                            >
-                                ${escapeHtml(setup)}
-                            </option>
+                                    <option
+                                        value="${
+                                            setup ===
+                                            "Tous les setups"
+                                                ? "ALL"
+                                                : setup
+                                        }"
+                                    >
+                                        ${escapeHtml(
+                                            setup
+                                        )}
+                                    </option>
 
-                        `
-                        ).join("")}
+                                `
+                            )
+                            .join("")
+                        }
 
                     </select>
 
                 </div>
 
+
             </div>
+
+
+            <!-- RESUME -->
 
             <div
                 id="v51FilterSummary"
                 class="v51-filter-summary"
+                style="
+                    margin-bottom:20px;
+                    padding:14px;
+                    border-radius:10px;
+                    background:
+                        rgba(
+                            148,
+                            163,
+                            184,
+                            0.10
+                        );
+                "
             >
             </div>
+
+
+
+            <!-- STATISTIQUES -->
 
             <div
                 id="v51Stats"
                 class="stats-grid v51-filter-stats"
             >
+
 
                 <div class="stat-box">
 
@@ -395,11 +792,15 @@ Fonctionnalités :
                         Trades
                     </span>
 
-                    <strong id="v51Trades">
+                    <strong
+                        id="v51Trades"
+                    >
                         0
                     </strong>
 
                 </div>
+
+
 
                 <div class="stat-box">
 
@@ -407,11 +808,15 @@ Fonctionnalités :
                         Gagnants
                     </span>
 
-                    <strong id="v51Winners">
+                    <strong
+                        id="v51Winners"
+                    >
                         0
                     </strong>
 
                 </div>
+
+
 
                 <div class="stat-box">
 
@@ -419,11 +824,15 @@ Fonctionnalités :
                         Perdants
                     </span>
 
-                    <strong id="v51Losers">
+                    <strong
+                        id="v51Losers"
+                    >
                         0
                     </strong>
 
                 </div>
+
+
 
                 <div class="stat-box">
 
@@ -431,11 +840,15 @@ Fonctionnalités :
                         BE
                     </span>
 
-                    <strong id="v51BE">
+                    <strong
+                        id="v51BE"
+                    >
                         0
                     </strong>
 
                 </div>
+
+
 
                 <div class="stat-box">
 
@@ -443,11 +856,15 @@ Fonctionnalités :
                         Winrate
                     </span>
 
-                    <strong id="v51Winrate">
+                    <strong
+                        id="v51Winrate"
+                    >
                         0%
                     </strong>
 
                 </div>
+
+
 
                 <div class="stat-box">
 
@@ -455,11 +872,15 @@ Fonctionnalités :
                         Profit
                     </span>
 
-                    <strong id="v51Profit">
+                    <strong
+                        id="v51Profit"
+                    >
                         $0.00
                     </strong>
 
                 </div>
+
+
 
                 <div class="stat-box">
 
@@ -467,70 +888,40 @@ Fonctionnalités :
                         RR moyen
                     </span>
 
-                    <strong id="v51RR">
+                    <strong
+                        id="v51RR"
+                    >
                         0.00
                     </strong>
 
                 </div>
 
+
             </div>
 
         `;
 
-        table.parentNode.insertBefore(
-            filterCard,
-            table
-        );
-
-        const assetSelect =
-            document.getElementById(
-                "v51AssetFilter"
-            );
-
-        const setupSelect =
-            document.getElementById(
-                "v51SetupFilter"
-            );
-
-        assetSelect.addEventListener(
-            "change",
-            function () {
-
-                selectedAsset =
-                    this.value;
-
-                refreshV51();
-
-            }
-        );
-
-        setupSelect.addEventListener(
-            "change",
-            function () {
-
-                selectedSetup =
-                    this.value;
-
-                refreshV51();
-
-            }
-        );
 
         /*
-        On place la carte juste après
-        la section Performance.
+        Insérer la carte après Performance
         */
 
-        const performanceCard =
+        const performanceButtons =
             document.querySelector(
                 ".period-buttons"
-            )?.closest(
-                ".card"
             );
 
+
+        const performanceCard =
+            performanceButtons
+                ? performanceButtons.closest(
+                    ".card"
+                )
+                : null;
+
+
         if (
-            performanceCard &&
-            performanceCard.nextSibling
+            performanceCard
         ) {
 
             performanceCard.parentNode.insertBefore(
@@ -538,110 +929,106 @@ Fonctionnalités :
                 performanceCard.nextSibling
             );
 
+        } else {
+
+            setupCard.parentNode.insertBefore(
+                filterCard,
+                setupCard
+            );
+
         }
+
+
+
+        /*
+        EVENEMENT PERIODE
+        */
+
+        const periodSelect =
+            document.getElementById(
+                "v51PeriodFilter"
+            );
+
+
+        if (periodSelect) {
+
+            periodSelect.addEventListener(
+                "change",
+                function () {
+
+                    selectedPeriod =
+                        this.value;
+
+                    refreshV51();
+
+                }
+            );
+
+        }
+
+
+
+        /*
+        EVENEMENT ACTIF
+        */
+
+        const assetSelect =
+            document.getElementById(
+                "v51AssetFilter"
+            );
+
+
+        if (assetSelect) {
+
+            assetSelect.addEventListener(
+                "change",
+                function () {
+
+                    selectedAsset =
+                        this.value;
+
+                    refreshV51();
+
+                }
+            );
+
+        }
+
+
+
+        /*
+        EVENEMENT SETUP
+        */
+
+        const setupSelect =
+            document.getElementById(
+                "v51SetupFilter"
+            );
+
+
+        if (setupSelect) {
+
+            setupSelect.addEventListener(
+                "change",
+                function () {
+
+                    selectedSetup =
+                        this.value;
+
+                    refreshV51();
+
+                }
+            );
+
+        }
+
     }
+
+
 
     /*
     ============================================================
-    MISE A JOUR
-    ============================================================
-    */
-
-    function refreshV51() {
-
-        const allTrades =
-            getCurrentCapitalTrades();
-
-        const filteredTrades =
-            applyCombinedFilters(
-                allTrades
-            );
-
-        const stats =
-            calculateStats(
-                filteredTrades
-            );
-
-        const tradesElement =
-            document.getElementById(
-                "v51Trades"
-            );
-
-        const winnersElement =
-            document.getElementById(
-                "v51Winners"
-            );
-
-        const losersElement =
-            document.getElementById(
-                "v51Losers"
-            );
-
-        const beElement =
-            document.getElementById(
-                "v51BE"
-            );
-
-        const winrateElement =
-            document.getElementById(
-                "v51Winrate"
-            );
-
-        const profitElement =
-            document.getElementById(
-                "v51Profit"
-            );
-
-        const rrElement =
-            document.getElementById(
-                "v51RR"
-            );
-
-        if (tradesElement) {
-            tradesElement.textContent =
-                stats.trades;
-        }
-
-        if (winnersElement) {
-            winnersElement.textContent =
-                stats.winners;
-        }
-
-        if (losersElement) {
-            losersElement.textContent =
-                stats.losers;
-        }
-
-        if (beElement) {
-            beElement.textContent =
-                stats.breakevens;
-        }
-
-        if (winrateElement) {
-            winrateElement.textContent =
-                stats.winrate.toFixed(1) +
-                "%";
-        }
-
-        if (profitElement) {
-            profitElement.textContent =
-                money(stats.profit);
-        }
-
-        if (rrElement) {
-            rrElement.textContent =
-                stats.averageRR.toFixed(2);
-        }
-
-        updateSummary();
-        updateFilteredTables(
-            filteredTrades
-        );
-    }
-
-    /*
-    ============================================================
-    RESUME FILTRE
+    RESUME DES FILTRES
     ============================================================
     */
 
@@ -652,78 +1039,226 @@ Fonctionnalités :
                 "v51FilterSummary"
             );
 
+
         if (!summary) {
+
             return;
+
         }
 
-        let periodLabel =
-            "Tout l'historique";
 
-        if (
-            typeof currentPeriod !== "undefined"
-        ) {
+        const period =
+            FILTER_PERIODS.find(
+                item =>
+                    item.value ===
+                    selectedPeriod
+            );
 
-            if (
-                currentPeriod === "today"
-            ) {
-                periodLabel =
-                    "Aujourd'hui";
-            }
 
-            if (
-                currentPeriod === "week"
-            ) {
-                periodLabel =
-                    "Cette semaine";
-            }
+        const periodLabel =
+            period
+                ? period.label
+                : "Tout l'historique";
 
-            if (
-                currentPeriod === "month"
-            ) {
-                periodLabel =
-                    "Ce mois";
-            }
-
-            if (
-                currentPeriod === "year"
-            ) {
-                periodLabel =
-                    "Cette année";
-            }
-        }
 
         const assetLabel =
             selectedAsset === "ALL"
                 ? "Tous les actifs"
                 : selectedAsset;
 
+
         const setupLabel =
             selectedSetup === "ALL"
                 ? "Tous les setups"
                 : selectedSetup;
 
+
         summary.innerHTML = `
+
             <strong>
                 Filtres actifs :
             </strong>
 
-            <span>
-                ${escapeHtml(periodLabel)}
+            <span
+                style="
+                    display:inline-block;
+                    margin-left:8px;
+                "
+            >
+                📅
+                ${escapeHtml(
+                    periodLabel
+                )}
             </span>
 
-            <span>
-                ${escapeHtml(assetLabel)}
+            <span
+                style="
+                    display:inline-block;
+                    margin-left:8px;
+                "
+            >
+                🌍
+                ${escapeHtml(
+                    assetLabel
+                )}
             </span>
 
-            <span>
-                ${escapeHtml(setupLabel)}
+            <span
+                style="
+                    display:inline-block;
+                    margin-left:8px;
+                "
+            >
+                🎯
+                ${escapeHtml(
+                    setupLabel
+                )}
             </span>
+
         `;
+
     }
+
+
 
     /*
     ============================================================
-    TABLEAUX FILTRES
+    MISE A JOUR STATISTIQUES
+    ============================================================
+    */
+
+    function refreshV51() {
+
+        const currentTrades =
+            getCurrentCapitalTrades();
+
+
+        const filteredTrades =
+            applyCombinedFilters(
+                currentTrades
+            );
+
+
+        const stats =
+            calculateStats(
+                filteredTrades
+            );
+
+
+
+        const tradesElement =
+            document.getElementById(
+                "v51Trades"
+            );
+
+
+        const winnersElement =
+            document.getElementById(
+                "v51Winners"
+            );
+
+
+        const losersElement =
+            document.getElementById(
+                "v51Losers"
+            );
+
+
+        const beElement =
+            document.getElementById(
+                "v51BE"
+            );
+
+
+        const winrateElement =
+            document.getElementById(
+                "v51Winrate"
+            );
+
+
+        const profitElement =
+            document.getElementById(
+                "v51Profit"
+            );
+
+
+        const rrElement =
+            document.getElementById(
+                "v51RR"
+            );
+
+
+
+        if (tradesElement) {
+
+            tradesElement.textContent =
+                stats.trades;
+
+        }
+
+
+        if (winnersElement) {
+
+            winnersElement.textContent =
+                stats.winners;
+
+        }
+
+
+        if (losersElement) {
+
+            losersElement.textContent =
+                stats.losers;
+
+        }
+
+
+        if (beElement) {
+
+            beElement.textContent =
+                stats.breakevens;
+
+        }
+
+
+        if (winrateElement) {
+
+            winrateElement.textContent =
+                stats.winrate.toFixed(1) +
+                "%";
+
+        }
+
+
+        if (profitElement) {
+
+            profitElement.textContent =
+                money(stats.profit);
+
+        }
+
+
+        if (rrElement) {
+
+            rrElement.textContent =
+                stats.averageRR.toFixed(2);
+
+        }
+
+
+        updateSummary();
+
+        updateFilteredTables(
+            filteredTrades
+        );
+
+    }
+
+
+
+    /*
+    ============================================================
+    TABLEAUX
     ============================================================
     */
 
@@ -732,49 +1267,79 @@ Fonctionnalités :
     ) {
 
         /*
-        Cette V5.1 ne modifie pas
-        les données originales.
+        Lorsque l'actif est choisi,
+        le tableau Setup devient
+        l'analyse des setups de cet actif.
 
-        Elle recalcule seulement
-        les informations affichées
-        lorsque les fonctions du dashboard
-        sont disponibles.
+        Lorsque le setup est choisi,
+        le tableau Actif devient
+        l'analyse des actifs avec ce setup.
+
+        Lorsque les deux sont choisis,
+        chacun affiche uniquement
+        la combinaison sélectionnée.
         */
+
 
         const setupBody =
             document.getElementById(
                 "setupTableBody"
             );
 
+
         if (
             setupBody &&
-            selectedAsset !== "ALL"
+            (
+                selectedAsset !== "ALL" ||
+                selectedSetup !== "ALL"
+            )
         ) {
 
             renderFilteredSetupTable(
                 filteredTrades
             );
+
+        } else if (
+            typeof window.updateSetupTable ===
+            "function"
+        ) {
+
+            /*
+            On laisse le dashboard principal
+            afficher son tableau normal.
+            */
+
         }
+
+
 
         const assetBody =
             document.getElementById(
                 "assetTableBody"
             );
 
+
         if (
             assetBody &&
-            selectedSetup !== "ALL"
+            (
+                selectedAsset !== "ALL" ||
+                selectedSetup !== "ALL"
+            )
         ) {
 
             renderFilteredAssetTable(
                 filteredTrades
             );
+
         }
+
     }
+
+
 
     /*
     ============================================================
-    TABLE SETUP FILTRÉ
+    TABLE SETUPS
     ============================================================
     */
 
@@ -787,11 +1352,17 @@ Fonctionnalités :
                 "setupTableBody"
             );
 
+
         if (!tbody) {
+
             return;
+
         }
 
+
         const grouped = {};
+
+
 
         tradeList.forEach(
             trade => {
@@ -799,51 +1370,85 @@ Fonctionnalités :
                 const setup =
                     trade.setup || "-";
 
-                if (!grouped[setup]) {
+
+                if (
+                    !grouped[setup]
+                ) {
 
                     grouped[setup] = {
+
                         trades: 0,
+
                         winners: 0,
+
                         profit: 0,
+
                         rr: []
+
                     };
 
                 }
 
+
                 grouped[setup].trades++;
+
 
                 if (
                     trade.result === "TP"
                 ) {
-                    grouped[setup].winners++;
+
+                    grouped[
+                        setup
+                    ].winners++;
+
                 }
 
+
                 grouped[setup].profit +=
-                    Number(trade.pnl) || 0;
+                    Number(
+                        trade.pnl
+                    ) || 0;
+
 
                 const rr =
-                    Number(trade.rr);
+                    Number(
+                        trade.rr
+                    );
+
 
                 if (
                     Number.isFinite(rr) &&
                     rr > 0
                 ) {
-                    grouped[setup].rr.push(rr);
+
+                    grouped[
+                        setup
+                    ].rr.push(rr);
+
                 }
 
             }
         );
 
+
+
         tbody.innerHTML = "";
+
+
 
         const entries =
             Object.entries(
                 grouped
             );
 
-        if (entries.length === 0) {
+
+
+        if (
+            entries.length === 0
+        ) {
 
             tbody.innerHTML = `
+
                 <tr>
 
                     <td
@@ -854,10 +1459,14 @@ Fonctionnalités :
                     </td>
 
                 </tr>
+
             `;
 
             return;
+
         }
+
+
 
         entries
             .sort(
@@ -876,28 +1485,19 @@ Fonctionnalités :
                             ) * 100
                             : 0;
 
-                    const averageRR =
-                        stats.rr.length > 0
-                            ? stats.rr.reduce(
-                                (
-                                    sum,
-                                    rr
-                                ) =>
-                                    sum + rr,
-                                0
-                            ) /
-                            stats.rr.length
-                            : 0;
 
                     const row =
                         document.createElement(
                             "tr"
                         );
 
+
                     row.innerHTML = `
 
                         <td>
-                            ${escapeHtml(setup)}
+                            ${escapeHtml(
+                                setup
+                            )}
                         </td>
 
                         <td>
@@ -909,25 +1509,34 @@ Fonctionnalités :
                         </td>
 
                         <td>
-                            ${winrate.toFixed(1)}%
+                            ${winrate.toFixed(
+                                1
+                            )}%
                         </td>
 
                         <td>
-                            ${money(stats.profit)}
+                            ${money(
+                                stats.profit
+                            )}
                         </td>
 
                     `;
 
+
                     tbody.appendChild(
                         row
                     );
+
                 }
             );
+
     }
+
+
 
     /*
     ============================================================
-    TABLE ACTIF FILTRÉ
+    TABLE ACTIFS
     ============================================================
     */
 
@@ -940,11 +1549,17 @@ Fonctionnalités :
                 "assetTableBody"
             );
 
+
         if (!tbody) {
+
             return;
+
         }
 
+
         const grouped = {};
+
+
 
         tradeList.forEach(
             trade => {
@@ -952,20 +1567,34 @@ Fonctionnalités :
                 const asset =
                     trade.asset || "-";
 
-                if (!grouped[asset]) {
+
+                if (
+                    !grouped[asset]
+                ) {
 
                     grouped[asset] = {
+
                         trades: 0,
+
                         winners: 0,
+
                         losers: 0,
+
                         be: 0,
+
                         profit: 0,
-                        rr: []
+
+                        rr: [],
+
+                        pnl: []
+
                     };
 
                 }
 
+
                 grouped[asset].trades++;
+
 
                 if (
                     trade.result === "TP"
@@ -975,7 +1604,10 @@ Fonctionnalités :
                         asset
                     ].winners++;
 
-                } else if (
+                }
+
+
+                if (
                     trade.result === "SL"
                 ) {
 
@@ -983,7 +1615,10 @@ Fonctionnalités :
                         asset
                     ].losers++;
 
-                } else if (
+                }
+
+
+                if (
                     trade.result === "BE"
                 ) {
 
@@ -993,11 +1628,25 @@ Fonctionnalités :
 
                 }
 
+
                 grouped[asset].profit +=
-                    Number(trade.pnl) || 0;
+                    Number(
+                        trade.pnl
+                    ) || 0;
+
+
+                grouped[asset].pnl.push(
+                    Number(
+                        trade.pnl
+                    ) || 0
+                );
+
 
                 const rr =
-                    Number(trade.rr);
+                    Number(
+                        trade.rr
+                    );
+
 
                 if (
                     Number.isFinite(rr) &&
@@ -1013,16 +1662,25 @@ Fonctionnalités :
             }
         );
 
+
+
         tbody.innerHTML = "";
+
+
 
         const entries =
             Object.entries(
                 grouped
             );
 
-        if (entries.length === 0) {
+
+
+        if (
+            entries.length === 0
+        ) {
 
             tbody.innerHTML = `
+
                 <tr>
 
                     <td
@@ -1033,10 +1691,14 @@ Fonctionnalités :
                     </td>
 
                 </tr>
+
             `;
 
             return;
+
         }
+
+
 
         entries
             .sort(
@@ -1055,6 +1717,7 @@ Fonctionnalités :
                             ) * 100
                             : 0;
 
+
                     const averageRR =
                         stats.rr.length > 0
                             ? stats.rr.reduce(
@@ -1068,43 +1731,35 @@ Fonctionnalités :
                             stats.rr.length
                             : 0;
 
-                    const pnlValues =
-                        tradeList
-                            .filter(
-                                trade =>
-                                    trade.asset ===
-                                    asset
-                            )
-                            .map(
-                                trade =>
-                                    Number(
-                                        trade.pnl
-                                    ) || 0
-                            );
 
                     const best =
-                        pnlValues.length > 0
+                        stats.pnl.length > 0
                             ? Math.max(
-                                ...pnlValues
+                                ...stats.pnl
                             )
                             : 0;
 
+
                     const worst =
-                        pnlValues.length > 0
+                        stats.pnl.length > 0
                             ? Math.min(
-                                ...pnlValues
+                                ...stats.pnl
                             )
                             : 0;
+
 
                     const row =
                         document.createElement(
                             "tr"
                         );
 
+
                     row.innerHTML = `
 
                         <td>
-                            ${escapeHtml(asset)}
+                            ${escapeHtml(
+                                asset
+                            )}
                         </td>
 
                         <td>
@@ -1124,26 +1779,37 @@ Fonctionnalités :
                         </td>
 
                         <td>
-                            ${winrate.toFixed(1)}%
+                            ${winrate.toFixed(
+                                1
+                            )}%
                         </td>
 
                         <td>
-                            ${money(stats.profit)}
+                            ${money(
+                                stats.profit
+                            )}
                         </td>
 
                         <td>
-                            ${averageRR.toFixed(2)}
+                            ${averageRR.toFixed(
+                                2
+                            )}
                         </td>
 
                         <td>
-                            ${money(best)}
+                            ${money(
+                                best
+                            )}
                         </td>
 
                         <td>
-                            ${money(worst)}
+                            ${money(
+                                worst
+                            )}
                         </td>
 
                     `;
+
 
                     tbody.appendChild(
                         row
@@ -1151,38 +1817,10 @@ Fonctionnalités :
 
                 }
             );
+
     }
 
-    /*
-    ============================================================
-    SURVEILLANCE DES CHANGEMENTS DE PERIODE
-    ============================================================
-    */
 
-    function hookPeriodButtons() {
-
-        document
-            .querySelectorAll(
-                ".period-btn"
-            )
-            .forEach(
-                button => {
-
-                    button.addEventListener(
-                        "click",
-                        function () {
-
-                            setTimeout(
-                                refreshV51,
-                                0
-                            );
-
-                        }
-                    );
-
-                }
-            );
-    }
 
     /*
     ============================================================
@@ -1194,30 +1832,35 @@ Fonctionnalités :
 
         createFilterInterface();
 
-        hookPeriodButtons();
-
         refreshV51();
 
     }
 
+
+
     /*
-    L'application principale
-    doit avoir fini de charger.
+    On attend que app.js
+    ait terminé son initialisation.
     */
 
     setTimeout(
         initialize,
-        300
+        500
     );
 
+
+
     /*
-    Rafraîchissement périodique
-    pour rester synchronisé avec
+    Synchronisation avec
     l'application principale.
     */
 
     setInterval(
-        refreshV51,
+        function () {
+
+            refreshV51();
+
+        },
         1000
     );
 
