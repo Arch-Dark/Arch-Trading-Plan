@@ -1,4825 +1,1927 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+
+<style>
 /* ============================================================
-   V5.8 — FILTRES + STATS + ANALYSE + CLASSEMENT
-   + RECOMMANDATIONS
-   + ANALYSE DU RISQUE
-   + CALENDRIER DE PERFORMANCE
+   NAVIGATION MULTI-PAGES
    ============================================================ */
 
-(function () {
-    "use strict";
+.app-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px 20px;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
 
-    /* ============================================================
-       CONFIGURATION
-       ============================================================ */
+.app-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    font-weight: 600;
+    transition: .2s ease;
+}
 
-    const SETUPS = [
-        "LDP+QML",
-        "LDP+FIBO 50",
-        "OB",
-        "BB",
-        "ZS OA",
-        "SSM1",
-        "SSM2",
-        "SSM3",
-        "SBM1",
-        "SBM2",
-        "SBM3"
-    ];
+.app-nav a:hover {
+    transform: translateY(-1px);
+}
 
-    const DEFAULT_ASSETS = [
-        "EUR/USD",
-        "GBP/USD",
-        "AUD/USD",
-        "NZD/USD",
-        "USD/CAD",
-        "USD/CHF",
-        "USD/JPY",
-        "XAUUSD",
-        "BTCUSD"
-    ];
+.app-nav a.active {
+    background: rgba(59,130,246,.18);
+    box-shadow: inset 0 0 0 1px rgba(96,165,250,.28);
+}
 
-    const RISK_TOLERANCE = 0.10;
+.page-title {
+    margin: 8px 0 18px;
+}
 
-    let chartResizeAttached = false;
+.page-title h2 {
+    margin: 0 0 4px;
+}
 
-    /* ============================================================
-       OUTILS
-       ============================================================ */
+.page-title p {
+    margin: 0;
+    opacity: .72;
+}
 
-    function formatMoney(value) {
-        const number = Number(value) || 0;
+/* ============================================================
+   AFFICHAGE DES PAGES
+   ============================================================ */
 
-        if (typeof money === "function") {
-            return money(number);
-        }
+#dashboardCapitalCard,
+#dashboardChartCard,
+#performanceSummaryCard,
+#dashboardTradeCard,
+#historyCard,
+#setupPerformanceCard,
+#assetPerformanceCard,
+#archivesCard,
+#analysisPageHeader,
+#performancePageHeader,
+#archivesPageHeader {
+    display: none;
+}
 
-        return "$" + number.toFixed(2);
-    }
+#v51FilterCard {
+    display: none;
+}
 
-    function escapeValue(value) {
-        if (typeof escapeHtml === "function") {
-            return escapeHtml(value);
-        }
+/* =========================
+   DASHBOARD
+   ========================= */
 
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+body[data-page="dashboard"] #dashboardCapitalCard,
+body[data-page="dashboard"] #dashboardChartCard,
+body[data-page="dashboard"] #performanceSummaryCard,
+body[data-page="dashboard"] #dashboardTradeCard,
+body[data-page="dashboard"] #historyCard {
+    display: block;
+}
 
-    function getCapitalTrades() {
-        if (
-            typeof trades === "undefined" ||
-            !Array.isArray(trades)
-        ) {
-            return [];
-        }
+/* =========================
+   ANALYSES
+   ========================= */
 
-        if (
-            typeof activeCapital === "undefined" ||
-            !activeCapital ||
-            !activeCapital.id
-        ) {
-            return [];
-        }
+body[data-page="analysis"] #analysisPageHeader {
+    display: block;
+}
 
-        return trades.filter(function (trade) {
-            return trade.capitalId === activeCapital.id;
-        });
-    }
+body[data-page="analysis"] #v51FilterCard {
+    display: block !important;
+}
 
-    function parseTradeDate(dateValue) {
-        if (!dateValue) {
-            return null;
-        }
+body[data-page="analysis"] #performanceSummaryCard {
+    display: none !important;
+}
 
-        const date = new Date(
-            String(dateValue) + "T00:00:00"
+/* =========================
+   PERFORMANCES
+   ========================= */
+
+body[data-page="performance"] #performancePageHeader {
+    display: block;
+}
+
+body[data-page="performance"] #setupPerformanceCard,
+body[data-page="performance"] #assetPerformanceCard {
+    display: block;
+}
+
+body[data-page="performance"] #performanceSummaryCard {
+    display: none !important;
+}
+
+/* =========================
+   ARCHIVES
+   ========================= */
+
+body[data-page="archives"] #archivesPageHeader {
+    display: block;
+}
+
+body[data-page="archives"] #archivesCard {
+    display: block;
+}
+
+body[data-page="archives"] #performanceSummaryCard {
+    display: none !important;
+}
+
+/* ============================================================
+   BOUTON AJOUT TRADE
+   ============================================================ */
+
+.trade-launcher-card {
+    display: none;
+}
+
+body[data-page="dashboard"] .trade-launcher-card {
+    display: block;
+}
+
+.trade-launcher {
+    width: 100%;
+    min-height: 96px;
+    border: 0;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: .2px;
+    padding: 20px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(59,130,246,.20),
+            rgba(34,197,94,.14)
         );
+    box-shadow:
+        0 12px 32px rgba(0,0,0,.12);
+}
 
-        if (Number.isNaN(date.getTime())) {
-            return null;
-        }
+.trade-launcher small {
+    display: block;
+    margin-top: 6px;
+    opacity: .7;
+    font-weight: 500;
+}
 
-        return date;
+/* ============================================================
+   MODALE TRADE
+   ============================================================ */
+
+.modal.trade-modal {
+    display: none;
+}
+
+.modal.trade-modal.open {
+    display: flex;
+}
+
+.trade-modal .modal-content {
+    width: min(1100px, 96vw);
+    max-height: 92vh;
+    overflow: auto;
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+    .app-nav {
+        padding: 10px 12px;
+        gap: 6px;
     }
 
-    /* ============================================================
-       PERIODES
-       ============================================================ */
-
-    function isToday(dateValue) {
-        const tradeDate = parseTradeDate(dateValue);
-
-        if (!tradeDate) {
-            return false;
-        }
-
-        const today = new Date();
-
-        return (
-            tradeDate.getFullYear() === today.getFullYear() &&
-            tradeDate.getMonth() === today.getMonth() &&
-            tradeDate.getDate() === today.getDate()
-        );
+    .app-nav a {
+        flex: 1 1 calc(50% - 6px);
+        justify-content: center;
+        font-size: .9rem;
     }
 
-    function isThisWeek(dateValue) {
-        const tradeDate = parseTradeDate(dateValue);
-
-        if (!tradeDate) {
-            return false;
-        }
-
-        const today = new Date();
-        const day = today.getDay();
-
-        const diffToMonday =
-            day === 0
-                ? 6
-                : day - 1;
-
-        const monday = new Date(today);
-
-        monday.setHours(0, 0, 0, 0);
-
-        monday.setDate(
-            today.getDate() - diffToMonday
-        );
-
-        const nextMonday =
-            new Date(monday);
-
-        nextMonday.setDate(
-            monday.getDate() + 7
-        );
-
-        return (
-            tradeDate >= monday &&
-            tradeDate < nextMonday
-        );
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
     }
+}
+</style>
 
-    function isThisMonth(dateValue) {
-        const tradeDate = parseTradeDate(dateValue);
+</head>
 
-        if (!tradeDate) {
-            return false;
-        }
+<body>
 
-        const today = new Date();
+<header class="topbar">
 
-        return (
-            tradeDate.getFullYear() === today.getFullYear() &&
-            tradeDate.getMonth() === today.getMonth()
-        );
-    }
+    <div>
+        <h1>Trading Dashboard</h1>
+        <p>Journal & performance de trading</p>
+    </div>
 
-    function isThisYear(dateValue) {
-        const tradeDate = parseTradeDate(dateValue);
+    <button id="themeToggle" class="theme-btn">
+        🌙
+    </button>
 
-        if (!tradeDate) {
-            return false;
-        }
+</header>
 
-        const today = new Date();
 
-        return (
-            tradeDate.getFullYear() ===
-            today.getFullYear()
-        );
-    }
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
 
-    function filterBySelectedPeriod(
-        tradeList,
-        period
-    ) {
-        if (period === "all") {
-            return [...tradeList];
-        }
+<nav class="app-nav" aria-label="Navigation principale">
 
-        return tradeList.filter(function (trade) {
-            if (period === "today") {
-                return isToday(trade.date);
-            }
+    <a
+        href="index.html?page=dashboard"
+        data-page-link="dashboard"
+    >
+        🏠 Dashboard
+    </a>
 
-            if (period === "week") {
-                return isThisWeek(trade.date);
-            }
+    <a
+        href="index.html?page=analysis"
+        data-page-link="analysis"
+    >
+        📊 Analyses & Risque
+    </a>
 
-            if (period === "month") {
-                return isThisMonth(trade.date);
-            }
+    <a
+        href="index.html?page=performance"
+        data-page-link="performance"
+    >
+        🎯 Performances
+    </a>
 
-            if (period === "year") {
-                return isThisYear(trade.date);
-            }
+    <a
+        href="index.html?page=archives"
+        data-page-link="archives"
+    >
+        🗄️ Archives
+    </a>
 
-            return true;
-        });
-    }
+</nav>
 
-    /* ============================================================
-       TRI CHRONOLOGIQUE
-       ============================================================ */
 
-    function sortChronologically(tradeList) {
-        return [...tradeList].sort(function (a, b) {
-            const dateA = new Date(
-                a.date || a.createdAt || 0
-            ).getTime();
+<main class="container">
 
-            const dateB = new Date(
-                b.date || b.createdAt || 0
-            ).getTime();
 
-            if (dateA !== dateB) {
-                return dateA - dateB;
-            }
+    <!-- ========================================================
+         TITRE PAGE ANALYSES
+         ======================================================== -->
 
-            const createdA = new Date(
-                a.createdAt || 0
-            ).getTime();
+    <div
+        id="analysisPageHeader"
+        class="page-title"
+    >
 
-            const createdB = new Date(
-                b.createdAt || 0
-            ).getTime();
+        <h2>
+            📊 Analyses & Risque
+        </h2>
 
-            return createdA - createdB;
-        });
-    }
+        <p>
+            Analyse filtrée, régularité du risque,
+            calendrier et recommandations.
+        </p>
 
-    /* ============================================================
-       CREATION SECTION
-       ============================================================ */
+    </div>
 
-    function createFilterSection() {
-        let section =
-            document.getElementById(
-                "v51FilterCard"
-            );
 
-        if (section) {
-            return section;
-        }
+    <!-- ========================================================
+         TITRE PAGE PERFORMANCES
+         ======================================================== -->
 
-        section =
-            document.createElement("section");
+    <div
+        id="performancePageHeader"
+        class="page-title"
+    >
 
-        section.id =
-            "v51FilterCard";
+        <h2>
+            🎯 Performances
+        </h2>
 
-        section.className =
-            "card";
+        <p>
+            Comparez vos setups et vos actifs
+            pour identifier vos meilleures performances.
+        </p>
 
-        section.innerHTML = `
-            <div class="section-header">
-                <div>
-                    <h2>🔎 Analyse filtrée</h2>
+    </div>
 
-                    <p>
-                        Analyse selon la période, l'actif et le setup
-                    </p>
-                </div>
+
+    <!-- ========================================================
+         TITRE PAGE ARCHIVES
+         ======================================================== -->
+
+    <div
+        id="archivesPageHeader"
+        class="page-title"
+    >
+
+        <h2>
+            🗄️ Archives des capitaux
+        </h2>
+
+        <p>
+            Chaque capital conserve son historique
+            et son évolution indépendamment.
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================
+         CAPITAL ACTIF
+         ======================================================== -->
+
+    <section
+        id="dashboardCapitalCard"
+        class="card active-capital-card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    💰 Capital actif
+                </h2>
+
+                <p id="activeCapitalName">
+                    Capital 1
+                </p>
+
             </div>
 
-            <!-- ==================================================
-                 FILTRES
-                 ================================================== -->
+
+            <div class="capital-actions">
+
+                <button
+                    id="changeCapitalBtn"
+                    class="secondary-btn"
+                >
+                    Modifier
+                </button>
+
+
+                <button
+                    id="archiveCapitalBtn"
+                    class="warning-btn"
+                >
+                    Archiver
+                </button>
+
+
+                <button
+                    id="newCapitalBtn"
+                    class="primary-btn"
+                >
+                    Nouveau capital
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="capital-summary">
+
+            <div class="capital-box">
+
+                <span>
+                    Capital initial
+                </span>
+
+                <strong id="initialCapital">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    Solde actuel
+                </span>
+
+                <strong id="currentBalance">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    Profit total
+                </span>
+
+                <strong id="totalProfit">
+                    $0.00
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================
+         GRAPHIQUE CAPITAL
+         ======================================================== -->
+
+    <section
+        id="dashboardChartCard"
+        class="card chart-card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    📈 Évolution du capital
+                </h2>
+
+                <p>
+                    Évolution du solde après chaque trade
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-container">
+
+            <canvas
+                id="capitalChart"
+            ></canvas>
+
 
             <div
-                style="
-                    display:grid;
-                    grid-template-columns:
-                        repeat(auto-fit,minmax(180px,1fr));
-                    gap:14px;
-                    margin-bottom:20px;
-                "
+                id="emptyChartMessage"
+                class="empty-chart-message"
             >
+                Aucun trade enregistré
+                pour afficher le graphique.
+            </div>
 
-                <div>
-                    <label for="v51PeriodFilter">
-                        Période
-                    </label>
+        </div>
 
-                    <select id="v51PeriodFilter">
-                        <option value="today">
-                            Aujourd'hui
-                        </option>
+    </section>
 
-                        <option value="week">
-                            Cette semaine
-                        </option>
 
-                        <option value="month">
-                            Ce mois
-                        </option>
+    <!-- ========================================================
+         PERFORMANCE GENERALE
+         ======================================================== -->
 
-                        <option value="year">
-                            Cette année
-                        </option>
+    <section
+        id="performanceSummaryCard"
+        class="card"
+    >
 
-                        <option value="all" selected>
-                            Tout l'historique
-                        </option>
-                    </select>
-                </div>
+        <div class="section-header">
 
-                <div>
-                    <label for="v51AssetFilter">
-                        Actif
-                    </label>
+            <div>
 
-                    <select id="v51AssetFilter">
-                        <option value="ALL">
-                            Tous les actifs
-                        </option>
-                    </select>
-                </div>
+                <h2>
+                    📊 Performance
+                </h2>
 
-                <div>
-                    <label for="v51SetupFilter">
-                        Setup
-                    </label>
-
-                    <select id="v51SetupFilter">
-                        <option value="ALL">
-                            Tous les setups
-                        </option>
-                    </select>
-                </div>
+                <p>
+                    Analyse de vos résultats
+                </p>
 
             </div>
 
-            <!-- ==================================================
-                 RECOMMANDATIONS
-                 ================================================== -->
+        </div>
 
-            <div
-                id="v56Recommendations"
-                style="
-                    display:grid;
-                    grid-template-columns:
-                        repeat(auto-fit,minmax(240px,1fr));
-                    gap:14px;
-                    margin-bottom:28px;
-                "
+
+        <div class="period-buttons">
+
+            <button
+                class="period-btn active"
+                data-period="today"
             >
+                Aujourd'hui
+            </button>
 
-                <div
-                    id="v56BestSetupCard"
-                    class="stat-box"
-                >
-                    <span>
-                        ⭐ Setup à privilégier
-                    </span>
 
-                    <strong id="v56BestSetup">
-                        -
-                    </strong>
-
-                    <small
-                        id="v56BestSetupInfo"
-                        style="
-                            display:block;
-                            margin-top:8px;
-                            opacity:.75;
-                        "
-                    >
-                        Pas assez de données
-                    </small>
-                </div>
-
-                <div
-                    id="v56BestAssetCard"
-                    class="stat-box"
-                >
-                    <span>
-                        📈 Actif à surveiller
-                    </span>
-
-                    <strong id="v56BestAsset">
-                        -
-                    </strong>
-
-                    <small
-                        id="v56BestAssetInfo"
-                        style="
-                            display:block;
-                            margin-top:8px;
-                            opacity:.75;
-                        "
-                    >
-                        Pas assez de données
-                    </small>
-                </div>
-
-                <div
-                    id="v56AvoidSetupCard"
-                    class="stat-box"
-                >
-                    <span>
-                        ⚠️ Setup à éviter
-                    </span>
-
-                    <strong id="v56AvoidSetup">
-                        -
-                    </strong>
-
-                    <small
-                        id="v56AvoidSetupInfo"
-                        style="
-                            display:block;
-                            margin-top:8px;
-                            opacity:.75;
-                        "
-                    >
-                        Pas assez de données
-                    </small>
-                </div>
-
-                <div
-                    id="v56WarningCard"
-                    class="stat-box"
-                >
-                    <span>
-                        🛡️ Signal général
-                    </span>
-
-                    <strong id="v56GeneralSignal">
-                        -
-                    </strong>
-
-                    <small
-                        id="v56GeneralSignalInfo"
-                        style="
-                            display:block;
-                            margin-top:8px;
-                            opacity:.75;
-                        "
-                    >
-                        Pas assez de données
-                    </small>
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 STATISTIQUES GENERALES
-                 ================================================== -->
-
-            <div
-                class="stats-grid"
-                id="v51StatsGrid"
-                style="margin-bottom:24px;"
+            <button
+                class="period-btn"
+                data-period="week"
             >
+                Cette semaine
+            </button>
 
-                <div class="stat-box">
-                    <span>Trades</span>
-                    <strong id="v51Trades">
-                        0
-                    </strong>
-                </div>
 
-                <div class="stat-box">
-                    <span>Gagnants</span>
-                    <strong id="v51Wins">
-                        0
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>Perdants</span>
-                    <strong id="v51Losses">
-                        0
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>BE</span>
-                    <strong id="v51BE">
-                        0
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>Winrate</span>
-                    <strong id="v51Winrate">
-                        0.0%
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>Profit</span>
-                    <strong id="v51Profit">
-                        $0.00
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>RR moyen</span>
-                    <strong id="v51AverageRR">
-                        0.00
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>Profit Factor</span>
-                    <strong id="v51ProfitFactor">
-                        0.00
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>Gain moyen / trade</span>
-                    <strong id="v51AverageTrade">
-                        $0.00
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>Gain moyen gagnant</span>
-                    <strong id="v51AverageWinner">
-                        $0.00
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>
-                        Perte moyenne perdant
-                    </span>
-
-                    <strong id="v51AverageLoser">
-                        $0.00
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>Meilleur trade</span>
-                    <strong id="v51BestTrade">
-                        $0.00
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>Pire trade</span>
-                    <strong id="v51WorstTrade">
-                        $0.00
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>
-                        Série gagnante max
-                    </span>
-
-                    <strong id="v51MaxWinStreak">
-                        0
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>
-                        Série perdante max
-                    </span>
-
-                    <strong id="v51MaxLossStreak">
-                        0
-                    </strong>
-                </div>
-
-                <div class="stat-box">
-                    <span>Drawdown maximal</span>
-
-                    <strong id="v51MaxDrawdown">
-                        $0.00
-                    </strong>
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 ANALYSE RISQUE
-                 ================================================== -->
-
-            <div style="margin-bottom:28px;">
-
-                <div class="section-header">
-                    <div>
-
-                        <h3>
-                            🛡️ Analyse du risque
-                        </h3>
-
-                        <p>
-                            Contrôle de la régularité et du respect du risque
-                        </p>
-
-                    </div>
-                </div>
-
-                <div
-                    class="stats-grid"
-                    style="margin-bottom:20px;"
-                >
-
-                    <div class="stat-box">
-                        <span>Risque moyen</span>
-
-                        <strong id="v57AverageRisk">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Risque minimum</span>
-
-                        <strong id="v57MinimumRisk">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Risque maximum</span>
-
-                        <strong id="v57MaximumRisk">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Risque référence</span>
-
-                        <strong id="v57ReferenceRisk">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Écart moyen</span>
-
-                        <strong id="v57AverageDeviation">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Risque régulier</span>
-
-                        <strong id="v57RiskRegularity">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Trades conformes</span>
-
-                        <strong id="v57CompliantTrades">
-                            0
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>Trades hors risque</span>
-
-                        <strong id="v57NonCompliantTrades">
-                            0
-                        </strong>
-                    </div>
-
-                </div>
-
-                <div class="stats-grid">
-
-                    <div class="stat-box">
-                        <span>
-                            RR cible moyen
-                        </span>
-
-                        <strong id="v57TargetRR">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>
-                            RR moyen enregistré
-                        </span>
-
-                        <strong id="v57RecordedRR">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>RR minimum</span>
-
-                        <strong id="v57MinimumRR">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>RR maximum</span>
-
-                        <strong id="v57MaximumRR">
-                            -
-                        </strong>
-                    </div>
-
-                    <div class="stat-box">
-                        <span>
-                            RR ≥ 2
-                        </span>
-
-                        <strong id="v57RRAboveTwo">
-                            0%
-                        </strong>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 V5.8 — CALENDRIER
-                 ================================================== -->
-
-            <div
-                style="
-                    margin-bottom:28px;
-                "
+            <button
+                class="period-btn"
+                data-period="month"
             >
+                Ce mois
+            </button>
 
-                <div class="section-header">
-                    <div>
 
-                        <h3>
-                            🗓️ Calendrier de performance
-                        </h3>
-
-                        <p>
-                            Performance quotidienne selon les filtres
-                        </p>
-
-                    </div>
-
-                    <div
-                        style="
-                            display:flex;
-                            gap:8px;
-                            align-items:center;
-                        "
-                    >
-
-                        <button
-                            id="v58PreviousMonth"
-                            type="button"
-                            class="secondary-btn"
-                        >
-                            ◀
-                        </button>
-
-                        <strong
-                            id="v58CalendarTitle"
-                            style="
-                                min-width:150px;
-                                text-align:center;
-                            "
-                        >
-                            -
-                        </strong>
-
-                        <button
-                            id="v58NextMonth"
-                            type="button"
-                            class="secondary-btn"
-                        >
-                            ▶
-                        </button>
-
-                    </div>
-                </div>
-
-                <div
-                    id="v58Calendar"
-                    style="
-                        width:100%;
-                        overflow-x:auto;
-                    "
-                >
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 CLASSEMENT SETUPS
-                 ================================================== -->
-
-            <div style="margin-bottom:28px;">
-
-                <div class="section-header">
-                    <div>
-                        <h3>
-                            🏆 Classement des setups
-                        </h3>
-
-                        <p>
-                            Performance globale
-                        </p>
-                    </div>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-
-                        <thead>
-                            <tr>
-                                <th>Rang</th>
-                                <th>Setup</th>
-                                <th>Trades</th>
-                                <th>Winrate</th>
-                                <th>Profit</th>
-                                <th>Profit Factor</th>
-                                <th>RR moyen</th>
-                                <th>Score</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="v55SetupRankingBody">
-                        </tbody>
-
-                    </table>
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 CLASSEMENT ACTIFS
-                 ================================================== -->
-
-            <div style="margin-bottom:28px;">
-
-                <div class="section-header">
-                    <div>
-
-                        <h3>
-                            🥇 Classement des actifs
-                        </h3>
-
-                        <p>
-                            Performance globale
-                        </p>
-
-                    </div>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-
-                        <thead>
-                            <tr>
-                                <th>Rang</th>
-                                <th>Actif</th>
-                                <th>Trades</th>
-                                <th>Winrate</th>
-                                <th>Profit</th>
-                                <th>Profit Factor</th>
-                                <th>RR moyen</th>
-                                <th>Score</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="v55AssetRankingBody">
-                        </tbody>
-
-                    </table>
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 DETAIL SETUPS
-                 ================================================== -->
-
-            <div style="margin-bottom:28px;">
-
-                <div class="section-header">
-                    <div>
-                        <h3>
-                            🎯 Analyse détaillée par setup
-                        </h3>
-                    </div>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-
-                        <thead>
-                            <tr>
-                                <th>Setup</th>
-                                <th>Trades</th>
-                                <th>TP</th>
-                                <th>SL</th>
-                                <th>BE</th>
-                                <th>Winrate</th>
-                                <th>Profit</th>
-                                <th>RR moyen</th>
-                                <th>Profit Factor</th>
-                                <th>Meilleur</th>
-                                <th>Pire</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="v54SetupBody">
-                        </tbody>
-
-                    </table>
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 DETAIL ACTIFS
-                 ================================================== -->
-
-            <div style="margin-bottom:28px;">
-
-                <div class="section-header">
-                    <div>
-                        <h3>
-                            📈 Analyse détaillée par actif
-                        </h3>
-                    </div>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-
-                        <thead>
-                            <tr>
-                                <th>Actif</th>
-                                <th>Trades</th>
-                                <th>TP</th>
-                                <th>SL</th>
-                                <th>BE</th>
-                                <th>Winrate</th>
-                                <th>Profit</th>
-                                <th>RR moyen</th>
-                                <th>Profit Factor</th>
-                                <th>Meilleur</th>
-                                <th>Pire</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="v54AssetBody">
-                        </tbody>
-
-                    </table>
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 GRAPHIQUE
-                 ================================================== -->
-
-            <div
-                id="v51ChartContainer"
-                style="
-                    position:relative;
-                    width:100%;
-                    min-height:320px;
-                "
+            <button
+                class="period-btn"
+                data-period="year"
             >
+                Cette année
+            </button>
 
-                <canvas
-                    id="v51PerformanceChart"
-                    style="
-                        width:100%;
-                        height:320px;
-                        display:block;
-                    "
-                ></canvas>
 
-                <div
-                    id="v51EmptyChart"
-                    class="empty-chart-message"
-                    style="
-                        display:none;
-                        min-height:280px;
-                        align-items:center;
-                        justify-content:center;
-                    "
-                >
-                    Aucun trade correspondant aux filtres.
-                </div>
+            <button
+                class="period-btn"
+                data-period="all"
+            >
+                Tout l'historique
+            </button>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+
+            <div class="stat-box">
+
+                <span>
+                    Capital / Solde
+                </span>
+
+                <strong id="statBalance">
+                    $0.00
+                </strong>
 
             </div>
-        `;
 
-        const periodButtons =
-            document.querySelector(
-                ".period-buttons"
-            );
 
-        if (
-            periodButtons &&
-            periodButtons.closest(".card")
-        ) {
-            const performanceCard =
-                periodButtons.closest(
-                    ".card"
-                );
+            <div class="stat-box">
 
-            performanceCard.insertAdjacentElement(
-                "afterend",
-                section
-            );
-        } else {
-            const main =
-                document.querySelector(
-                    "main"
-                );
+                <span>
+                    Profit total
+                </span>
 
-            if (main) {
-                main.appendChild(
-                    section
-                );
-            } else {
-                document.body.appendChild(
-                    section
-                );
-            }
-        }
+                <strong id="statProfit">
+                    $0.00
+                </strong>
 
-        return section;
-    }
+            </div>
 
-    /* ============================================================
-       FILTRES SELECT
-       ============================================================ */
 
-    function populateFilters() {
-        const assetSelect =
-            document.getElementById(
-                "v51AssetFilter"
-            );
+            <div class="stat-box">
 
-        const setupSelect =
-            document.getElementById(
-                "v51SetupFilter"
-            );
+                <span>
+                    Winrate
+                </span>
 
-        if (
-            !assetSelect ||
-            !setupSelect
-        ) {
-            return;
-        }
+                <strong id="statWinrate">
+                    0%
+                </strong>
 
-        const currentAsset =
-            assetSelect.value ||
-            "ALL";
+            </div>
 
-        const currentSetup =
-            setupSelect.value ||
-            "ALL";
 
-        const capitalTrades =
-            getCapitalTrades();
+            <div class="stat-box">
 
-        const assets =
-            new Set(
-                DEFAULT_ASSETS
-            );
+                <span>
+                    RR moyen
+                </span>
 
-        capitalTrades.forEach(
-            function (trade) {
-                if (trade.asset) {
-                    assets.add(
-                        String(
-                            trade.asset
-                        )
-                    );
-                }
-            }
-        );
+                <strong id="statAverageRR">
+                    0.00
+                </strong>
 
-        assetSelect.innerHTML = `
-            <option value="ALL">
-                Tous les actifs
-            </option>
-        `;
+            </div>
 
-        [...assets]
-            .sort(
-                function (a, b) {
-                    return String(
-                        a
-                    ).localeCompare(
-                        String(b),
-                        "fr",
-                        {
-                            sensitivity:
-                                "base"
-                        }
-                    );
-                }
-            )
-            .forEach(
-                function (asset) {
-                    const option =
-                        document.createElement(
-                            "option"
-                        );
 
-                    option.value =
-                        asset;
+            <div class="stat-box">
 
-                    option.textContent =
-                        asset;
+                <span>
+                    Nombre de trades
+                </span>
 
-                    assetSelect.appendChild(
-                        option
-                    );
-                }
-            );
-
-        if (
-            [...assets].includes(
-                currentAsset
-            )
-        ) {
-            assetSelect.value =
-                currentAsset;
-        } else {
-            assetSelect.value =
-                "ALL";
-        }
-
-        const setups =
-            new Set(
-                SETUPS
-            );
-
-        capitalTrades.forEach(
-            function (trade) {
-                if (trade.setup) {
-                    setups.add(
-                        String(
-                            trade.setup
-                        )
-                    );
-                }
-            }
-        );
-
-        setupSelect.innerHTML = `
-            <option value="ALL">
-                Tous les setups
-            </option>
-        `;
-
-        [...setups]
-            .sort(
-                function (a, b) {
-                    return String(
-                        a
-                    ).localeCompare(
-                        String(b),
-                        "fr",
-                        {
-                            sensitivity:
-                                "base"
-                        }
-                    );
-                }
-            )
-            .forEach(
-                function (setup) {
-                    const option =
-                        document.createElement(
-                            "option"
-                        );
-
-                    option.value =
-                        setup;
-
-                    option.textContent =
-                        setup;
-
-                    setupSelect.appendChild(
-                        option
-                    );
-                }
-            );
-
-        if (
-            [...setups].includes(
-                currentSetup
-            )
-        ) {
-            setupSelect.value =
-                currentSetup;
-        } else {
-            setupSelect.value =
-                "ALL";
-        }
-    }
-
-    /* ============================================================
-       TRADES FILTRES
-       ============================================================ */
-
-    function getFilteredTrades() {
-        const periodSelect =
-            document.getElementById(
-                "v51PeriodFilter"
-            );
-
-        const assetSelect =
-            document.getElementById(
-                "v51AssetFilter"
-            );
-
-        const setupSelect =
-            document.getElementById(
-                "v51SetupFilter"
-            );
-
-        const period =
-            periodSelect
-                ? periodSelect.value
-                : "all";
-
-        const asset =
-            assetSelect
-                ? assetSelect.value
-                : "ALL";
-
-        const setup =
-            setupSelect
-                ? setupSelect.value
-                : "ALL";
-
-        let result =
-            getCapitalTrades();
-
-        result =
-            filterBySelectedPeriod(
-                result,
-                period
-            );
-
-        if (
-            asset !== "ALL"
-        ) {
-            result =
-                result.filter(
-                    function (trade) {
-                        return String(
-                            trade.asset ||
-                                ""
-                        ) ===
-                            String(
-                                asset
-                            );
-                    }
-                );
-        }
-
-        if (
-            setup !== "ALL"
-        ) {
-            result =
-                result.filter(
-                    function (trade) {
-                        return String(
-                            trade.setup ||
-                                ""
-                        ) ===
-                            String(
-                                setup
-                            );
-                    }
-                );
-        }
-
-        return sortChronologically(
-            result
-        );
-    }
-
-    /* ============================================================
-       STATISTIQUES AVANCEES
-       ============================================================ */
-
-    function calculateAdvancedStats(
-        filteredTrades
-    ) {
-        const pnlValues =
-            filteredTrades.map(
-                function (trade) {
-                    return (
-                        Number(
-                            trade.pnl
-                        ) || 0
-                    );
-                }
-            );
-
-        const totalTrades =
-            filteredTrades.length;
-
-        const winners =
-            filteredTrades.filter(
-                function (trade) {
-                    return (
-                        String(
-                            trade.result ||
-                                ""
-                        ).toUpperCase() ===
-                        "TP"
-                    );
-                }
-            );
-
-        const losers =
-            filteredTrades.filter(
-                function (trade) {
-                    return (
-                        String(
-                            trade.result ||
-                                ""
-                        ).toUpperCase() ===
-                        "SL"
-                    );
-                }
-            );
-
-        const breakevens =
-            filteredTrades.filter(
-                function (trade) {
-                    return (
-                        String(
-                            trade.result ||
-                                ""
-                        ).toUpperCase() ===
-                        "BE"
-                    );
-                }
-            );
-
-        const totalProfit =
-            pnlValues.reduce(
-                function (
-                    sum,
-                    value
-                ) {
-                    return (
-                        sum +
-                        value
-                    );
-                },
-                0
-            );
-
-        const positivePnls =
-            pnlValues.filter(
-                function (value) {
-                    return value > 0;
-                }
-            );
-
-        const negativePnls =
-            pnlValues.filter(
-                function (value) {
-                    return value < 0;
-                }
-            );
-
-        const grossProfit =
-            positivePnls.reduce(
-                function (
-                    sum,
-                    value
-                ) {
-                    return (
-                        sum +
-                        value
-                    );
-                },
-                0
-            );
-
-        const grossLoss =
-            negativePnls.reduce(
-                function (
-                    sum,
-                    value
-                ) {
-                    return (
-                        sum +
-                        Math.abs(value)
-                    );
-                },
-                0
-            );
-
-        let profitFactor =
-            0;
-
-        if (
-            grossLoss > 0
-        ) {
-            profitFactor =
-                grossProfit /
-                grossLoss;
-        } else if (
-            grossProfit > 0
-        ) {
-            profitFactor =
-                Infinity;
-        }
-
-        const rrValues =
-            filteredTrades
-                .map(
-                    function (trade) {
-                        return Number(
-                            trade.rr
-                        );
-                    }
-                )
-                .filter(
-                    function (value) {
-                        return Number.isFinite(
-                            value
-                        );
-                    }
-                );
-
-        const averageRR =
-            rrValues.length > 0
-                ? rrValues.reduce(
-                      function (
-                          sum,
-                          value
-                      ) {
-                          return (
-                              sum +
-                              value
-                          );
-                      },
-                      0
-                  ) /
-                  rrValues.length
-                : 0;
-
-        const averageTrade =
-            totalTrades > 0
-                ? totalProfit /
-                  totalTrades
-                : 0;
-
-        const averageWinner =
-            positivePnls.length > 0
-                ? grossProfit /
-                  positivePnls.length
-                : 0;
-
-        const averageLoser =
-            negativePnls.length > 0
-                ? negativePnls.reduce(
-                      function (
-                          sum,
-                          value
-                      ) {
-                          return (
-                              sum +
-                              value
-                          );
-                      },
-                      0
-                  ) /
-                  negativePnls.length
-                : 0;
-
-        const bestTrade =
-            pnlValues.length > 0
-                ? Math.max(
-                      ...pnlValues
-                  )
-                : 0;
-
-        const worstTrade =
-            pnlValues.length > 0
-                ? Math.min(
-                      ...pnlValues
-                  )
-                : 0;
-
-        let currentWinStreak =
-            0;
-
-        let maxWinStreak =
-            0;
-
-        let currentLossStreak =
-            0;
-
-        let maxLossStreak =
-            0;
-
-        filteredTrades.forEach(
-            function (trade) {
-                const result =
-                    String(
-                        trade.result ||
-                            ""
-                    ).toUpperCase();
-
-                if (
-                    result ===
-                    "TP"
-                ) {
-                    currentWinStreak++;
-
-                    maxWinStreak =
-                        Math.max(
-                            maxWinStreak,
-                            currentWinStreak
-                        );
-                } else {
-                    currentWinStreak =
-                        0;
-                }
-
-                if (
-                    result ===
-                    "SL"
-                ) {
-                    currentLossStreak++;
-
-                    maxLossStreak =
-                        Math.max(
-                            maxLossStreak,
-                            currentLossStreak
-                        );
-                } else {
-                    currentLossStreak =
-                        0;
-                }
-            }
-        );
-
-        let cumulativeProfit =
-            0;
-
-        let highestPoint =
-            0;
-
-        let maxDrawdown =
-            0;
-
-        filteredTrades.forEach(
-            function (trade) {
-                cumulativeProfit +=
-                    Number(
-                        trade.pnl
-                    ) || 0;
-
-                if (
-                    cumulativeProfit >
-                    highestPoint
-                ) {
-                    highestPoint =
-                        cumulativeProfit;
-                }
-
-                const drawdown =
-                    cumulativeProfit -
-                    highestPoint;
-
-                if (
-                    drawdown <
-                    maxDrawdown
-                ) {
-                    maxDrawdown =
-                        drawdown;
-                }
-            }
-        );
-
-        return {
-            totalTrades:
-                totalTrades,
-
-            wins:
-                winners.length,
-
-            losses:
-                losers.length,
-
-            be:
-                breakevens.length,
-
-            winrate:
-                totalTrades > 0
-                    ? (
-                          winners.length /
-                          totalTrades
-                      ) *
-                      100
-                    : 0,
-
-            totalProfit:
-                totalProfit,
-
-            averageRR:
-                averageRR,
-
-            profitFactor:
-                profitFactor,
-
-            averageTrade:
-                averageTrade,
-
-            averageWinner:
-                averageWinner,
-
-            averageLoser:
-                averageLoser,
-
-            bestTrade:
-                bestTrade,
-
-            worstTrade:
-                worstTrade,
-
-            maxWinStreak:
-                maxWinStreak,
-
-            maxLossStreak:
-                maxLossStreak,
-
-            maxDrawdown:
-                maxDrawdown
-        };
-    }
-
-    function displayStats(
-        filteredTrades
-    ) {
-        const stats =
-            calculateAdvancedStats(
-                filteredTrades
-            );
-
-        function setText(
-            id,
-            value
-        ) {
-            const element =
-                document.getElementById(
-                    id
-                );
-
-            if (element) {
-                element.textContent =
-                    value;
-            }
-        }
-
-        setText(
-            "v51Trades",
-            stats.totalTrades
-        );
-
-        setText(
-            "v51Wins",
-            stats.wins
-        );
-
-        setText(
-            "v51Losses",
-            stats.losses
-        );
-
-        setText(
-            "v51BE",
-            stats.be
-        );
-
-        setText(
-            "v51Winrate",
-            stats.winrate.toFixed(
-                1
-            ) + "%"
-        );
-
-        setText(
-            "v51Profit",
-            formatMoney(
-                stats.totalProfit
-            )
-        );
-
-        setText(
-            "v51AverageRR",
-            stats.averageRR.toFixed(
-                2
-            )
-        );
-
-        setText(
-            "v51ProfitFactor",
-            Number.isFinite(
-                stats.profitFactor
-            )
-                ? stats.profitFactor.toFixed(
-                      2
-                  )
-                : "∞"
-        );
-
-        setText(
-            "v51AverageTrade",
-            formatMoney(
-                stats.averageTrade
-            )
-        );
-
-        setText(
-            "v51AverageWinner",
-            formatMoney(
-                stats.averageWinner
-            )
-        );
-
-        setText(
-            "v51AverageLoser",
-            formatMoney(
-                stats.averageLoser
-            )
-        );
-
-        setText(
-            "v51BestTrade",
-            formatMoney(
-                stats.bestTrade
-            )
-        );
-
-        setText(
-            "v51WorstTrade",
-            formatMoney(
-                stats.worstTrade
-            )
-        );
-
-        setText(
-            "v51MaxWinStreak",
-            String(
-                stats.maxWinStreak
-            )
-        );
-
-        setText(
-            "v51MaxLossStreak",
-            String(
-                stats.maxLossStreak
-            )
-        );
-
-        setText(
-            "v51MaxDrawdown",
-            formatMoney(
-                stats.maxDrawdown
-            )
-        );
-    }
-
-    /* ============================================================
-       RISQUE
-       ============================================================ */
-
-    function getTradeRisk(trade) {
-        const possibleFields = [
-            "actualRisk",
-            "riskAmount",
-            "risk",
-            "tradeRisk",
-            "riskReferenceUsed"
-        ];
-
-        for (
-            let i = 0;
-            i <
-            possibleFields.length;
-            i++
-        ) {
-            const value =
-                Number(
-                    trade[
-                        possibleFields[i]
-                    ]
-                );
-
-            if (
-                Number.isFinite(value) &&
-                value > 0
-            ) {
-                return value;
-            }
-        }
-
-        return null;
-    }
-
-    function getReferenceRisk(trade) {
-        const possibleFields = [
-            "riskReference",
-            "referenceRisk",
-            "riskTarget",
-            "plannedRisk"
-        ];
-
-        for (
-            let i = 0;
-            i <
-            possibleFields.length;
-            i++
-        ) {
-            const value =
-                Number(
-                    trade[
-                        possibleFields[i]
-                    ]
-                );
-
-            if (
-                Number.isFinite(value) &&
-                value > 0
-            ) {
-                return value;
-            }
-        }
-
-        if (
-            typeof activeCapital !==
-                "undefined" &&
-            activeCapital
-        ) {
-            const capitalFields = [
-                "riskReference",
-                "risk",
-                "riskPerTrade",
-                "riskAmount"
-            ];
-
-            for (
-                let i = 0;
-                i <
-                capitalFields.length;
-                i++
-            ) {
-                const value =
-                    Number(
-                        activeCapital[
-                            capitalFields[i]
-                        ]
-                    );
-
-                if (
-                    Number.isFinite(value) &&
-                    value > 0
-                ) {
-                    return value;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    function getTradeTargetRR(trade) {
-        const possibleFields = [
-            "targetRR",
-            "rrTarget",
-            "plannedRR",
-            "objectifRR"
-        ];
-
-        for (
-            let i = 0;
-            i <
-            possibleFields.length;
-            i++
-        ) {
-            const value =
-                Number(
-                    trade[
-                        possibleFields[i]
-                    ]
-                );
-
-            if (
-                Number.isFinite(value) &&
-                value > 0
-            ) {
-                return value;
-            }
-        }
-
-        if (
-            typeof activeCapital !==
-                "undefined" &&
-            activeCapital
-        ) {
-            const capitalFields = [
-                "targetRR",
-                "rr",
-                "rrTarget",
-                "objectiveRR"
-            ];
-
-            for (
-                let i = 0;
-                i <
-                capitalFields.length;
-                i++
-            ) {
-                const value =
-                    Number(
-                        activeCapital[
-                            capitalFields[i]
-                        ]
-                    );
-
-                if (
-                    Number.isFinite(value) &&
-                    value > 0
-                ) {
-                    return value;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    function calculateRiskStats(
-        filteredTrades
-    ) {
-        const riskRecords = [];
-
-        filteredTrades.forEach(
-            function (trade) {
-                const risk =
-                    getTradeRisk(
-                        trade
-                    );
-
-                const reference =
-                    getReferenceRisk(
-                        trade
-                    );
-
-                if (
-                    risk !== null
-                ) {
-                    riskRecords.push({
-                        risk:
-                            risk,
-
-                        reference:
-                            reference
-                    });
-                }
-            }
-        );
-
-        const risks =
-            riskRecords.map(
-                function (item) {
-                    return item.risk;
-                }
-            );
-
-        const references =
-            riskRecords
-                .map(
-                    function (item) {
-                        return item.reference;
-                    }
-                )
-                .filter(
-                    function (value) {
-                        return (
-                            value !==
-                                null &&
-                            Number.isFinite(
-                                value
-                            )
-                        );
-                    }
-                );
-
-        let referenceRisk =
-            null;
-
-        if (
-            references.length >
-            0
-        ) {
-            referenceRisk =
-                references.reduce(
-                    function (
-                        sum,
-                        value
-                    ) {
-                        return (
-                            sum +
-                            value
-                        );
-                    },
+                <strong id="statTrades">
                     0
-                ) /
-                references.length;
-        }
+                </strong>
 
-        const averageRisk =
-            risks.length >
-            0
-                ? risks.reduce(
-                      function (
-                          sum,
-                          value
-                      ) {
-                          return (
-                              sum +
-                              value
-                          );
-                      },
-                      0
-                  ) /
-                  risks.length
-                : null;
-
-        const minimumRisk =
-            risks.length >
-            0
-                ? Math.min(
-                      ...risks
-                  )
-                : null;
-
-        const maximumRisk =
-            risks.length >
-            0
-                ? Math.max(
-                      ...risks
-                  )
-                : null;
-
-        const deviations = [];
-
-        let compliantTrades =
-            0;
-
-        let nonCompliantTrades =
-            0;
-
-        riskRecords.forEach(
-            function (record) {
-                if (
-                    record.reference ===
-                        null ||
-                    !Number.isFinite(
-                        record.reference
-                    )
-                ) {
-                    return;
-                }
-
-                const deviation =
-                    (
-                        (
-                            record.risk -
-                            record.reference
-                        ) /
-                        record.reference
-                    ) *
-                    100;
-
-                deviations.push(
-                    deviation
-                );
-
-                if (
-                    Math.abs(
-                        deviation
-                    ) <=
-                    RISK_TOLERANCE *
-                        100
-                ) {
-                    compliantTrades++;
-                } else {
-                    nonCompliantTrades++;
-                }
-            }
-        );
-
-        const averageDeviation =
-            deviations.length >
-            0
-                ? deviations.reduce(
-                      function (
-                          sum,
-                          value
-                      ) {
-                          return (
-                              sum +
-                              value
-                          );
-                      },
-                      0
-                  ) /
-                  deviations.length
-                : null;
-
-        let riskRegularity =
-            null;
-
-        if (
-            averageRisk !==
-                null &&
-            averageDeviation !==
-                null
-        ) {
-            riskRegularity =
-                Math.max(
-                    0,
-                    Math.min(
-                        100,
-                        100 -
-                            Math.abs(
-                                averageDeviation
-                            )
-                    )
-                );
-        }
-
-        return {
-            averageRisk:
-                averageRisk,
-
-            minimumRisk:
-                minimumRisk,
-
-            maximumRisk:
-                maximumRisk,
-
-            referenceRisk:
-                referenceRisk,
-
-            averageDeviation:
-                averageDeviation,
-
-            riskRegularity:
-                riskRegularity,
-
-            compliantTrades:
-                compliantTrades,
-
-            nonCompliantTrades:
-                nonCompliantTrades
-        };
-    }
-
-    /* ============================================================
-       RR
-       ============================================================ */
-
-    function calculateRRStats(
-        filteredTrades
-    ) {
-        const rrValues =
-            filteredTrades
-                .map(
-                    function (trade) {
-                        return Number(
-                            trade.rr
-                        );
-                    }
-                )
-                .filter(
-                    function (value) {
-                        return Number.isFinite(
-                            value
-                        );
-                    }
-                );
-
-        const targetValues =
-            filteredTrades
-                .map(
-                    function (trade) {
-                        return getTradeTargetRR(
-                            trade
-                        );
-                    }
-                )
-                .filter(
-                    function (value) {
-                        return (
-                            value !==
-                                null &&
-                            Number.isFinite(
-                                value
-                            )
-                        );
-                    }
-                );
-
-        const averageRR =
-            rrValues.length >
-            0
-                ? rrValues.reduce(
-                      function (
-                          sum,
-                          value
-                      ) {
-                          return (
-                              sum +
-                              value
-                          );
-                      },
-                      0
-                  ) /
-                  rrValues.length
-                : null;
-
-        const targetRR =
-            targetValues.length >
-            0
-                ? targetValues.reduce(
-                      function (
-                          sum,
-                          value
-                      ) {
-                          return (
-                              sum +
-                              value
-                          );
-                      },
-                      0
-                  ) /
-                  targetValues.length
-                : null;
-
-        const minimumRR =
-            rrValues.length >
-            0
-                ? Math.min(
-                      ...rrValues
-                  )
-                : null;
-
-        const maximumRR =
-            rrValues.length >
-            0
-                ? Math.max(
-                      ...rrValues
-                  )
-                : null;
-
-        const rrAboveTwoCount =
-            rrValues.filter(
-                function (value) {
-                    return (
-                        value >= 2
-                    );
-                }
-            ).length;
-
-        const rrAboveTwo =
-            rrValues.length >
-            0
-                ? (
-                      rrAboveTwoCount /
-                      rrValues.length
-                  ) *
-                  100
-                : 0;
-
-        return {
-            averageRR:
-                averageRR,
-
-            targetRR:
-                targetRR,
-
-            minimumRR:
-                minimumRR,
-
-            maximumRR:
-                maximumRR,
-
-            rrAboveTwo:
-                rrAboveTwo
-        };
-    }
-
-    function displayRiskStats(
-        filteredTrades
-    ) {
-        const riskStats =
-            calculateRiskStats(
-                filteredTrades
-            );
-
-        const rrStats =
-            calculateRRStats(
-                filteredTrades
-            );
-
-        function setText(
-            id,
-            value
-        ) {
-            const element =
-                document.getElementById(
-                    id
-                );
-
-            if (element) {
-                element.textContent =
-                    value;
-            }
-        }
-
-        setText(
-            "v57AverageRisk",
-            riskStats.averageRisk !==
-                null
-                ? formatMoney(
-                      riskStats.averageRisk
-                  )
-                : "-"
-        );
-
-        setText(
-            "v57MinimumRisk",
-            riskStats.minimumRisk !==
-                null
-                ? formatMoney(
-                      riskStats.minimumRisk
-                  )
-                : "-"
-        );
-
-        setText(
-            "v57MaximumRisk",
-            riskStats.maximumRisk !==
-                null
-                ? formatMoney(
-                      riskStats.maximumRisk
-                  )
-                : "-"
-        );
-
-        setText(
-            "v57ReferenceRisk",
-            riskStats.referenceRisk !==
-                null
-                ? formatMoney(
-                      riskStats.referenceRisk
-                  )
-                : "-"
-        );
-
-        setText(
-            "v57AverageDeviation",
-            riskStats.averageDeviation !==
-                null
-                ? riskStats.averageDeviation.toFixed(
-                      1
-                  ) +
-                      "%"
-                : "-"
-        );
-
-        setText(
-            "v57RiskRegularity",
-            riskStats.riskRegularity !==
-                null
-                ? riskStats.riskRegularity.toFixed(
-                      1
-                  ) +
-                      "%"
-                : "-"
-        );
-
-        setText(
-            "v57CompliantTrades",
-            String(
-                riskStats.compliantTrades
-            )
-        );
-
-        setText(
-            "v57NonCompliantTrades",
-            String(
-                riskStats.nonCompliantTrades
-            )
-        );
-
-        setText(
-            "v57TargetRR",
-            rrStats.targetRR !==
-                null
-                ? rrStats.targetRR.toFixed(
-                      2
-                  )
-                : "-"
-        );
-
-        setText(
-            "v57RecordedRR",
-            rrStats.averageRR !==
-                null
-                ? rrStats.averageRR.toFixed(
-                      2
-                  )
-                : "-"
-        );
-
-        setText(
-            "v57MinimumRR",
-            rrStats.minimumRR !==
-                null
-                ? rrStats.minimumRR.toFixed(
-                      2
-                  )
-                : "-"
-        );
-
-        setText(
-            "v57MaximumRR",
-            rrStats.maximumRR !==
-                null
-                ? rrStats.maximumRR.toFixed(
-                      2
-                  )
-                : "-"
-        );
-
-        setText(
-            "v57RRAboveTwo",
-            rrStats.rrAboveTwo.toFixed(
-                1
-            ) +
-                "%"
-        );
-    }
-
-    /* ============================================================
-       SCORE CLASSEMENT
-       ============================================================ */
-
-    function calculateRankingScore(
-        stats
-    ) {
-        if (
-            !stats ||
-            stats.totalTrades ===
-                0
-        ) {
-            return -Infinity;
-        }
-
-        const profitComponent =
-            stats.totalProfit;
-
-        const winrateComponent =
-            stats.winrate;
-
-        const profitFactorComponent =
-            Number.isFinite(
-                stats.profitFactor
-            )
-                ? stats.profitFactor
-                : 10;
-
-        const rrComponent =
-            stats.averageRR;
-
-        return (
-            profitComponent *
-                0.40 +
-            winrateComponent *
-                0.30 +
-            profitFactorComponent *
-                20 +
-            rrComponent *
-                10
-        );
-    }
-
-    function getRankingGroups(
-        filteredTrades,
-        field
-    ) {
-        const groups =
-            new Map();
-
-        filteredTrades.forEach(
-            function (trade) {
-                const value =
-                    String(
-                        trade[field] ||
-                            "Non défini"
-                    );
-
-                if (
-                    !groups.has(
-                        value
-                    )
-                ) {
-                    groups.set(
-                        value,
-                        []
-                    );
-                }
-
-                groups
-                    .get(value)
-                    .push(trade);
-            }
-        );
-
-        const ranking = [];
-
-        groups.forEach(
-            function (
-                groupTrades,
-                name
-            ) {
-                const stats =
-                    calculateAdvancedStats(
-                        groupTrades
-                    );
-
-                const score =
-                    calculateRankingScore(
-                        stats
-                    );
-
-                ranking.push({
-                    name:
-                        name,
-
-                    stats:
-                        stats,
-
-                    score:
-                        score
-                });
-            }
-        );
-
-        ranking.sort(
-            function (a, b) {
-                if (
-                    b.score !==
-                    a.score
-                ) {
-                    return (
-                        b.score -
-                        a.score
-                    );
-                }
-
-                return (
-                    b.stats.totalProfit -
-                    a.stats.totalProfit
-                );
-            }
-        );
-
-        return ranking;
-    }
-
-    function rankingLabel(
-        position
-    ) {
-        if (
-            position ===
-            0
-        ) {
-            return "🥇";
-        }
-
-        if (
-            position ===
-            1
-        ) {
-            return "🥈";
-        }
-
-        if (
-            position ===
-            2
-        ) {
-            return "🥉";
-        }
-
-        return "#" +
-            (
-                position + 1
-            );
-    }
-
-    /* ============================================================
-       CLASSEMENTS
-       ============================================================ */
-
-    function renderSetupRanking(
-        filteredTrades
-    ) {
-        const tbody =
-            document.getElementById(
-                "v55SetupRankingBody"
-            );
-
-        if (!tbody) {
-            return;
-        }
-
-        tbody.innerHTML = "";
-
-        const ranking =
-            getRankingGroups(
-                filteredTrades,
-                "setup"
-            );
-
-        if (
-            ranking.length ===
-            0
-        ) {
-            tbody.innerHTML = `
-                <tr>
-                    <td
-                        colspan="8"
-                        class="empty-table"
-                    >
-                        Aucun setup à classer.
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-        ranking.forEach(
-            function (
-                item,
-                index
-            ) {
-                const stats =
-                    item.stats;
-
-                const pf =
-                    Number.isFinite(
-                        stats.profitFactor
-                    )
-                        ? stats.profitFactor.toFixed(
-                              2
-                          )
-                        : "∞";
-
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-                row.innerHTML = `
-                    <td>
-                        ${rankingLabel(
-                            index
-                        )}
-                    </td>
-
-                    <td>
-                        <strong>
-                            ${escapeValue(
-                                item.name
-                            )}
-                        </strong>
-                    </td>
-
-                    <td>
-                        ${stats.totalTrades}
-                    </td>
-
-                    <td>
-                        ${stats.winrate.toFixed(
-                            1
-                        )}%
-                    </td>
-
-                    <td>
-                        ${formatMoney(
-                            stats.totalProfit
-                        )}
-                    </td>
-
-                    <td>
-                        ${pf}
-                    </td>
-
-                    <td>
-                        ${stats.averageRR.toFixed(
-                            2
-                        )}
-                    </td>
-
-                    <td>
-                        ${
-                            Number.isFinite(
-                                item.score
-                            )
-                                ? item.score.toFixed(
-                                      2
-                                  )
-                                : "-"
-                        }
-                    </td>
-                `;
-
-                tbody.appendChild(
-                    row
-                );
-            }
-        );
-    }
-
-    function renderAssetRanking(
-        filteredTrades
-    ) {
-        const tbody =
-            document.getElementById(
-                "v55AssetRankingBody"
-            );
-
-        if (!tbody) {
-            return;
-        }
-
-        tbody.innerHTML = "";
-
-        const ranking =
-            getRankingGroups(
-                filteredTrades,
-                "asset"
-            );
-
-        if (
-            ranking.length ===
-            0
-        ) {
-            tbody.innerHTML = `
-                <tr>
-                    <td
-                        colspan="8"
-                        class="empty-table"
-                    >
-                        Aucun actif à classer.
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-        ranking.forEach(
-            function (
-                item,
-                index
-            ) {
-                const stats =
-                    item.stats;
-
-                const pf =
-                    Number.isFinite(
-                        stats.profitFactor
-                    )
-                        ? stats.profitFactor.toFixed(
-                              2
-                          )
-                        : "∞";
-
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-                row.innerHTML = `
-                    <td>
-                        ${rankingLabel(
-                            index
-                        )}
-                    </td>
-
-                    <td>
-                        <strong>
-                            ${escapeValue(
-                                item.name
-                            )}
-                        </strong>
-                    </td>
-
-                    <td>
-                        ${stats.totalTrades}
-                    </td>
-
-                    <td>
-                        ${stats.winrate.toFixed(
-                            1
-                        )}%
-                    </td>
-
-                    <td>
-                        ${formatMoney(
-                            stats.totalProfit
-                        )}
-                    </td>
-
-                    <td>
-                        ${pf}
-                    </td>
-
-                    <td>
-                        ${stats.averageRR.toFixed(
-                            2
-                        )}
-                    </td>
-
-                    <td>
-                        ${
-                            Number.isFinite(
-                                item.score
-                            )
-                                ? item.score.toFixed(
-                                      2
-                                  )
-                                : "-"
-                        }
-                    </td>
-                `;
-
-                tbody.appendChild(
-                    row
-                );
-            }
-        );
-    }
-
-    /* ============================================================
-       DETAIL SETUPS
-       ============================================================ */
-
-    function renderSetupAnalysis(
-        filteredTrades
-    ) {
-        const tbody =
-            document.getElementById(
-                "v54SetupBody"
-            );
-
-        if (!tbody) {
-            return;
-        }
-
-        tbody.innerHTML = "";
-
-        const setups =
-            new Set(
-                SETUPS
-            );
-
-        filteredTrades.forEach(
-            function (trade) {
-                if (trade.setup) {
-                    setups.add(
-                        String(
-                            trade.setup
-                        )
-                    );
-                }
-            }
-        );
-
-        let rowsAdded =
-            0;
-
-        [...setups]
-            .sort(
-                function (a, b) {
-                    return String(
-                        a
-                    ).localeCompare(
-                        String(b),
-                        "fr",
-                        {
-                            sensitivity:
-                                "base"
-                        }
-                    );
-                }
-            )
-            .forEach(
-                function (setup) {
-                    const groupTrades =
-                        filteredTrades.filter(
-                            function (trade) {
-                                return String(
-                                    trade.setup ||
-                                        ""
-                                ) ===
-                                    String(
-                                        setup
-                                    );
-                            }
-                        );
-
-                    if (
-                        groupTrades.length ===
-                        0
-                    ) {
-                        return;
-                    }
-
-                    const stats =
-                        calculateAdvancedStats(
-                            groupTrades
-                        );
-
-                    const pf =
-                        Number.isFinite(
-                            stats.profitFactor
-                        )
-                            ? stats.profitFactor.toFixed(
-                                  2
-                              )
-                            : "∞";
-
-                    const row =
-                        document.createElement(
-                            "tr"
-                        );
-
-                    row.innerHTML = `
-                        <td>
-                            ${escapeValue(
-                                setup
-                            )}
-                        </td>
-
-                        <td>
-                            ${stats.totalTrades}
-                        </td>
-
-                        <td>
-                            ${stats.wins}
-                        </td>
-
-                        <td>
-                            ${stats.losses}
-                        </td>
-
-                        <td>
-                            ${stats.be}
-                        </td>
-
-                        <td>
-                            ${stats.winrate.toFixed(
-                                1
-                            )}%
-                        </td>
-
-                        <td>
-                            ${formatMoney(
-                                stats.totalProfit
-                            )}
-                        </td>
-
-                        <td>
-                            ${stats.averageRR.toFixed(
-                                2
-                            )}
-                        </td>
-
-                        <td>
-                            ${pf}
-                        </td>
-
-                        <td>
-                            ${formatMoney(
-                                stats.bestTrade
-                            )}
-                        </td>
-
-                        <td>
-                            ${formatMoney(
-                                stats.worstTrade
-                            )}
-                        </td>
-                    `;
-
-                    tbody.appendChild(
-                        row
-                    );
-
-                    rowsAdded++;
-                }
-            );
-
-        if (
-            rowsAdded ===
-            0
-        ) {
-            tbody.innerHTML = `
-                <tr>
-                    <td
-                        colspan="11"
-                        class="empty-table"
-                    >
-                        Aucun setup correspondant aux filtres.
-                    </td>
-                </tr>
-            `;
-        }
-    }
-
-    /* ============================================================
-       DETAIL ACTIFS
-       ============================================================ */
-
-    function renderAssetAnalysis(
-        filteredTrades
-    ) {
-        const tbody =
-            document.getElementById(
-                "v54AssetBody"
-            );
-
-        if (!tbody) {
-            return;
-        }
-
-        tbody.innerHTML = "";
-
-        const assets =
-            new Set(
-                DEFAULT_ASSETS
-            );
-
-        filteredTrades.forEach(
-            function (trade) {
-                if (trade.asset) {
-                    assets.add(
-                        String(
-                            trade.asset
-                        )
-                    );
-                }
-            }
-        );
-
-        let rowsAdded =
-            0;
-
-        [...assets]
-            .sort(
-                function (a, b) {
-                    return String(
-                        a
-                    ).localeCompare(
-                        String(b),
-                        "fr",
-                        {
-                            sensitivity:
-                                "base"
-                        }
-                    );
-                }
-            )
-            .forEach(
-                function (asset) {
-                    const groupTrades =
-                        filteredTrades.filter(
-                            function (trade) {
-                                return String(
-                                    trade.asset ||
-                                        ""
-                                ) ===
-                                    String(
-                                        asset
-                                    );
-                            }
-                        );
-
-                    if (
-                        groupTrades.length ===
-                        0
-                    ) {
-                        return;
-                    }
-
-                    const stats =
-                        calculateAdvancedStats(
-                            groupTrades
-                        );
-
-                    const pf =
-                        Number.isFinite(
-                            stats.profitFactor
-                        )
-                            ? stats.profitFactor.toFixed(
-                                  2
-                              )
-                            : "∞";
-
-                    const row =
-                        document.createElement(
-                            "tr"
-                        );
-
-                    row.innerHTML = `
-                        <td>
-                            ${escapeValue(
-                                asset
-                            )}
-                        </td>
-
-                        <td>
-                            ${stats.totalTrades}
-                        </td>
-
-                        <td>
-                            ${stats.wins}
-                        </td>
-
-                        <td>
-                            ${stats.losses}
-                        </td>
-
-                        <td>
-                            ${stats.be}
-                        </td>
-
-                        <td>
-                            ${stats.winrate.toFixed(
-                                1
-                            )}%
-                        </td>
-
-                        <td>
-                            ${formatMoney(
-                                stats.totalProfit
-                            )}
-                        </td>
-
-                        <td>
-                            ${stats.averageRR.toFixed(
-                                2
-                            )}
-                        </td>
-
-                        <td>
-                            ${pf}
-                        </td>
-
-                        <td>
-                            ${formatMoney(
-                                stats.bestTrade
-                            )}
-                        </td>
-
-                        <td>
-                            ${formatMoney(
-                                stats.worstTrade
-                            )}
-                        </td>
-                    `;
-
-                    tbody.appendChild(
-                        row
-                    );
-
-                    rowsAdded++;
-                }
-            );
-
-        if (
-            rowsAdded ===
-            0
-        ) {
-            tbody.innerHTML = `
-                <tr>
-                    <td
-                        colspan="11"
-                        class="empty-table"
-                    >
-                        Aucun actif correspondant aux filtres.
-                    </td>
-                </tr>
-            `;
-        }
-    }
-
-    /* ============================================================
-       RECOMMANDATIONS
-       ============================================================ */
-
-    function calculateRecommendationScore(
-        stats
-    ) {
-        if (
-            !stats ||
-            stats.totalTrades <
-                3
-        ) {
-            return null;
-        }
-
-        let score =
-            calculateRankingScore(
-                stats
-            );
-
-        if (
-            stats.totalTrades >=
-            10
-        ) {
-            score +=
-                10;
-        }
-
-        if (
-            stats.totalTrades >=
-            20
-        ) {
-            score +=
-                10;
-        }
-
-        if (
-            stats.maxLossStreak >=
-            3
-        ) {
-            score -=
-                stats.maxLossStreak *
-                3;
-        }
-
-        return score;
-    }
-
-    function getRecommendationGroups(
-        filteredTrades,
-        field
-    ) {
-        const groups =
-            new Map();
-
-        filteredTrades.forEach(
-            function (trade) {
-                const name =
-                    String(
-                        trade[field] ||
-                            "Non défini"
-                    );
-
-                if (
-                    !groups.has(
-                        name
-                    )
-                ) {
-                    groups.set(
-                        name,
-                        []
-                    );
-                }
-
-                groups
-                    .get(name)
-                    .push(trade);
-            }
-        );
-
-        const result = [];
-
-        groups.forEach(
-            function (
-                groupTrades,
-                name
-            ) {
-                const stats =
-                    calculateAdvancedStats(
-                        groupTrades
-                    );
-
-                const score =
-                    calculateRecommendationScore(
-                        stats
-                    );
-
-                if (
-                    score === null
-                ) {
-                    return;
-                }
-
-                result.push({
-                    name:
-                        name,
-
-                    stats:
-                        stats,
-
-                    score:
-                        score
-                });
-            }
-        );
-
-        result.sort(
-            function (a, b) {
-                return (
-                    b.score -
-                    a.score
-                );
-            }
-        );
-
-        return result;
-    }
-
-    function setRecommendationText(
-        id,
-        value
-    ) {
-        const element =
-            document.getElementById(
-                id
-            );
-
-        if (element) {
-            element.textContent =
-                value;
-        }
-    }
-
-    function displayRecommendations(
-        filteredTrades
-    ) {
-        const setupGroups =
-            getRecommendationGroups(
-                filteredTrades,
-                "setup"
-            );
-
-        const assetGroups =
-            getRecommendationGroups(
-                filteredTrades,
-                "asset"
-            );
-
-        if (
-            setupGroups.length >
-            0
-        ) {
-            const best =
-                setupGroups[0];
-
-            setRecommendationText(
-                "v56BestSetup",
-                "🥇 " +
-                    best.name
-            );
-
-            setRecommendationText(
-                "v56BestSetupInfo",
-                best.stats.totalTrades +
-                    " trades • " +
-                    best.stats.winrate.toFixed(
-                        1
-                    ) +
-                    "% winrate • " +
-                    formatMoney(
-                        best.stats.totalProfit
-                    )
-            );
-        } else {
-            setRecommendationText(
-                "v56BestSetup",
-                "-"
-            );
-
-            setRecommendationText(
-                "v56BestSetupInfo",
-                "Pas assez de données (minimum 3 trades)"
-            );
-        }
-
-        if (
-            assetGroups.length >
-            0
-        ) {
-            const best =
-                assetGroups[0];
-
-            setRecommendationText(
-                "v56BestAsset",
-                "🥇 " +
-                    best.name
-            );
-
-            setRecommendationText(
-                "v56BestAssetInfo",
-                best.stats.totalTrades +
-                    " trades • " +
-                    best.stats.winrate.toFixed(
-                        1
-                    ) +
-                    "% winrate • " +
-                    formatMoney(
-                        best.stats.totalProfit
-                    )
-            );
-        } else {
-            setRecommendationText(
-                "v56BestAsset",
-                "-"
-            );
-
-            setRecommendationText(
-                "v56BestAssetInfo",
-                "Pas assez de données (minimum 3 trades)"
-            );
-        }
-
-        const avoidCandidates =
-            setupGroups
-                .slice()
-                .sort(
-                    function (a, b) {
-                        return (
-                            a.score -
-                            b.score
-                        );
-                    }
-                );
-
-        if (
-            avoidCandidates.length >
-            0
-        ) {
-            const worst =
-                avoidCandidates[0];
-
-            setRecommendationText(
-                "v56AvoidSetup",
-                "⚠️ " +
-                    worst.name
-            );
-
-            setRecommendationText(
-                "v56AvoidSetupInfo",
-                worst.stats.totalTrades +
-                    " trades • " +
-                    worst.stats.winrate.toFixed(
-                        1
-                    ) +
-                    "% winrate • " +
-                    formatMoney(
-                        worst.stats.totalProfit
-                    )
-            );
-        } else {
-            setRecommendationText(
-                "v56AvoidSetup",
-                "-"
-            );
-
-            setRecommendationText(
-                "v56AvoidSetupInfo",
-                "Pas assez de données"
-            );
-        }
-
-        const globalStats =
-            calculateAdvancedStats(
-                filteredTrades
-            );
-
-        if (
-            globalStats.totalTrades <
-            3
-        ) {
-            setRecommendationText(
-                "v56GeneralSignal",
-                "🟡 NEUTRE"
-            );
-
-            setRecommendationText(
-                "v56GeneralSignalInfo",
-                "Au moins 3 trades sont nécessaires."
-            );
-
-            return;
-        }
-
-        const hasProfit =
-            globalStats.totalProfit >
-            0;
-
-        const strongWinrate =
-            globalStats.winrate >=
-            50;
-
-        const goodProfitFactor =
-            globalStats.profitFactor >=
-            1.20;
-
-        const badProfit =
-            globalStats.totalProfit <
-            0;
-
-        const badWinrate =
-            globalStats.winrate <
-            40;
-
-        const badProfitFactor =
-            globalStats.profitFactor <
-            1;
-
-        if (
-            hasProfit &&
-            strongWinrate &&
-            goodProfitFactor
-        ) {
-            setRecommendationText(
-                "v56GeneralSignal",
-                "🟢 FAVORABLE"
-            );
-
-            setRecommendationText(
-                "v56GeneralSignalInfo",
-                "Les statistiques filtrées sont globalement positives."
-            );
-
-            return;
-        }
-
-        if (
-            badProfit &&
-            badWinrate &&
-            badProfitFactor
-        ) {
-            setRecommendationText(
-                "v56GeneralSignal",
-                "🔴 PRUDENCE"
-            );
-
-            setRecommendationText(
-                "v56GeneralSignalInfo",
-                "Les statistiques filtrées sont actuellement faibles."
-            );
-
-            return;
-        }
-
-        setRecommendationText(
-            "v56GeneralSignal",
-            "🟡 MIXTE"
-        );
-
-        setRecommendationText(
-            "v56GeneralSignalInfo",
-            "Les résultats sont mitigés : attendre davantage de données."
-        );
-    }
-
-    /* ============================================================
-       CALENDRIER V5.8
-       ============================================================ */
-
-    let calendarMonth;
-    let calendarYear;
-
-    function initializeCalendarDate() {
-        const today = new Date();
-
-        calendarMonth =
-            today.getMonth();
-
-        calendarYear =
-            today.getFullYear();
-    }
-
-    function getMonthName(
-        month
-    ) {
-        const names = [
-            "Janvier",
-            "Février",
-            "Mars",
-            "Avril",
-            "Mai",
-            "Juin",
-            "Juillet",
-            "Août",
-            "Septembre",
-            "Octobre",
-            "Novembre",
-            "Décembre"
-        ];
-
-        return (
-            names[
-                month
-            ] ||
-            ""
-        );
-    }
-
-    function getTradesForDay(
-        filteredTrades,
-        dateString
-    ) {
-        return filteredTrades.filter(
-            function (trade) {
-                return (
-                    String(
-                        trade.date || ""
-                    ) ===
-                    dateString
-                );
-            }
-        );
-    }
-
-    function getDayPnl(
-        dayTrades
-    ) {
-        return dayTrades.reduce(
-            function (
-                sum,
-                trade
-            ) {
-                return (
-                    sum +
-                    (
-                        Number(
-                            trade.pnl
-                        ) || 0
-                    )
-                );
-            },
-            0
-        );
-    }
-
-    function getDayResult(
-        dayTrades
-    ) {
-        if (
-            dayTrades.length ===
-            0
-        ) {
-            return "";
-        }
-
-        const pnl =
-            getDayPnl(
-                dayTrades
-            );
-
-        if (
-            pnl > 0
-        ) {
-            return "profit";
-        }
-
-        if (
-            pnl < 0
-        ) {
-            return "loss";
-        }
-
-        return "neutral";
-    }
-
-    function formatCalendarNumber(
-        day
-    ) {
-        return String(day).padStart(
-            2,
-            "0"
-        );
-    }
-
-    function getCalendarDateString(
-        year,
-        month,
-        day
-    ) {
-        return (
-            String(year) +
-            "-" +
-            String(
-                month + 1
-            ).padStart(
-                2,
-                "0"
-            ) +
-            "-" +
-            String(day).padStart(
-                2,
-                "0"
-            )
-        );
-    }
-
-    function renderCalendar(
-        filteredTrades
-    ) {
-        const calendar =
-            document.getElementById(
-                "v58Calendar"
-            );
-
-        const title =
-            document.getElementById(
-                "v58CalendarTitle"
-            );
-
-        if (
-            !calendar ||
-            !title
-        ) {
-            return;
-        }
-
-        title.textContent =
-            getMonthName(
-                calendarMonth
-            ) +
-            " " +
-            calendarYear;
-
-        const firstDay =
-            new Date(
-                calendarYear,
-                calendarMonth,
-                1
-            );
-
-        const lastDay =
-            new Date(
-                calendarYear,
-                calendarMonth + 1,
-                0
-            );
-
-        let startDay =
-            firstDay.getDay();
-
-        /*
-         * JavaScript :
-         * Dimanche = 0
-         *
-         * Nous voulons :
-         * Lundi = 0
-         */
-
-        startDay =
-            startDay === 0
-                ? 6
-                : startDay - 1;
-
-        const daysInMonth =
-            lastDay.getDate();
-
-        const weekdayNames = [
-            "Lun",
-            "Mar",
-            "Mer",
-            "Jeu",
-            "Ven",
-            "Sam",
-            "Dim"
-        ];
-
-        let html = `
-            <div
-                style="
-                    min-width:700px;
-                    display:grid;
-                    grid-template-columns:
-                        repeat(7,minmax(90px,1fr));
-                    gap:8px;
-                "
-            >
-        `;
-
-        weekdayNames.forEach(
-            function (name) {
-                html += `
-                    <div
-                        style="
-                            text-align:center;
-                            font-weight:700;
-                            padding:8px 4px;
-                            opacity:.75;
-                        "
-                    >
-                        ${name}
-                    </div>
-                `;
-            }
-        );
-
-        for (
-            let i = 0;
-            i < startDay;
-            i++
-        ) {
-            html += `
-                <div
-                    style="
-                        min-height:100px;
-                        border-radius:10px;
-                        opacity:.25;
-                    "
-                >
-                </div>
-            `;
-        }
-
-        for (
-            let day = 1;
-            day <= daysInMonth;
-            day++
-        ) {
-            const dateString =
-                getCalendarDateString(
-                    calendarYear,
-                    calendarMonth,
-                    day
-                );
-
-            const dayTrades =
-                getTradesForDay(
-                    filteredTrades,
-                    dateString
-                );
-
-            const dayPnl =
-                getDayPnl(
-                    dayTrades
-                );
-
-            const result =
-                getDayResult(
-                    dayTrades
-                );
-
-            const tpCount =
-                dayTrades.filter(
-                    function (trade) {
-                        return (
-                            String(
-                                trade.result ||
-                                    ""
-                            ).toUpperCase() ===
-                            "TP"
-                        );
-                    }
-                ).length;
-
-            const slCount =
-                dayTrades.filter(
-                    function (trade) {
-                        return (
-                            String(
-                                trade.result ||
-                                    ""
-                            ).toUpperCase() ===
-                            "SL"
-                        );
-                    }
-                ).length;
-
-            const beCount =
-                dayTrades.filter(
-                    function (trade) {
-                        return (
-                            String(
-                                trade.result ||
-                                    ""
-                            ).toUpperCase() ===
-                            "BE"
-                        );
-                    }
-                ).length;
-
-            let background =
-                "rgba(255,255,255,0.04)";
-
-            let border =
-                "rgba(255,255,255,0.12)";
-
-            if (
-                result ===
-                "profit"
-            ) {
-                background =
-                    "rgba(34,197,94,0.12)";
-
-                border =
-                    "rgba(34,197,94,0.35)";
-            }
-
-            if (
-                result ===
-                "loss"
-            ) {
-                background =
-                    "rgba(239,68,68,0.12)";
-
-                border =
-                    "rgba(239,68,68,0.35)";
-            }
-
-            if (
-                result ===
-                "neutral"
-            ) {
-                background =
-                    "rgba(148,163,184,0.10)";
-
-                border =
-                    "rgba(148,163,184,0.30)";
-            }
-
-            const pnlText =
-                dayTrades.length >
-                0
-                    ? formatMoney(
-                          dayPnl
-                      )
-                    : "";
-
-            const details =
-                dayTrades.length >
-                0
-                    ? (
-                          dayTrades.length +
-                          " trade" +
-                          (
-                              dayTrades.length >
-                              1
-                                  ? "s"
-                                  : ""
-                          ) +
-                          " • TP " +
-                          tpCount +
-                          " • SL " +
-                          slCount +
-                          " • BE " +
-                          beCount
-                      )
-                    : "";
-
-            html += `
-                <div
-                    style="
-                        min-height:100px;
-                        padding:10px;
-                        border-radius:10px;
-                        border:1px solid ${border};
-                        background:${background};
-                        box-sizing:border-box;
-                    "
-                    title="${escapeValue(
-                        dateString +
-                        (
-                            details
-                                ? " — " +
-                                  details
-                                : ""
-                        )
-                    )}"
-                >
-
-                    <div
-                        style="
-                            display:flex;
-                            justify-content:space-between;
-                            align-items:center;
-                            margin-bottom:8px;
-                        "
-                    >
-
-                        <strong>
-                            ${day}
-                        </strong>
-
-                        ${
-                            dayTrades.length >
-                            0
-                                ? `<span
-                                    style="
-                                        font-size:12px;
-                                        opacity:.75;
-                                    "
-                                  >
-                                    ${
-                                        dayTrades.length
-                                    }
-                                  </span>`
-                                : ""
-                        }
-
-                    </div>
-
-                    ${
-                        dayTrades.length >
-                        0
-                            ? `
-                                <div
-                                    style="
-                                        font-size:15px;
-                                        font-weight:700;
-                                        margin-bottom:6px;
-                                    "
-                                >
-                                    ${pnlText}
-                                </div>
-
-                                <div
-                                    style="
-                                        font-size:11px;
-                                        line-height:1.4;
-                                        opacity:.75;
-                                    "
-                                >
-                                    ${details}
-                                </div>
-                            `
-                            : `
-                                <div
-                                    style="
-                                        font-size:11px;
-                                        opacity:.35;
-                                    "
-                                >
-                                    Aucun trade
-                                </div>
-                            `
-                    }
-
-                </div>
-            `;
-        }
-
-        html += `
             </div>
-        `;
 
-        calendar.innerHTML =
-            html;
-    }
 
-    function goToPreviousMonth() {
-        calendarMonth--;
+            <div class="stat-box">
 
-        if (
-            calendarMonth <
-            0
-        ) {
-            calendarMonth =
-                11;
+                <span>
+                    Meilleur setup
+                </span>
 
-            calendarYear--;
-        }
+                <strong id="statBestSetup">
+                    -
+                </strong>
 
-        renderCalendar(
-            getFilteredTrades()
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================
+         AJOUT TRADE
+         ======================================================== -->
+
+    <section
+        id="dashboardTradeCard"
+        class="card trade-launcher-card"
+    >
+
+        <button
+            id="openTradeModalBtn"
+            class="trade-launcher"
+            type="button"
+        >
+
+            ➕ Ajouter un trade
+
+            <small>
+                Ouvrir le formulaire d'enregistrement
+            </small>
+
+        </button>
+
+    </section>
+
+
+    <!-- ========================================================
+         PERFORMANCE DES SETUPS
+         ======================================================== -->
+
+    <section
+        id="setupPerformanceCard"
+        class="card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    🎯 Performance des setups
+                </h2>
+
+                <p>
+                    Résultats par stratégie
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Setup
+                        </th>
+
+                        <th>
+                            Trades
+                        </th>
+
+                        <th>
+                            Gagnants
+                        </th>
+
+                        <th>
+                            Winrate
+                        </th>
+
+                        <th>
+                            Profit
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="setupTableBody"
+                ></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================
+         PERFORMANCE PAR ACTIF
+         ======================================================== -->
+
+    <section
+        id="assetPerformanceCard"
+        class="card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    📈 Performance par actif
+                </h2>
+
+                <p>
+                    Résultats détaillés pour chaque actif.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Actif
+                        </th>
+
+                        <th>
+                            Trades
+                        </th>
+
+                        <th>
+                            Gagnants
+                        </th>
+
+                        <th>
+                            Perdants
+                        </th>
+
+                        <th>
+                            BE
+                        </th>
+
+                        <th>
+                            Winrate
+                        </th>
+
+                        <th>
+                            Profit
+                        </th>
+
+                        <th>
+                            RR moyen
+                        </th>
+
+                        <th>
+                            Meilleur
+                        </th>
+
+                        <th>
+                            Pire
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="assetTableBody"
+                ></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================
+         HISTORIQUE DES TRADES
+         ======================================================== -->
+
+    <section
+        id="historyCard"
+        class="card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    📜 Historique des trades
+                </h2>
+
+                <p>
+                    Tous les trades du capital actif
+                </p>
+
+            </div>
+
+
+            <button
+                id="clearBtn"
+                class="danger-btn"
+            >
+                Effacer les trades
+            </button>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Actif
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Lot
+                        </th>
+
+                        <th>
+                            Entry
+                        </th>
+
+                        <th>
+                            SL
+                        </th>
+
+                        <th>
+                            TP
+                        </th>
+
+                        <th>
+                            RR
+                        </th>
+
+                        <th>
+                            Setup
+                        </th>
+
+                        <th>
+                            Résultat
+                        </th>
+
+                        <th>
+                            P/L
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="historyBody"
+                ></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================
+         ARCHIVES
+         ======================================================== -->
+
+    <section
+        id="archivesCard"
+        class="card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    🗄️ Archives des capitaux
+                </h2>
+
+                <p>
+                    Historique indépendant de chaque capital
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="archivesList"
+            class="archives-list"
+        ></div>
+
+    </section>
+
+</main>
+
+
+<!-- ============================================================
+     MODAL AJOUT TRADE
+     ============================================================ -->
+
+<div
+    id="tradeModal"
+    class="modal trade-modal"
+>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2>
+                    ➕ Ajouter un trade
+                </h2>
+
+                <p>
+                    Enregistrez votre trade manuellement
+                </p>
+
+            </div>
+
+
+            <button
+                id="closeTradeModalBtn"
+                class="close-btn"
+                type="button"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <form id="tradeForm">
+
+
+                <div class="form-grid">
+
+
+                    <!-- ACTIF -->
+
+                    <div>
+
+                        <label for="asset">
+                            Actif
+                        </label>
+
+                        <input
+                            type="text"
+                            id="asset"
+                            placeholder="XAUUSD"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- DATE -->
+
+                    <div>
+
+                        <label for="date">
+                            Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="date"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- POSITION -->
+
+                    <div>
+
+                        <label for="direction">
+                            Position
+                        </label>
+
+                        <select
+                            id="direction"
+                            required
+                        >
+
+                            <option value="BUY">
+                                Buy
+                            </option>
+
+                            <option value="SELL">
+                                Sell
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- TYPE ORDRE -->
+
+                    <div>
+
+                        <label for="orderType">
+                            Type d'ordre
+                        </label>
+
+                        <select
+                            id="orderType"
+                            required
+                        >
+
+                            <option value="Market">
+                                Immediat
+                            </option>
+
+                            <option value="Buy Limit">
+                                Buy Limit
+                            </option>
+
+                            <option value="Sell Limit">
+                                Sell Limit
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- LOT -->
+
+                    <div>
+
+                        <label for="lot">
+                            Lot
+                        </label>
+
+                        <input
+                            type="number"
+                            id="lot"
+                            step="0.01"
+                            min="0.01"
+                            placeholder="0.01"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- ENTRY -->
+
+                    <div>
+
+                        <label for="entry">
+                            Entry
+                        </label>
+
+                        <input
+                            type="number"
+                            id="entry"
+                            step="any"
+                            placeholder="4450.00"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- SL -->
+
+                    <div>
+
+                        <label for="sl">
+                            Stop Loss
+                        </label>
+
+                        <input
+                            type="number"
+                            id="sl"
+                            step="any"
+                            placeholder="4445.00"
+                        >
+
+                    </div>
+
+
+                    <!-- TP -->
+
+                    <div>
+
+                        <label for="tp">
+                            Take Profit
+                        </label>
+
+                        <input
+                            type="number"
+                            id="tp"
+                            step="any"
+                            placeholder="4460.00"
+                        >
+
+                    </div>
+
+
+                    <!-- RR -->
+
+                    <div>
+
+                        <label for="calculatedRR">
+                            RR
+                        </label>
+
+                        <input
+                            type="text"
+                            id="calculatedRR"
+                            value="0.00"
+                            readonly
+                        >
+
+                    </div>
+
+
+                    <!-- RESULTAT -->
+
+                    <div>
+
+                        <label for="result">
+                            Résultat
+                        </label>
+
+                        <select
+                            id="result"
+                            required
+                        >
+
+                            <option value="TP">
+                                TP
+                            </option>
+
+                            <option value="SL">
+                                SL
+                            </option>
+
+                            <option value="BE">
+                                BE
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- SETUP -->
+
+                    <div>
+
+                        <label for="setup">
+                            Setup
+                        </label>
+
+                        <select
+                            id="setup"
+                            required
+                        >
+
+                            <option value="LDP+QML">
+                                LDP+QML
+                            </option>
+
+                            <option value="LDP+FIBO 50">
+                                LDP+FIBO 50
+                            </option>
+
+                            <option value="OB">
+                                OB
+                            </option>
+
+                            <option value="BB">
+                                BB
+                            </option>
+
+                            <option value="ZS OA">
+                                ZS OA
+                            </option>
+
+                            <option value="SSM1">
+                                SSM1
+                            </option>
+
+                            <option value="SSM2">
+                                SSM2
+                            </option>
+
+                            <option value="SSM3">
+                                SSM3
+                            </option>
+
+                            <option value="SBM1">
+                                SBM1
+                            </option>
+
+                            <option value="SBM2">
+                                SBM2
+                            </option>
+
+                            <option value="SBM3">
+                                SBM3
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- P/L -->
+
+                    <div>
+
+                        <label for="profit">
+                            P/L réel du trade
+                        </label>
+
+                        <input
+                            type="number"
+                            id="profit"
+                            step="any"
+                            placeholder="20 ou -10"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- INFORMATIONS MONEY MANAGEMENT -->
+
+                <div
+                    id="tradeMMInfo"
+                    class="form-full"
+                    aria-live="polite"
+                ></div>
+
+
+                <!-- BE -->
+
+                <div
+                    id="beProfitGroup"
+                    class="form-full"
+                    style="display:none;"
+                >
+
+                    <label for="beProfit">
+                        P/L réel du BE (manuel)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="beProfit"
+                        step="any"
+                        placeholder="Exemple : -0.20"
+                    >
+
+                </div>
+
+
+                <!-- COMMENTAIRE -->
+
+                <div class="form-full">
+
+                    <label for="comment">
+                        Commentaire
+                    </label>
+
+                    <textarea
+                        id="comment"
+                        rows="3"
+                        placeholder="Commentaire sur le trade..."
+                    ></textarea>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        Enregistrer le trade
+                    </button>
+
+
+                    <button
+                        id="cancelTradeModalBtn"
+                        type="button"
+                        class="secondary-btn"
+                    >
+                        Annuler
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     MODAL NOUVEAU / MODIFIER CAPITAL
+     ============================================================ -->
+
+<div
+    id="capitalModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="capitalModalTitle">
+                    Nouveau capital
+                </h2>
+
+                <p>
+                    Créer ou modifier un capital
+                </p>
+
+            </div>
+
+
+            <button
+                id="cancelCapitalBtn"
+                class="close-btn"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+
+            <!-- NOM CAPITAL -->
+
+            <div>
+
+                <label for="capitalNameInput">
+                    Nom du capital
+                </label>
+
+                <input
+                    type="text"
+                    id="capitalNameInput"
+                    placeholder="Capital 1"
+                >
+
+            </div>
+
+
+            <!-- CAPITAL INITIAL -->
+
+            <div>
+
+                <label for="capitalAmountInput">
+                    Capital initial
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="capitalAmountInput"
+                    placeholder="100"
+                >
+
+            </div>
+
+
+            <!-- RISQUE -->
+
+            <div>
+
+                <label for="capitalRiskInput">
+                    Risque de référence / trade ($)
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="capitalRiskInput"
+                    placeholder="1"
+                >
+
+                <small
+                    id="capitalAmountHelp"
+                    style="
+                        display:block;
+                        margin-top:6px;
+                        opacity:.7;
+                    "
+                ></small>
+
+            </div>
+
+
+            <!-- RR -->
+
+            <div>
+
+                <label for="capitalRRInput">
+                    RR cible
+                </label>
+
+                <input
+                    type="number"
+                    step="0.10"
+                    min="2"
+                    id="capitalRRInput"
+                    placeholder="2.00"
+                >
+
+                <small
+                    style="
+                        display:block;
+                        margin-top:6px;
+                        opacity:.7;
+                    "
+                >
+                    Minimum autorisé : 2.00
+                </small>
+
+            </div>
+
+
+            <!-- PREVISUALISATION -->
+
+            <div class="form-full">
+
+                <div
+                    id="capitalModalRiskPreview"
+                    style="margin-bottom:6px;"
+                ></div>
+
+
+                <div
+                    id="capitalModalRR"
+                    style="margin-bottom:6px;"
+                ></div>
+
+
+                <strong
+                    id="capitalModalObjective"
+                ></strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+
+            <button
+                id="cancelCapitalBtn2"
+                class="secondary-btn"
+            >
+                Annuler
+            </button>
+
+
+            <button
+                id="saveCapitalBtn"
+                class="primary-btn"
+            >
+                Enregistrer
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     MODAL GRAPHIQUE ARCHIVE
+     ============================================================ -->
+
+<div
+    id="archiveChartModal"
+    class="modal"
+>
+
+    <div
+        class="modal-content archive-chart-modal-content"
+    >
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="archiveChartTitle">
+                    Graphique du capital
+                </h2>
+
+                <p id="archiveChartSubtitle">
+                    Évolution du capital archivé
+                </p>
+
+            </div>
+
+
+            <button
+                id="closeArchiveChartBtn"
+                class="close-btn"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <!-- INFOS ARCHIVE -->
+
+        <div class="archive-chart-info">
+
+
+            <div>
+
+                <span>
+                    Capital initial
+                </span>
+
+                <strong id="archiveChartInitial">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Capital final
+                </span>
+
+                <strong id="archiveChartFinal">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Profit total
+                </span>
+
+                <strong id="archiveChartProfit">
+                    $0.00
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- GRAPHIQUE -->
+
+        <div
+            class="chart-container archive-chart-container"
+        >
+
+            <canvas
+                id="archiveChart"
+            ></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     JAVASCRIPT PRINCIPAL
+     ============================================================ -->
+
+<script src="app.js"></script>
+
+<script src="v51-filters.js"></script>
+
+
+<!-- ============================================================
+     ROUTAGE / NAVIGATION DES PAGES
+     ============================================================ -->
+
+<script>
+
+(function () {
+
+    /* ========================================================
+       PAGES AUTORISÉES
+       ======================================================== */
+
+    const allowedPages = [
+        "dashboard",
+        "analysis",
+        "performance",
+        "archives"
+    ];
+
+
+    /* ========================================================
+       LECTURE URL
+       ======================================================== */
+
+    const params =
+        new URLSearchParams(
+            window.location.search
         );
-    }
 
-    function goToNextMonth() {
-        calendarMonth++;
 
-        if (
-            calendarMonth >
-            11
-        ) {
-            calendarMonth =
-                0;
+    const requested =
+        params.get("page");
 
-            calendarYear++;
-        }
 
-        renderCalendar(
-            getFilteredTrades()
-        );
-    }
+    const page =
+        allowedPages.includes(requested)
+            ? requested
+            : "dashboard";
 
-    /* ============================================================
-       GRAPHIQUE
-       ============================================================ */
 
-    function drawChart(
-        filteredTrades
-    ) {
-        const canvas =
-            document.getElementById(
-                "v51PerformanceChart"
+    /* ========================================================
+       APPLIQUER PAGE AU BODY
+       ======================================================== */
+
+    document.body.dataset.page = page;
+
+
+    /* ========================================================
+       NAVIGATION ACTIVE
+       ======================================================== */
+
+    document
+        .querySelectorAll("[data-page-link]")
+        .forEach(link => {
+
+            link.classList.toggle(
+                "active",
+                link.dataset.pageLink === page
             );
 
-        const emptyMessage =
+        });
+
+
+    /* ========================================================
+       OUVRIR MODALE TRADE
+       ======================================================== */
+
+    function openTradeModal() {
+
+        const modal =
             document.getElementById(
-                "v51EmptyChart"
+                "tradeModal"
             );
 
-        const container =
-            document.getElementById(
-                "v51ChartContainer"
-            );
 
-        if (
-            !canvas ||
-            !emptyMessage ||
-            !container
-        ) {
+        if (!modal) {
             return;
         }
 
-        if (
-            !chartResizeAttached
-        ) {
-            chartResizeAttached =
-                true;
 
-            window.addEventListener(
-                "resize",
-                function () {
-                    drawChart(
-                        getFilteredTrades()
-                    );
-                }
+        modal.classList.add("open");
+
+        modal.style.display = "flex";
+
+        document.body.classList.add(
+            "modal-open"
+        );
+
+    }
+
+
+    /* ========================================================
+       FERMER MODALE TRADE
+       ======================================================== */
+
+    function closeTradeModal() {
+
+        const modal =
+            document.getElementById(
+                "tradeModal"
             );
-        }
 
-        const ctx =
-            canvas.getContext(
-                "2d"
-            );
 
-        if (!ctx) {
+        if (!modal) {
             return;
         }
 
-        if (
-            filteredTrades.length ===
-            0
-        ) {
-            canvas.style.display =
-                "none";
 
-            emptyMessage.style.display =
-                "flex";
+        modal.classList.remove("open");
 
-            return;
-        }
+        modal.style.display = "none";
 
-        canvas.style.display =
-            "block";
-
-        emptyMessage.style.display =
-            "none";
-
-        const width =
-            container.clientWidth ||
-            600;
-
-        const height =
-            320;
-
-        const ratio =
-            window.devicePixelRatio ||
-            1;
-
-        canvas.width =
-            Math.max(
-                1,
-                Math.floor(
-                    width *
-                        ratio
-                )
-            );
-
-        canvas.height =
-            Math.max(
-                1,
-                Math.floor(
-                    height *
-                        ratio
-                )
-            );
-
-        canvas.style.width =
-            width + "px";
-
-        canvas.style.height =
-            height + "px";
-
-        ctx.setTransform(
-            ratio,
-            0,
-            0,
-            ratio,
-            0,
-            0
+        document.body.classList.remove(
+            "modal-open"
         );
 
-        ctx.clearRect(
-            0,
-            0,
-            width,
-            height
-        );
-
-        const values =
-            [0];
-
-        let cumulative =
-            0;
-
-        filteredTrades.forEach(
-            function (trade) {
-                cumulative +=
-                    Number(
-                        trade.pnl
-                    ) || 0;
-
-                values.push(
-                    cumulative
-                );
-            }
-        );
-
-        let minValue =
-            Math.min(
-                ...values
-            );
-
-        let maxValue =
-            Math.max(
-                ...values
-            );
-
-        if (
-            minValue ===
-            maxValue
-        ) {
-            minValue -=
-                1;
-
-            maxValue +=
-                1;
-        }
-
-        const paddingLeft =
-            65;
-
-        const paddingRight =
-            20;
-
-        const paddingTop =
-            20;
-
-        const paddingBottom =
-            42;
-
-        const chartWidth =
-            width -
-            paddingLeft -
-            paddingRight;
-
-        const chartHeight =
-            height -
-            paddingTop -
-            paddingBottom;
-
-        const range =
-            maxValue -
-            minValue;
-
-        function getX(
-            index
-        ) {
-            if (
-                filteredTrades.length ===
-                0
-            ) {
-                return paddingLeft;
-            }
-
-            return (
-                paddingLeft +
-                (
-                    index /
-                    filteredTrades.length
-                ) *
-                    chartWidth
-            );
-        }
-
-        function getY(
-            value
-        ) {
-            return (
-                paddingTop +
-                (
-                    maxValue -
-                    value
-                ) /
-                    range *
-                    chartHeight
-            );
-        }
-
-        ctx.font =
-            "12px sans-serif";
-
-        ctx.lineWidth =
-            1;
-
-        for (
-            let i = 0;
-            i <= 5;
-            i++
-        ) {
-            const value =
-                minValue +
-                (
-                    (
-                        maxValue -
-                        minValue
-                    ) *
-                    i
-                ) /
-                    5;
-
-            const y =
-                getY(
-                    value
-                );
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                paddingLeft,
-                y
-            );
-
-            ctx.lineTo(
-                width -
-                    paddingRight,
-                y
-            );
-
-            ctx.strokeStyle =
-                "rgba(255,255,255,0.15)";
-
-            ctx.stroke();
-
-            ctx.fillStyle =
-                "rgba(255,255,255,0.75)";
-
-            ctx.fillText(
-                value.toFixed(
-                    2
-                ),
-                8,
-                y + 4
-            );
-        }
-
-        if (
-            minValue <= 0 &&
-            maxValue >= 0
-        ) {
-            const zeroY =
-                getY(0);
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                paddingLeft,
-                zeroY
-            );
-
-            ctx.lineTo(
-                width -
-                    paddingRight,
-                zeroY
-            );
-
-            ctx.strokeStyle =
-                "rgba(255,255,255,0.35)";
-
-            ctx.lineWidth =
-                1.5;
-
-            ctx.stroke();
-        }
-
-        for (
-            let i = 0;
-            i <
-            values.length - 1;
-            i++
-        ) {
-            const x1 =
-                getX(i);
-
-            const y1 =
-                getY(
-                    values[i]
-                );
-
-            const x2 =
-                getX(
-                    i + 1
-                );
-
-            const y2 =
-                getY(
-                    values[i + 1]
-                );
-
-            const difference =
-                values[i + 1] -
-                values[i];
-
-            let lineColor =
-                "rgb(148,163,184)";
-
-            if (
-                difference >
-                0
-            ) {
-                lineColor =
-                    "rgb(34,197,94)";
-            }
-
-            if (
-                difference <
-                0
-            ) {
-                lineColor =
-                    "rgb(239,68,68)";
-            }
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                x1,
-                y1
-            );
-
-            ctx.lineTo(
-                x2,
-                y2
-            );
-
-            ctx.strokeStyle =
-                lineColor;
-
-            ctx.lineWidth =
-                3;
-
-            ctx.stroke();
-        }
-
-        for (
-            let i = 1;
-            i <
-            values.length;
-            i++
-        ) {
-            const value =
-                values[i];
-
-            const previous =
-                values[i - 1];
-
-            let pointColor =
-                "rgb(148,163,184)";
-
-            if (
-                value >
-                previous
-            ) {
-                pointColor =
-                    "rgb(34,197,94)";
-            }
-
-            if (
-                value <
-                previous
-            ) {
-                pointColor =
-                    "rgb(239,68,68)";
-            }
-
-            ctx.beginPath();
-
-            ctx.arc(
-                getX(i),
-                getY(value),
-                3.5,
-                0,
-                Math.PI * 2
-            );
-
-            ctx.fillStyle =
-                pointColor;
-
-            ctx.fill();
-        }
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            paddingLeft,
-            height -
-                paddingBottom
-        );
-
-        ctx.lineTo(
-            width -
-                paddingRight,
-            height -
-                paddingBottom
-        );
-
-        ctx.strokeStyle =
-            "rgba(255,255,255,0.18)";
-
-        ctx.lineWidth =
-            1;
-
-        ctx.stroke();
-
-        ctx.fillStyle =
-            "rgba(255,255,255,0.75)";
-
-        ctx.font =
-            "12px sans-serif";
-
-        ctx.fillText(
-            "Trades filtrés",
-            width -
-                paddingRight -
-                85,
-            height -
-                12
-        );
     }
 
-    /* ============================================================
-       REFRESH
-       ============================================================ */
 
-    function refreshV58() {
-        try {
-            createFilterSection();
+    /* ========================================================
+       BOUTONS MODALE TRADE
+       ======================================================== */
 
-            populateFilters();
+    document.addEventListener(
+        "click",
+        function (event) {
 
-            const filteredTrades =
-                getFilteredTrades();
-
-            displayRecommendations(
-                filteredTrades
-            );
-
-            displayStats(
-                filteredTrades
-            );
-
-            displayRiskStats(
-                filteredTrades
-            );
-
-            renderSetupRanking(
-                filteredTrades
-            );
-
-            renderAssetRanking(
-                filteredTrades
-            );
-
-            renderSetupAnalysis(
-                filteredTrades
-            );
-
-            renderAssetAnalysis(
-                filteredTrades
-            );
-
-            renderCalendar(
-                filteredTrades
-            );
-
-            drawChart(
-                filteredTrades
-            );
-
-        } catch (error) {
-            console.error(
-                "Erreur V5.8 :",
-                error
-            );
-        }
-    }
-
-    /* ============================================================
-       EVENEMENTS
-       ============================================================ */
-
-    function attachEvents() {
-        const periodSelect =
-            document.getElementById(
-                "v51PeriodFilter"
-            );
-
-        const assetSelect =
-            document.getElementById(
-                "v51AssetFilter"
-            );
-
-        const setupSelect =
-            document.getElementById(
-                "v51SetupFilter"
-            );
-
-        const previousMonth =
-            document.getElementById(
-                "v58PreviousMonth"
-            );
-
-        const nextMonth =
-            document.getElementById(
-                "v58NextMonth"
-            );
-
-        if (periodSelect) {
-            periodSelect.addEventListener(
-                "change",
-                function () {
-                    refreshV58();
-                }
-            );
-        }
-
-        if (assetSelect) {
-            assetSelect.addEventListener(
-                "change",
-                function () {
-                    refreshV58();
-                }
-            );
-        }
-
-        if (setupSelect) {
-            setupSelect.addEventListener(
-                "change",
-                function () {
-                    refreshV58();
-                }
-            );
-        }
-
-        if (previousMonth) {
-            previousMonth.addEventListener(
-                "click",
-                function () {
-                    goToPreviousMonth();
-                }
-            );
-        }
-
-        if (nextMonth) {
-            nextMonth.addEventListener(
-                "click",
-                function () {
-                    goToNextMonth();
-                }
-            );
-        }
-    }
-
-    /* ============================================================
-       INITIALISATION
-       ============================================================ */
-
-    function initV58() {
-        initializeCalendarDate();
-
-        createFilterSection();
-
-        populateFilters();
-
-        attachEvents();
-
-        refreshV58();
-    }
-
-    /* ============================================================
-       VARIABLES PUBLIQUES
-       ============================================================ */
-
-    window.refreshV51 =
-        refreshV58;
-
-    window.getV51FilteredTrades =
-        getFilteredTrades;
-
-    window.calculateV51Stats =
-        calculateAdvancedStats;
-
-    window.calculateV55RankingScore =
-        calculateRankingScore;
-
-    window.calculateV56RecommendationScore =
-        calculateRecommendationScore;
-
-    window.calculateV57RiskStats =
-        calculateRiskStats;
-
-    window.calculateV57RRStats =
-        calculateRRStats;
-
-    window.renderV58Calendar =
-        renderCalendar;
-
-    /* ============================================================
-       LANCEMENT
-       ============================================================ */
-
-    if (
-        document.readyState ===
-        "loading"
-    ) {
-        document.addEventListener(
-            "DOMContentLoaded",
-            function () {
-                setTimeout(
-                    initV58,
-                    500
+            const target =
+                event.target.closest(
+                    "#openTradeModalBtn, #closeTradeModalBtn, #cancelTradeModalBtn"
                 );
+
+
+            if (!target) {
+                return;
             }
-        );
-    } else {
-        setTimeout(
-            initV58,
-            500
-        );
-    }
 
-    /* ============================================================
-       ACTUALISATION AUTOMATIQUE
-       ============================================================ */
 
-    setInterval(
-        refreshV58,
-        1000
+            if (
+                target.id ===
+                "openTradeModalBtn"
+            ) {
+
+                openTradeModal();
+
+            } else {
+
+                closeTradeModal();
+
+            }
+
+        }
     );
 
+
+    /* ========================================================
+       CLIQUER A L'EXTÉRIEUR DE LA MODALE
+       ======================================================== */
+
+    const tradeModal =
+        document.getElementById(
+            "tradeModal"
+        );
+
+
+    if (tradeModal) {
+
+        tradeModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    tradeModal
+                ) {
+
+                    closeTradeModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* ========================================================
+       TOUCHE ESC
+       ======================================================== */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Escape"
+            ) {
+
+                closeTradeModal();
+
+            }
+
+        }
+    );
+
+
+    /* ========================================================
+       FERMETURE APRES ENREGISTREMENT
+       ======================================================== */
+
+    const tradeForm =
+        document.getElementById(
+            "tradeForm"
+        );
+
+
+    if (tradeForm) {
+
+        tradeForm.addEventListener(
+            "submit",
+            function () {
+
+                setTimeout(
+                    closeTradeModal,
+                    50
+                );
+
+            },
+            true
+        );
+
+    }
+
 })();
+
+</script>
+
+
+</body>
+</html>
