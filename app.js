@@ -1,3 +1,4 @@
+```javascript
 const TRADES_KEY = "tradingTrades";
 const CAPITAL_KEY = "tradingActiveCapital";
 const ARCHIVES_KEY = "tradingCapitalArchives";
@@ -335,6 +336,100 @@ function calculateCapitalRR(
 
 
 // ============================================================
+// P/L AUTOMATIQUE
+// ============================================================
+
+function calculateAutomaticPnL(
+    result
+) {
+
+    const risk =
+        getCapitalRisk();
+
+    const objective =
+        getCapitalObjective();
+
+
+    if (
+        risk <= 0 ||
+        objective <= 0
+    ) {
+        return null;
+    }
+
+
+    if (result === "TP") {
+
+        return objective;
+    }
+
+
+    if (result === "SL") {
+
+        return -risk;
+    }
+
+
+    if (result === "BE") {
+
+        return 0;
+    }
+
+
+    return null;
+}
+
+
+function updateAutomaticPnL() {
+
+    const resultElement =
+        document.getElementById(
+            "result"
+        );
+
+    const profitElement =
+        document.getElementById(
+            "profit"
+        );
+
+    if (
+        !resultElement ||
+        !profitElement
+    ) {
+        return;
+    }
+
+
+    const result =
+        resultElement.value;
+
+
+    const pnl =
+        calculateAutomaticPnL(
+            result
+        );
+
+
+    if (
+        pnl === null
+    ) {
+
+        profitElement.value = "";
+
+        return;
+    }
+
+
+    profitElement.value =
+        pnl.toFixed(2);
+
+
+    // Le P/L est calculé automatiquement.
+    profitElement.readOnly = true;
+}
+
+
+// ============================================================
 // VALEUR DU PIP SELON L'ACTIF
 // ============================================================
 
@@ -364,11 +459,6 @@ function getPipValuePerLotUSD(
 
 
     // USD/CAD et USD/CHF
-    // 1 lot = 100000 unités de devise de base
-    // 1 pip = 0.0001
-    // Valeur = 10 unités de devise quote
-    // Conversion approximate en USD :
-    // 10 / prix
     if (
         spec.type === "forexQuoteConversion"
     ) {
@@ -385,11 +475,6 @@ function getPipValuePerLotUSD(
 
 
     // USD/JPY
-    // 1 lot = 100000 USD
-    // 1 pip = 0.01 JPY
-    // = 1000 JPY
-    // Conversion approximative en USD :
-    // 1000 / prix
     if (
         spec.type === "jpy"
     ) {
@@ -403,6 +488,7 @@ function getPipValuePerLotUSD(
 
         return 1000 / entry;
     }
+
 
     return null;
 }
@@ -443,10 +529,7 @@ function calculateRawLot(
     let lot = 0;
 
 
-    // --------------------------------------------------------
     // FOREX
-    // --------------------------------------------------------
-
     if (
         spec.type === "forex"
     ) {
@@ -464,10 +547,7 @@ function calculateRawLot(
     }
 
 
-    // --------------------------------------------------------
-    // USD/CAD et USD/CHF
-    // --------------------------------------------------------
-
+    // USD/CAD / USD/CHF
     else if (
         spec.type === "forexQuoteConversion"
     ) {
@@ -500,10 +580,7 @@ function calculateRawLot(
     }
 
 
-    // --------------------------------------------------------
     // USD/JPY
-    // --------------------------------------------------------
-
     else if (
         spec.type === "jpy"
     ) {
@@ -536,11 +613,7 @@ function calculateRawLot(
     }
 
 
-    // --------------------------------------------------------
     // XAUUSD
-    // 1 lot = 100 oz
-    // --------------------------------------------------------
-
     else if (
         spec.type === "gold"
     ) {
@@ -554,12 +627,7 @@ function calculateRawLot(
     }
 
 
-    // --------------------------------------------------------
     // BTCUSD
-    // Convention du journal :
-    // 1 lot = 1 BTC
-    // --------------------------------------------------------
-
     else if (
         spec.type === "crypto"
     ) {
@@ -608,7 +676,6 @@ function calculateAutomaticLot(
     }
 
 
-    // Arrondi vers le bas au pas de 0.01
     const lot =
         Math.floor(
             rawLot * 100
@@ -627,7 +694,7 @@ function calculateAutomaticLot(
 
 
 // ============================================================
-// CALCUL DU RISQUE RÉEL POUR UN LOT
+// CALCUL RISQUE RÉEL
 // ============================================================
 
 function calculateRiskForLot(
@@ -658,10 +725,6 @@ function calculateRiskForLot(
     }
 
 
-    // --------------------------------------------------------
-    // FOREX
-    // --------------------------------------------------------
-
     if (
         spec.type === "forex"
     ) {
@@ -677,10 +740,6 @@ function calculateRiskForLot(
         );
     }
 
-
-    // --------------------------------------------------------
-    // USD/CAD / USD/CHF
-    // --------------------------------------------------------
 
     if (
         spec.type ===
@@ -713,10 +772,6 @@ function calculateRiskForLot(
     }
 
 
-    // --------------------------------------------------------
-    // USD/JPY
-    // --------------------------------------------------------
-
     if (
         spec.type === "jpy"
     ) {
@@ -747,10 +802,6 @@ function calculateRiskForLot(
     }
 
 
-    // --------------------------------------------------------
-    // XAUUSD
-    // --------------------------------------------------------
-
     if (
         spec.type === "gold"
     ) {
@@ -762,10 +813,6 @@ function calculateRiskForLot(
         );
     }
 
-
-    // --------------------------------------------------------
-    // BTCUSD
-    // --------------------------------------------------------
 
     if (
         spec.type === "crypto"
@@ -940,6 +987,9 @@ function updateAutomaticTradeValues() {
     rrElement.value = "0.00";
 
 
+    updateAutomaticPnL();
+
+
     if (
         risk <= 0 ||
         objective <= 0
@@ -957,12 +1007,25 @@ function updateAutomaticTradeValues() {
 
 
     const rr =
-        objective /
-        risk;
+        objective / risk;
 
 
     rrElement.value =
         rr.toFixed(2);
+
+
+    if (
+        rr < 2
+    ) {
+
+        if (mmInfo) {
+
+            mmInfo.textContent =
+                `RR actuel : ${rr.toFixed(2)}. Le RR minimum autorisé est 2.00.`;
+        }
+
+        return;
+    }
 
 
     if (
@@ -1039,10 +1102,6 @@ function updateAutomaticTradeValues() {
             objective
         );
 
-
-    // --------------------------------------------------------
-    // Le lot théorique est inférieur à 0.01
-    // --------------------------------------------------------
 
     if (
         rawLot === null
@@ -1306,7 +1365,6 @@ function loadData() {
     }
 
 
-    // Compatibilité avec les anciens capitaux
     if (
         activeCapital.riskPerTrade === undefined
     ) {
@@ -1354,6 +1412,18 @@ function loadData() {
 
 
             if (
+                trade.position === undefined &&
+                trade.direction !== undefined
+            ) {
+
+                trade.position =
+                    trade.direction;
+
+                changed = true;
+            }
+
+
+            if (
                 trade.pnl === undefined &&
                 trade.profit !== undefined
             ) {
@@ -1362,18 +1432,6 @@ function loadData() {
                     parseNumber(
                         trade.profit
                     );
-
-                changed = true;
-            }
-
-
-            if (
-                trade.position === undefined &&
-                trade.direction !== undefined
-            ) {
-
-                trade.position =
-                    trade.direction;
 
                 changed = true;
             }
@@ -2488,32 +2546,6 @@ function validateTrade(
 
 
     if (
-        result === "TP" &&
-        !Number.isFinite(tp)
-    ) {
-
-        alert(
-            "Un trade terminé en TP doit avoir un Take Profit."
-        );
-
-        return false;
-    }
-
-
-    if (
-        result === "SL" &&
-        !Number.isFinite(sl)
-    ) {
-
-        alert(
-            "Un trade terminé en SL doit avoir un Stop Loss."
-        );
-
-        return false;
-    }
-
-
-    if (
         direction ===
         "BUY"
     ) {
@@ -2651,11 +2683,10 @@ function addTrade(event) {
         ).value;
 
 
+    // P/L automatique
     const pnl =
-        parseNumber(
-            document.getElementById(
-                "profit"
-            ).value
+        calculateAutomaticPnL(
+            result
         );
 
 
@@ -2673,6 +2704,10 @@ function addTrade(event) {
         getCapitalObjective();
 
 
+    const rr =
+        calculateCapitalRR();
+
+
     // --------------------------------------------------------
     // Vérifications MM
     // --------------------------------------------------------
@@ -2684,6 +2719,18 @@ function addTrade(event) {
 
         alert(
             "Veuillez d'abord configurer le Risque par trade et l'Objectif par trade du capital actif."
+        );
+
+        return;
+    }
+
+
+    if (
+        rr < 2
+    ) {
+
+        alert(
+            "Le RR minimum autorisé est 2.00. L'Objectif doit être au moins égal à 2 × le Risque."
         );
 
         return;
@@ -2732,7 +2779,7 @@ function addTrade(event) {
     ) {
 
         alert(
-            "Veuillez entrer un P/L valide."
+            "Impossible de calculer automatiquement le P/L."
         );
 
         return;
@@ -2755,15 +2802,6 @@ function addTrade(event) {
 
         return;
     }
-
-
-    // --------------------------------------------------------
-    // RR
-    // --------------------------------------------------------
-
-    const rr =
-        objective /
-        risk;
 
 
     // --------------------------------------------------------
@@ -2899,12 +2937,6 @@ function addTrade(event) {
         "result"
     ).value =
         "TP";
-
-
-    document.getElementById(
-        "calculatedRR"
-    ).value =
-        calculateCapitalRR().toFixed(2);
 
 
     updateAutomaticTradeValues();
@@ -4540,6 +4572,22 @@ function createNewCapital() {
     }
 
 
+    const rr =
+        objective / risk;
+
+
+    if (
+        rr < 2
+    ) {
+
+        alert(
+            `RR invalide : ${rr.toFixed(2)}. Le RR minimum autorisé est 2.00. Pour un risque de ${money(risk)}, l'objectif doit être au minimum de ${money(risk * 2)}.`
+        );
+
+        return;
+    }
+
+
     const currentTrades =
         getCurrentCapitalTrades();
 
@@ -4584,7 +4632,7 @@ function createNewCapital() {
 
 
     alert(
-        `Capital créé avec succès ! RR configuré : ${(objective / risk).toFixed(2)}`
+        `Capital créé avec succès ! RR configuré : ${rr.toFixed(2)}`
     );
 }
 
@@ -4674,6 +4722,22 @@ function saveCapitalModification() {
     }
 
 
+    const rr =
+        objective / risk;
+
+
+    if (
+        rr < 2
+    ) {
+
+        alert(
+            `RR invalide : ${rr.toFixed(2)}. Le RR minimum autorisé est 2.00. Pour un risque de ${money(risk)}, l'objectif doit être au minimum de ${money(risk * 2)}.`
+        );
+
+        return;
+    }
+
+
     const currentTrades =
         getCurrentCapitalTrades();
 
@@ -4747,7 +4811,7 @@ function saveCapitalModification() {
 
 
     alert(
-        `Capital modifié ! RR configuré : ${(objective / risk).toFixed(2)}`
+        `Capital modifié ! RR configuré : ${rr.toFixed(2)}`
     );
 }
 
@@ -4757,10 +4821,6 @@ function saveCapitalModification() {
 // ============================================================
 
 function archiveCurrentCapital() {
-
-    const currentTrades =
-        getCurrentCapitalTrades();
-
 
     const confirmed =
         confirm(
@@ -4902,6 +4962,21 @@ function updateCapitalModalRR() {
         rr > 0
             ? rr.toFixed(2)
             : "0.00";
+
+
+    if (
+        rr > 0 &&
+        rr < 2
+    ) {
+
+        rrDisplay.style.color =
+            "#dc2626";
+
+    } else {
+
+        rrDisplay.style.color =
+            "";
+    }
 }
 
 
@@ -5295,7 +5370,29 @@ function setupEvents() {
     );
 
 
-    // Mise à jour RR dans la fenêtre Capital
+    // Résultat => P/L automatique
+    const resultElement =
+        document.getElementById(
+            "result"
+        );
+
+
+    if (resultElement) {
+
+        resultElement.addEventListener(
+            "input",
+            updateAutomaticTradeValues
+        );
+
+
+        resultElement.addEventListener(
+            "change",
+            updateAutomaticTradeValues
+        );
+    }
+
+
+    // Mise à jour RR capital
     [
         "capitalRiskInput",
         "capitalObjectiveInput"
@@ -5600,3 +5697,4 @@ document.addEventListener(
     "DOMContentLoaded",
     init
 );
+```
