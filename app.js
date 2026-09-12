@@ -40,7 +40,15 @@ let archives = [];
 let activeCapital = null;
 
 let currentPeriod = "today";
-let editingExistingCapital = false;
+
+/*
+ * Gestion fiable du modal capital.
+ *
+ * new     = Nouveau capital
+ * edit    = Modifier le capital actif
+ * archive = Modifier une archive
+ */
+let currentCapitalModalMode = "new";
 let editingArchiveId = null;
 
 
@@ -305,7 +313,7 @@ function calculateCurrentBalance() {
 
     return (
         Number(
-            activeCapital.initialCapital
+            activeCapital?.initialCapital
         ) || 0
     ) +
         calculateProfit(
@@ -462,12 +470,10 @@ function loadData() {
 
             activeCapital.rrTarget =
                 Number(
-                    activeCapital
-                        .objectivePerTrade
+                    activeCapital.objectivePerTrade
                 ) /
                 Number(
-                    activeCapital
-                        .riskReference
+                    activeCapital.riskReference
                 );
 
         } else {
@@ -3352,19 +3358,57 @@ function deleteTrade(
 
 function updateCapitalModalPreview() {
 
+    const riskInput =
+        document.getElementById(
+            "capitalRiskInput"
+        );
+
+
+    const rrInput =
+        document.getElementById(
+            "capitalRRInput"
+        );
+
+
+    const riskPreview =
+        document.getElementById(
+            "capitalModalRiskPreview"
+        );
+
+
+    const rrPreview =
+        document.getElementById(
+            "capitalModalRR"
+        );
+
+
+    const objectivePreview =
+        document.getElementById(
+            "capitalModalObjective"
+        );
+
+
+    if (
+        !riskInput ||
+        !rrInput ||
+        !riskPreview ||
+        !rrPreview ||
+        !objectivePreview
+    ) {
+
+        return;
+    }
+
+
     const risk =
         parseNumber(
-            document.getElementById(
-                "capitalRiskInput"
-            ).value
+            riskInput.value
         );
 
 
     const rr =
         parseNumber(
-            document.getElementById(
-                "capitalRRInput"
-            ).value
+            rrInput.value
         );
 
 
@@ -3381,27 +3425,57 @@ function updateCapitalModalPreview() {
             : MIN_RR;
 
 
-    document.getElementById(
-        "capitalModalRiskPreview"
-    ).textContent =
+    riskPreview.textContent =
         "Risque : " +
         money(safeRisk);
 
 
-    document.getElementById(
-        "capitalModalRR"
-    ).textContent =
+    rrPreview.textContent =
         "RR cible : " +
         safeRR.toFixed(2);
 
 
-    document.getElementById(
-        "capitalModalObjective"
-    ).textContent =
+    objectivePreview.textContent =
         money(
             safeRisk *
             safeRR
         );
+}
+
+
+function setCapitalModalMode(
+    mode
+) {
+
+    const modal =
+        document.getElementById(
+            "capitalModal"
+        );
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    currentCapitalModalMode =
+        mode;
+
+
+    modal.dataset.mode =
+        mode;
+
+
+    /*
+     * Synchronisation supplémentaire
+     * avec les attributs HTML du bouton,
+     * afin que le mode reste fiable même
+     * si le modal est réutilisé plusieurs fois.
+     */
+    modal.setAttribute(
+        "data-mode",
+        mode
+    );
 }
 
 
@@ -3445,12 +3519,37 @@ function openCapitalModal(
         );
 
 
-    editingExistingCapital =
-        mode === "edit";
+    const amountHelp =
+        document.getElementById(
+            "capitalAmountHelp"
+        );
+
+
+    if (
+        !modal ||
+        !title ||
+        !nameInput ||
+        !amountInput ||
+        !riskInput ||
+        !rrInput ||
+        !amountHelp
+    ) {
+
+        console.error(
+            "Le modal capital ou l'un de ses champs est introuvable."
+        );
+
+        return;
+    }
 
 
     editingArchiveId =
         null;
+
+
+    setCapitalModalMode(
+        mode
+    );
 
 
     if (
@@ -3463,11 +3562,13 @@ function openCapitalModal(
 
 
         nameInput.value =
-            activeCapital.name;
+            activeCapital.name || "";
 
 
         amountInput.value =
-            activeCapital.initialCapital;
+            Number(
+                activeCapital.initialCapital
+            ) || 0;
 
 
         riskInput.value =
@@ -3487,13 +3588,12 @@ function openCapitalModal(
             0;
 
 
-        document.getElementById(
-            "capitalAmountHelp"
-        ).textContent =
+        amountHelp.textContent =
             currentTrades.length >
             0
                 ? "Capital initial verrouillé car ce capital contient des trades."
                 : "Le capital initial sera verrouillé après le premier trade.";
+
 
     } else {
 
@@ -3501,12 +3601,42 @@ function openCapitalModal(
             "Nouveau capital";
 
 
+        /*
+         * Génération d'un nom simple et
+         * toujours unique.
+         */
+        let nextNumber =
+            archives.length +
+            1;
+
+
+        const existingNames =
+            new Set(
+                [
+                    activeCapital?.name,
+                    ...archives.map(
+                        archive =>
+                            archive.name
+                    )
+                ]
+                .filter(Boolean)
+            );
+
+
+        while (
+            existingNames.has(
+                "Capital " +
+                nextNumber
+            )
+        ) {
+
+            nextNumber++;
+        }
+
+
         nameInput.value =
             "Capital " +
-            (
-                archives.length +
-                1
-            );
+            nextNumber;
 
 
         amountInput.value =
@@ -3525,10 +3655,8 @@ function openCapitalModal(
             false;
 
 
-        document.getElementById(
-            "capitalAmountHelp"
-        ).textContent =
-            "Le capital initial est verrouillé après le premier trade.";
+        amountHelp.textContent =
+            "Le capital initial sera verrouillé après le premier trade.";
     }
 
 
@@ -3543,11 +3671,43 @@ function openCapitalModal(
 
 function closeCapitalModal() {
 
-    document.getElementById(
-        "capitalModal"
-    ).classList.remove(
+    const modal =
+        document.getElementById(
+            "capitalModal"
+        );
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    modal.classList.remove(
         "show"
     );
+
+
+    /*
+     * On remet le mode par défaut
+     * après fermeture pour éviter
+     * qu'un ancien mode soit réutilisé.
+     */
+    currentCapitalModalMode =
+        "new";
+
+
+    modal.dataset.mode =
+        "new";
+
+
+    modal.setAttribute(
+        "data-mode",
+        "new"
+    );
+
+
+    editingArchiveId =
+        null;
 }
 
 
@@ -3557,34 +3717,72 @@ function closeCapitalModal() {
 
 function createNewCapital() {
 
-    const name =
+    const nameInput =
         document.getElementById(
             "capitalNameInput"
-        ).value.trim();
+        );
+
+
+    const amountInput =
+        document.getElementById(
+            "capitalAmountInput"
+        );
+
+
+    const riskInput =
+        document.getElementById(
+            "capitalRiskInput"
+        );
+
+
+    const rrInput =
+        document.getElementById(
+            "capitalRRInput"
+        );
+
+
+    if (
+        !nameInput ||
+        !amountInput ||
+        !riskInput ||
+        !rrInput
+    ) {
+
+        alert(
+            "Impossible de créer le capital : formulaire introuvable."
+        );
+
+        return;
+    }
+
+
+    const name =
+        nameInput.value.trim();
 
 
     const amount =
         parseNumber(
-            document.getElementById(
-                "capitalAmountInput"
-            ).value
+            amountInput.value
         );
 
 
     const risk =
         parseNumber(
-            document.getElementById(
-                "capitalRiskInput"
-            ).value
+            riskInput.value
         );
 
 
     const rr =
         parseNumber(
-            document.getElementById(
-                "capitalRRInput"
-            ).value
+            rrInput.value
         );
+
+
+    /*
+     * IMPORTANT :
+     * toutes les validations sont faites
+     * AVANT d'archiver l'ancien capital.
+     */
 
 
     if (!name) {
@@ -3640,6 +3838,10 @@ function createNewCapital() {
         getActiveCapitalTrades();
 
 
+    /*
+     * L'ancien capital est archivé uniquement
+     * maintenant que le nouveau capital est valide.
+     */
     if (
         currentTrades.length >
         0
@@ -3677,6 +3879,11 @@ function createNewCapital() {
 
 
     refreshAll();
+
+
+    alert(
+        "Nouveau capital créé avec succès !"
+    );
 }
 
 
@@ -3685,6 +3892,16 @@ function createNewCapital() {
 // ============================================================
 
 function saveCapitalModification() {
+
+    if (!activeCapital) {
+
+        alert(
+            "Aucun capital actif à modifier."
+        );
+
+        return;
+    }
+
 
     const name =
         document.getElementById(
@@ -3798,6 +4015,20 @@ function saveCapitalModification() {
         rr;
 
 
+    /*
+     * Si aucun trade n'existe encore,
+     * le capital initial peut être modifié.
+     */
+    if (
+        currentTrades.length ===
+        0
+    ) {
+
+        activeCapital.initialCapital =
+            amount;
+    }
+
+
     saveActiveCapital();
 
 
@@ -3805,6 +4036,11 @@ function saveCapitalModification() {
 
 
     refreshAll();
+
+
+    alert(
+        "Capital modifié avec succès !"
+    );
 }
 
 
@@ -3813,6 +4049,11 @@ function saveCapitalModification() {
 // ============================================================
 
 function createArchiveFromCurrentCapital() {
+
+    if (!activeCapital) {
+        return null;
+    }
+
 
     const currentTrades =
         getActiveCapitalTrades();
@@ -3886,6 +4127,11 @@ function createArchiveFromCurrentCapital() {
 
 function archiveCurrentCapital() {
 
+    if (!activeCapital) {
+        return;
+    }
+
+
     const confirmed =
         confirm(
             "Voulez-vous archiver le capital actuel ?"
@@ -3949,6 +4195,11 @@ function archiveCurrentCapital() {
 
 
     refreshAll();
+
+
+    alert(
+        "Capital archivé avec succès ! Un nouveau capital actif a été créé."
+    );
 }
 
 
@@ -3977,8 +4228,9 @@ function openArchiveEdit(
         archiveId;
 
 
-    editingExistingCapital =
-        false;
+    setCapitalModalMode(
+        "archive"
+    );
 
 
     document.getElementById(
@@ -4044,6 +4296,10 @@ function saveArchiveModification() {
         !editingArchiveId
     ) {
 
+        alert(
+            "Aucune archive sélectionnée."
+        );
+
         return;
     }
 
@@ -4057,6 +4313,11 @@ function saveArchiveModification() {
 
 
     if (!archive) {
+
+        alert(
+            "Archive introuvable."
+        );
+
         return;
     }
 
@@ -4146,6 +4407,11 @@ function saveArchiveModification() {
 
 
     refreshAll();
+
+
+    alert(
+        "Archive modifiée avec succès !"
+    );
 }
 
 
@@ -4317,21 +4583,27 @@ function renderArchives() {
 
                     <button
                         class="secondary-btn view-archive-chart"
-                        data-id="${archive.id}"
+                        data-id="${escapeHtml(
+                            archive.id
+                        )}"
                     >
                         📈 Voir le graphique
                     </button>
 
                     <button
                         class="secondary-btn edit-archive"
-                        data-id="${archive.id}"
+                        data-id="${escapeHtml(
+                            archive.id
+                        )}"
                     >
                         ✏️ Modifier
                     </button>
 
                     <button
                         class="danger-btn delete-archive"
-                        data-id="${archive.id}"
+                        data-id="${escapeHtml(
+                            archive.id
+                        )}"
                     >
                         🗑️ Supprimer
                     </button>
@@ -4617,8 +4889,11 @@ function drawCapitalChart() {
         canvas.style.display =
             "none";
 
-        emptyMessage.style.display =
-            "flex";
+        if (emptyMessage) {
+
+            emptyMessage.style.display =
+                "flex";
+        }
 
         return;
     }
@@ -4628,8 +4903,11 @@ function drawCapitalChart() {
         "block";
 
 
-    emptyMessage.style.display =
-        "none";
+    if (emptyMessage) {
+
+        emptyMessage.style.display =
+            "none";
+    }
 
 
     const ctx =
@@ -5347,9 +5625,18 @@ function openArchiveChart(
 
 function closeArchiveChart() {
 
-    document.getElementById(
-        "archiveChartModal"
-    ).classList.remove(
+    const modal =
+        document.getElementById(
+            "archiveChartModal"
+        );
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    modal.classList.remove(
         "show"
     );
 }
@@ -5586,12 +5873,19 @@ function refreshAll() {
 
 function setupEvents() {
 
-    document.getElementById(
-        "tradeForm"
-    ).addEventListener(
-        "submit",
-        addTrade
-    );
+    const tradeForm =
+        document.getElementById(
+            "tradeForm"
+        );
+
+
+    if (tradeForm) {
+
+        tradeForm.addEventListener(
+            "submit",
+            addTrade
+        );
+    }
 
 
     [
@@ -5669,68 +5963,129 @@ function setupEvents() {
         );
 
 
-    document.getElementById(
-        "changeCapitalBtn"
-    ).addEventListener(
-        "click",
-        () => {
-
-            openCapitalModal(
-                "edit"
-            );
-        }
-    );
+    const changeCapitalBtn =
+        document.getElementById(
+            "changeCapitalBtn"
+        );
 
 
-    document.getElementById(
-        "newCapitalBtn"
-    ).addEventListener(
-        "click",
-        () => {
+    if (changeCapitalBtn) {
 
-            openCapitalModal(
-                "new"
-            );
-        }
-    );
+        changeCapitalBtn.addEventListener(
+            "click",
+            () => {
 
-
-    document.getElementById(
-        "archiveCapitalBtn"
-    ).addEventListener(
-        "click",
-        archiveCurrentCapital
-    );
-
-
-    document.getElementById(
-        "saveCapitalBtn"
-    ).addEventListener(
-        "click",
-        () => {
-
-            if (
-                editingArchiveId
-            ) {
-
-                saveArchiveModification();
-
-                return;
+                openCapitalModal(
+                    "edit"
+                );
             }
+        );
+    }
 
 
-            if (
-                editingExistingCapital
-            ) {
+    const newCapitalBtn =
+        document.getElementById(
+            "newCapitalBtn"
+        );
 
-                saveCapitalModification();
 
-            } else {
+    if (newCapitalBtn) {
+
+        newCapitalBtn.addEventListener(
+            "click",
+            () => {
+
+                openCapitalModal(
+                    "new"
+                );
+            }
+        );
+    }
+
+
+    const archiveCapitalBtn =
+        document.getElementById(
+            "archiveCapitalBtn"
+        );
+
+
+    if (archiveCapitalBtn) {
+
+        archiveCapitalBtn.addEventListener(
+            "click",
+            archiveCurrentCapital
+        );
+    }
+
+
+    const saveCapitalBtn =
+        document.getElementById(
+            "saveCapitalBtn"
+        );
+
+
+    if (saveCapitalBtn) {
+
+        saveCapitalBtn.addEventListener(
+            "click",
+            event => {
+
+                /*
+                 * Empêche un éventuel submit HTML
+                 * de recharger la page ou d'exécuter
+                 * une seconde action.
+                 */
+                if (event) {
+                    event.preventDefault();
+                }
+
+
+                const modal =
+                    document.getElementById(
+                        "capitalModal"
+                    );
+
+
+                const mode =
+                    (
+                        modal?.dataset?.mode ||
+                        currentCapitalModalMode ||
+                        "new"
+                    ).toLowerCase();
+
+
+                console.log(
+                    "Capital modal mode :",
+                    mode
+                );
+
+
+                if (
+                    mode ===
+                    "archive"
+                ) {
+
+                    saveArchiveModification();
+
+                    return;
+                }
+
+
+                if (
+                    mode ===
+                    "edit"
+                ) {
+
+                    saveCapitalModification();
+
+                    return;
+                }
+
 
                 createNewCapital();
             }
-        }
-    );
+        );
+    }
 
 
     [
@@ -5762,78 +6117,127 @@ function setupEvents() {
     );
 
 
-    document.getElementById(
-        "cancelCapitalBtn"
-    ).addEventListener(
-        "click",
-        closeCapitalModal
-    );
+    const cancelCapitalBtn =
+        document.getElementById(
+            "cancelCapitalBtn"
+        );
 
 
-    document.getElementById(
-        "cancelCapitalBtn2"
-    ).addEventListener(
-        "click",
-        closeCapitalModal
-    );
+    if (cancelCapitalBtn) {
+
+        cancelCapitalBtn.addEventListener(
+            "click",
+            closeCapitalModal
+        );
+    }
 
 
-    document.getElementById(
-        "closeArchiveChartBtn"
-    ).addEventListener(
-        "click",
-        closeArchiveChart
-    );
+    const cancelCapitalBtn2 =
+        document.getElementById(
+            "cancelCapitalBtn2"
+        );
 
 
-    document.getElementById(
-        "clearBtn"
-    ).addEventListener(
-        "click",
-        clearCurrentTrades
-    );
+    if (cancelCapitalBtn2) {
+
+        cancelCapitalBtn2.addEventListener(
+            "click",
+            closeCapitalModal
+        );
+    }
 
 
-    document.getElementById(
-        "themeToggle"
-    ).addEventListener(
-        "click",
-        toggleTheme
-    );
+    const closeArchiveChartBtn =
+        document.getElementById(
+            "closeArchiveChartBtn"
+        );
 
 
-    document.getElementById(
-        "capitalModal"
-    ).addEventListener(
-        "click",
-        event => {
+    if (closeArchiveChartBtn) {
 
-            if (
-                event.target.id ===
-                "capitalModal"
-            ) {
+        closeArchiveChartBtn.addEventListener(
+            "click",
+            closeArchiveChart
+        );
+    }
 
-                closeCapitalModal();
+
+    const clearBtn =
+        document.getElementById(
+            "clearBtn"
+        );
+
+
+    if (clearBtn) {
+
+        clearBtn.addEventListener(
+            "click",
+            clearCurrentTrades
+        );
+    }
+
+
+    const themeToggle =
+        document.getElementById(
+            "themeToggle"
+        );
+
+
+    if (themeToggle) {
+
+        themeToggle.addEventListener(
+            "click",
+            toggleTheme
+        );
+    }
+
+
+    const capitalModal =
+        document.getElementById(
+            "capitalModal"
+        );
+
+
+    if (capitalModal) {
+
+        capitalModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.id ===
+                    "capitalModal"
+                ) {
+
+                    closeCapitalModal();
+                }
             }
-        }
-    );
+        );
+    }
 
 
-    document.getElementById(
-        "archiveChartModal"
-    ).addEventListener(
-        "click",
-        event => {
+    const archiveChartModal =
+        document.getElementById(
+            "archiveChartModal"
+        );
 
-            if (
-                event.target.id ===
-                "archiveChartModal"
-            ) {
 
-                closeArchiveChart();
+    if (archiveChartModal) {
+
+        archiveChartModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.id ===
+                    "archiveChartModal"
+                ) {
+
+                    closeArchiveChart();
+                }
             }
-        }
-    );
+        );
+    }
 
 
     document.addEventListener(
