@@ -1,4 +1,3 @@
-```javascript
 const TRADES_KEY = "tradingTrades";
 const CAPITAL_KEY = "tradingActiveCapital";
 const ARCHIVES_KEY = "tradingCapitalArchives";
@@ -339,9 +338,7 @@ function calculateCapitalRR(
 // P/L AUTOMATIQUE
 // ============================================================
 
-function calculateAutomaticPnL(
-    result
-) {
+function calculateAutomaticPnL(result) {
 
     const risk =
         getCapitalRisk();
@@ -359,19 +356,16 @@ function calculateAutomaticPnL(
 
 
     if (result === "TP") {
-
         return objective;
     }
 
 
     if (result === "SL") {
-
         return -risk;
     }
 
 
     if (result === "BE") {
-
         return 0;
     }
 
@@ -383,14 +377,11 @@ function calculateAutomaticPnL(
 function updateAutomaticPnL() {
 
     const resultElement =
-        document.getElementById(
-            "result"
-        );
+        document.getElementById("result");
 
     const profitElement =
-        document.getElementById(
-            "profit"
-        );
+        document.getElementById("profit");
+
 
     if (
         !resultElement ||
@@ -405,14 +396,10 @@ function updateAutomaticPnL() {
 
 
     const pnl =
-        calculateAutomaticPnL(
-            result
-        );
+        calculateAutomaticPnL(result);
 
 
-    if (
-        pnl === null
-    ) {
+    if (pnl === null) {
 
         profitElement.value = "";
 
@@ -423,14 +410,12 @@ function updateAutomaticPnL() {
     profitElement.value =
         pnl.toFixed(2);
 
-
-    // Le P/L est calculé automatiquement.
     profitElement.readOnly = true;
 }
 
 
 // ============================================================
-// VALEUR DU PIP SELON L'ACTIF
+// VALEUR DU PIP EN USD
 // ============================================================
 
 function getPipValuePerLotUSD(
@@ -444,16 +429,14 @@ function getPipValuePerLotUSD(
     const spec =
         getAssetSpec(normalized);
 
+
     if (!spec) {
         return null;
     }
 
 
     // EUR/USD, GBP/USD, AUD/USD, NZD/USD
-    if (
-        spec.type === "forex"
-    ) {
-
+    if (spec.type === "forex") {
         return spec.pipValuePerLot;
     }
 
@@ -475,9 +458,7 @@ function getPipValuePerLotUSD(
 
 
     // USD/JPY
-    if (
-        spec.type === "jpy"
-    ) {
+    if (spec.type === "jpy") {
 
         if (
             !Number.isFinite(entry) ||
@@ -508,6 +489,7 @@ function calculateRawLot(
     const spec =
         getAssetSpec(asset);
 
+
     if (
         !spec ||
         !Number.isFinite(entry) ||
@@ -518,8 +500,10 @@ function calculateRawLot(
         return null;
     }
 
+
     const distance =
         Math.abs(entry - sl);
+
 
     if (distance <= 0) {
         return null;
@@ -529,7 +513,10 @@ function calculateRawLot(
     let lot = 0;
 
 
+    // --------------------------------------------------------
     // FOREX
+    // --------------------------------------------------------
+
     if (
         spec.type === "forex"
     ) {
@@ -537,6 +524,7 @@ function calculateRawLot(
         const pips =
             distance *
             spec.pipMultiplier;
+
 
         lot =
             riskAmount /
@@ -547,7 +535,10 @@ function calculateRawLot(
     }
 
 
+    // --------------------------------------------------------
     // USD/CAD / USD/CHF
+    // --------------------------------------------------------
+
     else if (
         spec.type === "forexQuoteConversion"
     ) {
@@ -556,11 +547,13 @@ function calculateRawLot(
             distance *
             spec.pipMultiplier;
 
+
         const pipValuePerLot =
             getPipValuePerLotUSD(
                 asset,
                 entry
             );
+
 
         if (
             !Number.isFinite(
@@ -571,6 +564,7 @@ function calculateRawLot(
             return null;
         }
 
+
         lot =
             riskAmount /
             (
@@ -580,7 +574,10 @@ function calculateRawLot(
     }
 
 
+    // --------------------------------------------------------
     // USD/JPY
+    // --------------------------------------------------------
+
     else if (
         spec.type === "jpy"
     ) {
@@ -589,11 +586,13 @@ function calculateRawLot(
             distance *
             spec.pipMultiplier;
 
+
         const pipValuePerLot =
             getPipValuePerLotUSD(
                 asset,
                 entry
             );
+
 
         if (
             !Number.isFinite(
@@ -604,6 +603,7 @@ function calculateRawLot(
             return null;
         }
 
+
         lot =
             riskAmount /
             (
@@ -613,7 +613,10 @@ function calculateRawLot(
     }
 
 
+    // --------------------------------------------------------
     // XAUUSD
+    // --------------------------------------------------------
+
     else if (
         spec.type === "gold"
     ) {
@@ -627,7 +630,12 @@ function calculateRawLot(
     }
 
 
+    // --------------------------------------------------------
     // BTCUSD
+    // Convention du journal :
+    // 1 lot = 1 BTC
+    // --------------------------------------------------------
+
     else if (
         spec.type === "crypto"
     ) {
@@ -669,6 +677,7 @@ function calculateAutomaticLot(
             riskAmount
         );
 
+
     if (
         rawLot === null
     ) {
@@ -682,9 +691,7 @@ function calculateAutomaticLot(
         ) / 100;
 
 
-    if (
-        lot < 0.01
-    ) {
+    if (lot < 0.01) {
         return 0;
     }
 
@@ -707,6 +714,7 @@ function calculateRiskForLot(
     const spec =
         getAssetSpec(asset);
 
+
     if (
         !spec ||
         !Number.isFinite(entry) ||
@@ -717,14 +725,17 @@ function calculateRiskForLot(
         return null;
     }
 
+
     const distance =
         Math.abs(entry - sl);
+
 
     if (distance <= 0) {
         return null;
     }
 
 
+    // Forex
     if (
         spec.type === "forex"
     ) {
@@ -732,6 +743,7 @@ function calculateRiskForLot(
         const pips =
             distance *
             spec.pipMultiplier;
+
 
         return (
             pips *
@@ -741,20 +753,22 @@ function calculateRiskForLot(
     }
 
 
+    // USD/CAD / USD/CHF
     if (
-        spec.type ===
-        "forexQuoteConversion"
+        spec.type === "forexQuoteConversion"
     ) {
 
         const pips =
             distance *
             spec.pipMultiplier;
 
+
         const pipValuePerLot =
             getPipValuePerLotUSD(
                 asset,
                 entry
             );
+
 
         if (
             !Number.isFinite(
@@ -764,6 +778,7 @@ function calculateRiskForLot(
             return null;
         }
 
+
         return (
             pips *
             pipValuePerLot *
@@ -772,6 +787,7 @@ function calculateRiskForLot(
     }
 
 
+    // USD/JPY
     if (
         spec.type === "jpy"
     ) {
@@ -780,11 +796,13 @@ function calculateRiskForLot(
             distance *
             spec.pipMultiplier;
 
+
         const pipValuePerLot =
             getPipValuePerLotUSD(
                 asset,
                 entry
             );
+
 
         if (
             !Number.isFinite(
@@ -794,6 +812,7 @@ function calculateRiskForLot(
             return null;
         }
 
+
         return (
             pips *
             pipValuePerLot *
@@ -802,6 +821,7 @@ function calculateRiskForLot(
     }
 
 
+    // XAUUSD
     if (
         spec.type === "gold"
     ) {
@@ -814,6 +834,7 @@ function calculateRiskForLot(
     }
 
 
+    // BTCUSD
     if (
         spec.type === "crypto"
     ) {
@@ -850,6 +871,7 @@ function calculateAutomaticTP(
         return null;
     }
 
+
     if (
         riskAmount <= 0 ||
         objectiveAmount <= 0
@@ -857,8 +879,10 @@ function calculateAutomaticTP(
         return null;
     }
 
+
     const riskDistance =
         Math.abs(entry - sl);
+
 
     if (
         riskDistance <= 0
@@ -866,9 +890,11 @@ function calculateAutomaticTP(
         return null;
     }
 
+
     const rr =
         objectiveAmount /
         riskAmount;
+
 
     const rewardDistance =
         riskDistance *
@@ -901,44 +927,35 @@ function calculateAutomaticTP(
 function updateAutomaticTradeValues() {
 
     const assetElement =
-        document.getElementById(
-            "asset"
-        );
+        document.getElementById("asset");
+
 
     const entryElement =
-        document.getElementById(
-            "entry"
-        );
+        document.getElementById("entry");
+
 
     const slElement =
-        document.getElementById(
-            "sl"
-        );
+        document.getElementById("sl");
+
 
     const tpElement =
-        document.getElementById(
-            "tp"
-        );
+        document.getElementById("tp");
+
 
     const lotElement =
-        document.getElementById(
-            "lot"
-        );
+        document.getElementById("lot");
+
 
     const rrElement =
-        document.getElementById(
-            "calculatedRR"
-        );
+        document.getElementById("calculatedRR");
+
 
     const directionElement =
-        document.getElementById(
-            "direction"
-        );
+        document.getElementById("direction");
+
 
     const mmInfo =
-        document.getElementById(
-            "tradeMMInfo"
-        );
+        document.getElementById("tradeMMInfo");
 
 
     if (
@@ -959,15 +976,18 @@ function updateAutomaticTradeValues() {
             assetElement.value
         );
 
+
     const entry =
         parseNumber(
             entryElement.value
         );
 
+
     const sl =
         parseNumber(
             slElement.value
         );
+
 
     const direction =
         directionElement.value;
@@ -975,6 +995,7 @@ function updateAutomaticTradeValues() {
 
     const risk =
         getCapitalRisk();
+
 
     const objective =
         getCapitalObjective();
@@ -990,6 +1011,10 @@ function updateAutomaticTradeValues() {
     updateAutomaticPnL();
 
 
+    // --------------------------------------------------------
+    // MM non configuré
+    // --------------------------------------------------------
+
     if (
         risk <= 0 ||
         objective <= 0
@@ -999,12 +1024,15 @@ function updateAutomaticTradeValues() {
 
             mmInfo.textContent =
                 "Configurez le risque et l'objectif du capital actif.";
-
         }
 
         return;
     }
 
+
+    // --------------------------------------------------------
+    // RR
+    // --------------------------------------------------------
 
     const rr =
         objective / risk;
@@ -1014,6 +1042,10 @@ function updateAutomaticTradeValues() {
         rr.toFixed(2);
 
 
+    // --------------------------------------------------------
+    // RR minimum = 2
+    // --------------------------------------------------------
+
     if (
         rr < 2
     ) {
@@ -1021,12 +1053,16 @@ function updateAutomaticTradeValues() {
         if (mmInfo) {
 
             mmInfo.textContent =
-                `RR actuel : ${rr.toFixed(2)}. Le RR minimum autorisé est 2.00.`;
+                `RR actuel : ${rr.toFixed(2)} | RR minimum autorisé : 2.00 | Objectif minimum : ${money(risk * 2)}`;
         }
 
         return;
     }
 
+
+    // --------------------------------------------------------
+    // Actif valide ?
+    // --------------------------------------------------------
 
     if (
         !asset ||
@@ -1037,12 +1073,15 @@ function updateAutomaticTradeValues() {
 
             mmInfo.textContent =
                 `Risque souhaité : ${money(risk)} | Objectif : ${money(objective)} | RR : ${rr.toFixed(2)}`;
-
         }
 
         return;
     }
 
+
+    // --------------------------------------------------------
+    // Entry / SL
+    // --------------------------------------------------------
 
     if (
         !Number.isFinite(entry) ||
@@ -1053,7 +1092,6 @@ function updateAutomaticTradeValues() {
 
             mmInfo.textContent =
                 `Risque souhaité : ${money(risk)} | Objectif : ${money(objective)} | RR : ${rr.toFixed(2)}`;
-
         }
 
         return;
@@ -1068,12 +1106,15 @@ function updateAutomaticTradeValues() {
 
             mmInfo.textContent =
                 "Entry et SL doivent être différents.";
-
         }
 
         return;
     }
 
+
+    // --------------------------------------------------------
+    // CALCULS
+    // --------------------------------------------------------
 
     const rawLot =
         calculateRawLot(
@@ -1103,6 +1144,10 @@ function updateAutomaticTradeValues() {
         );
 
 
+    // --------------------------------------------------------
+    // LOT IMPOSSIBLE
+    // --------------------------------------------------------
+
     if (
         rawLot === null
     ) {
@@ -1110,13 +1155,16 @@ function updateAutomaticTradeValues() {
         if (mmInfo) {
 
             mmInfo.textContent =
-                "Impossible de calculer le lot automatiquement. Vérifiez Entry, SL et le risque.";
-
+                "Impossible de calculer automatiquement le lot. Vérifiez Entry, SL et le risque.";
         }
 
         return;
     }
 
+
+    // --------------------------------------------------------
+    // LOT THÉORIQUE < 0.01
+    // --------------------------------------------------------
 
     if (
         rawLot < 0.01 ||
@@ -1162,6 +1210,10 @@ function updateAutomaticTradeValues() {
     }
 
 
+    // --------------------------------------------------------
+    // TP IMPOSSIBLE
+    // --------------------------------------------------------
+
     if (
         tp === null
     ) {
@@ -1169,13 +1221,16 @@ function updateAutomaticTradeValues() {
         if (mmInfo) {
 
             mmInfo.textContent =
-                "Impossible de calculer le TP.";
-
+                "Impossible de calculer automatiquement le TP.";
         }
 
         return;
     }
 
+
+    // --------------------------------------------------------
+    // RISQUE RÉEL
+    // --------------------------------------------------------
 
     const realRisk =
         calculateRiskForLot(
@@ -1192,6 +1247,10 @@ function updateAutomaticTradeValues() {
             : null;
 
 
+    // --------------------------------------------------------
+    // AFFICHAGE
+    // --------------------------------------------------------
+
     lotElement.value =
         lot.toFixed(2);
 
@@ -1203,24 +1262,19 @@ function updateAutomaticTradeValues() {
     if (mmInfo) {
 
         let message =
-            `Risque souhaité : ${money(risk)} | Lot : ${lot.toFixed(2)}`;
+            `Risque souhaité : ${money(risk)}`;
+
+
+        message +=
+            ` | Lot : ${lot.toFixed(2)}`;
+
+
+        message +=
+            ` | Théorique : ${rawLot.toFixed(4)}`;
 
 
         if (
-            Number.isFinite(
-                rawLot
-            )
-        ) {
-
-            message +=
-                ` | Théorique : ${rawLot.toFixed(4)}`;
-        }
-
-
-        if (
-            Number.isFinite(
-                realRisk
-            )
+            Number.isFinite(realRisk)
         ) {
 
             message +=
@@ -1257,7 +1311,11 @@ function updateAutomaticTradeValues() {
 
 
         message +=
-            ` | Objectif : ${money(objective)} | RR : ${rr.toFixed(2)}`;
+            ` | Objectif : ${money(objective)}`;
+
+
+        message +=
+            ` | RR : ${rr.toFixed(2)}`;
 
 
         mmInfo.textContent =
@@ -1444,6 +1502,7 @@ function loadData() {
                         trade.asset
                     );
 
+
                 if (
                     normalizedAsset &&
                     normalizedAsset !== trade.asset
@@ -1507,6 +1566,7 @@ function calculateCurrentBalance() {
     const currentTrades =
         getCurrentCapitalTrades();
 
+
     const profit =
         currentTrades.reduce(
             (sum, trade) =>
@@ -1514,6 +1574,7 @@ function calculateCurrentBalance() {
                 (Number(trade.pnl) || 0),
             0
         );
+
 
     return (
         Number(
@@ -1546,8 +1607,10 @@ function isSameDay(date) {
             date + "T00:00:00"
         );
 
+
     const today =
         new Date();
+
 
     return (
         tradeDate.getFullYear() ===
@@ -1569,19 +1632,24 @@ function isThisWeek(date) {
             date + "T00:00:00"
         );
 
+
     const today =
         new Date();
 
+
     const day =
         today.getDay();
+
 
     const diffToMonday =
         day === 0
             ? 6
             : day - 1;
 
+
     const monday =
         new Date(today);
+
 
     monday.setHours(
         0,
@@ -1590,17 +1658,21 @@ function isThisWeek(date) {
         0
     );
 
+
     monday.setDate(
         today.getDate() -
         diffToMonday
     );
 
+
     const nextMonday =
         new Date(monday);
+
 
     nextMonday.setDate(
         monday.getDate() + 7
     );
+
 
     return (
         tradeDate >= monday &&
@@ -1616,8 +1688,10 @@ function isThisMonth(date) {
             date + "T00:00:00"
         );
 
+
     const today =
         new Date();
+
 
     return (
         tradeDate.getFullYear() ===
@@ -1636,8 +1710,10 @@ function isThisYear(date) {
             date + "T00:00:00"
         );
 
+
     const today =
         new Date();
+
 
     return (
         tradeDate.getFullYear() ===
@@ -1657,6 +1733,7 @@ function filterByPeriod(
         return tradeList;
     }
 
+
     return tradeList.filter(
         trade => {
 
@@ -1664,41 +1741,50 @@ function filterByPeriod(
                 return false;
             }
 
+
             if (
                 currentPeriod ===
                 "today"
             ) {
+
                 return isSameDay(
                     trade.date
                 );
             }
 
+
             if (
                 currentPeriod ===
                 "week"
             ) {
+
                 return isThisWeek(
                     trade.date
                 );
             }
 
+
             if (
                 currentPeriod ===
                 "month"
             ) {
+
                 return isThisMonth(
                     trade.date
                 );
             }
 
+
             if (
                 currentPeriod ===
                 "year"
             ) {
+
                 return isThisYear(
                     trade.date
                 );
             }
+
 
             return true;
         }
@@ -1720,11 +1806,13 @@ function calculateWinrate(
         return 0;
     }
 
+
     const winners =
         tradeList.filter(
             trade =>
                 trade.result === "TP"
         ).length;
+
 
     return (
         winners /
@@ -1743,6 +1831,7 @@ function calculateAverageRR(
         return 0;
     }
 
+
     const validRR =
         tradeList
             .map(
@@ -1755,11 +1844,13 @@ function calculateAverageRR(
                     rr > 0
             );
 
+
     if (
         validRR.length === 0
     ) {
         return 0;
     }
+
 
     const total =
         validRR.reduce(
@@ -1767,6 +1858,7 @@ function calculateAverageRR(
                 sum + rr,
             0
         );
+
 
     return (
         total /
@@ -1785,6 +1877,7 @@ function findBestSetup(
         return "-";
     }
 
+
     const setupStats = {};
 
 
@@ -1794,6 +1887,7 @@ function findBestSetup(
             if (!trade.setup) {
                 return;
             }
+
 
             if (
                 !setupStats[trade.setup]
@@ -1806,6 +1900,7 @@ function findBestSetup(
                     winners: 0
                 };
             }
+
 
             setupStats[
                 trade.setup
@@ -1971,25 +2066,30 @@ function updateStats() {
     const currentTrades =
         getCurrentCapitalTrades();
 
+
     const periodTrades =
         filterByPeriod(
             currentTrades
         );
+
 
     const profit =
         calculateProfit(
             periodTrades
         );
 
+
     const winrate =
         calculateWinrate(
             periodTrades
         );
 
+
     const averageRR =
         calculateAverageRR(
             periodTrades
         );
+
 
     const bestSetup =
         findBestSetup(
@@ -2048,11 +2148,13 @@ function updateSetupTable() {
             "setupTableBody"
         );
 
+
     tbody.innerHTML = "";
 
 
     const currentTrades =
         getCurrentCapitalTrades();
+
 
     const periodTrades =
         filterByPeriod(
@@ -2166,6 +2268,7 @@ function renderHistory() {
         document.getElementById(
             "historyBody"
         );
+
 
     tbody.innerHTML = "";
 
@@ -2505,8 +2608,7 @@ function validateTrade(
     direction,
     entry,
     sl,
-    tp,
-    result
+    tp
 ) {
 
     if (
@@ -2546,8 +2648,7 @@ function validateTrade(
 
 
     if (
-        direction ===
-        "BUY"
+        direction === "BUY"
     ) {
 
         if (
@@ -2683,7 +2784,6 @@ function addTrade(event) {
         ).value;
 
 
-    // P/L automatique
     const pnl =
         calculateAutomaticPnL(
             result
@@ -2709,7 +2809,7 @@ function addTrade(event) {
 
 
     // --------------------------------------------------------
-    // Vérifications MM
+    // MM
     // --------------------------------------------------------
 
     if (
@@ -2738,7 +2838,7 @@ function addTrade(event) {
 
 
     // --------------------------------------------------------
-    // Vérification actif
+    // ACTIF
     // --------------------------------------------------------
 
     if (
@@ -2754,7 +2854,7 @@ function addTrade(event) {
 
 
     // --------------------------------------------------------
-    // Vérification lot
+    // LOT
     // --------------------------------------------------------
 
     if (
@@ -2771,7 +2871,7 @@ function addTrade(event) {
 
 
     // --------------------------------------------------------
-    // Vérification P/L
+    // P/L automatique
     // --------------------------------------------------------
 
     if (
@@ -2787,7 +2887,7 @@ function addTrade(event) {
 
 
     // --------------------------------------------------------
-    // Vérification prix
+    // PRIX
     // --------------------------------------------------------
 
     if (
@@ -2795,8 +2895,7 @@ function addTrade(event) {
             direction,
             entry,
             sl,
-            tp,
-            result
+            tp
         )
     ) {
 
@@ -2831,6 +2930,10 @@ function addTrade(event) {
     }
 
 
+    // --------------------------------------------------------
+    // RISQUE RÉEL
+    // --------------------------------------------------------
+
     const realRisk =
         calculateRiskForLot(
             asset,
@@ -2839,6 +2942,10 @@ function addTrade(event) {
             lot
         );
 
+
+    // --------------------------------------------------------
+    // TRADE
+    // --------------------------------------------------------
 
     const trade = {
 
@@ -2894,7 +3001,9 @@ function addTrade(event) {
             risk,
 
         realRisk:
-            Number.isFinite(realRisk)
+            Number.isFinite(
+                realRisk
+            )
                 ? realRisk
                 : null
     };
@@ -2907,6 +3016,10 @@ function addTrade(event) {
 
     saveTrades();
 
+
+    // --------------------------------------------------------
+    // RESET FORMULAIRE
+    // --------------------------------------------------------
 
     document
         .getElementById(
@@ -4920,10 +5033,12 @@ function updateCapitalModalRR() {
             "capitalRiskInput"
         );
 
+
     const objectiveInput =
         document.getElementById(
             "capitalObjectiveInput"
         );
+
 
     const rrDisplay =
         document.getElementById(
@@ -4944,6 +5059,7 @@ function updateCapitalModalRR() {
         parseNumber(
             riskInput.value
         );
+
 
     const objective =
         parseNumber(
@@ -5327,7 +5443,10 @@ function refreshAll() {
 
 function setupEvents() {
 
-    // Trade
+    // --------------------------------------------------------
+    // TRADE
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "tradeForm"
@@ -5338,7 +5457,10 @@ function setupEvents() {
         );
 
 
-    // MM automatique
+    // --------------------------------------------------------
+    // MM AUTOMATIQUE
+    // --------------------------------------------------------
+
     [
         "asset",
         "direction",
@@ -5370,7 +5492,10 @@ function setupEvents() {
     );
 
 
-    // Résultat => P/L automatique
+    // --------------------------------------------------------
+    // RESULTAT => P/L AUTOMATIQUE
+    // --------------------------------------------------------
+
     const resultElement =
         document.getElementById(
             "result"
@@ -5392,7 +5517,10 @@ function setupEvents() {
     }
 
 
-    // Mise à jour RR capital
+    // --------------------------------------------------------
+    // RR CAPITAL
+    // --------------------------------------------------------
+
     [
         "capitalRiskInput",
         "capitalObjectiveInput"
@@ -5422,7 +5550,10 @@ function setupEvents() {
     );
 
 
-    // Périodes
+    // --------------------------------------------------------
+    // PERIODES
+    // --------------------------------------------------------
+
     document
         .querySelectorAll(
             ".period-btn"
@@ -5464,7 +5595,10 @@ function setupEvents() {
         );
 
 
-    // Modifier capital
+    // --------------------------------------------------------
+    // MODIFIER CAPITAL
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "changeCapitalBtn"
@@ -5480,7 +5614,10 @@ function setupEvents() {
         );
 
 
-    // Nouveau capital
+    // --------------------------------------------------------
+    // NOUVEAU CAPITAL
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "newCapitalBtn"
@@ -5496,7 +5633,10 @@ function setupEvents() {
         );
 
 
-    // Archiver
+    // --------------------------------------------------------
+    // ARCHIVER
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "archiveCapitalBtn"
@@ -5507,7 +5647,10 @@ function setupEvents() {
         );
 
 
-    // Sauvegarder capital
+    // --------------------------------------------------------
+    // SAUVEGARDER CAPITAL
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "saveCapitalBtn"
@@ -5538,7 +5681,10 @@ function setupEvents() {
         );
 
 
-    // Annuler modal
+    // --------------------------------------------------------
+    // ANNULER MODAL
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "cancelCapitalBtn"
@@ -5559,7 +5705,10 @@ function setupEvents() {
         );
 
 
-    // Fermer graphique archive
+    // --------------------------------------------------------
+    // FERMER GRAPHIQUE ARCHIVE
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "closeArchiveChartBtn"
@@ -5570,7 +5719,10 @@ function setupEvents() {
         );
 
 
-    // Effacer trades
+    // --------------------------------------------------------
+    // EFFACER TRADES
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "clearBtn"
@@ -5581,7 +5733,10 @@ function setupEvents() {
         );
 
 
-    // Theme
+    // --------------------------------------------------------
+    // THEME
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "themeToggle"
@@ -5592,7 +5747,10 @@ function setupEvents() {
         );
 
 
-    // Fermer modal en cliquant dehors
+    // --------------------------------------------------------
+    // FERME MODAL CAPITAL EN CLIQUANT DEHORS
+    // --------------------------------------------------------
+
     document
         .getElementById(
             "capitalModal"
@@ -5611,6 +5769,10 @@ function setupEvents() {
             }
         );
 
+
+    // --------------------------------------------------------
+    // FERME MODAL GRAPHIQUE
+    // --------------------------------------------------------
 
     document
         .getElementById(
@@ -5631,7 +5793,10 @@ function setupEvents() {
         );
 
 
-    // Escape
+    // --------------------------------------------------------
+    // ESCAPE
+    // --------------------------------------------------------
+
     document.addEventListener(
         "keydown",
         event => {
@@ -5649,7 +5814,10 @@ function setupEvents() {
     );
 
 
-    // Redimensionnement graphique
+    // --------------------------------------------------------
+    // REDIMENSIONNEMENT
+    // --------------------------------------------------------
+
     window.addEventListener(
         "resize",
         () => {
@@ -5697,4 +5865,3 @@ document.addEventListener(
     "DOMContentLoaded",
     init
 );
-```
