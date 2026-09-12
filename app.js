@@ -13,49 +13,63 @@ let archiveChart = null;
 
 
 // ============================================================
-// CONFIGURATION DES ACTIFS / PIPS
+// CONFIGURATION DES ACTIFS / PIPS / MM
 // ============================================================
 
 const ASSET_SPECS = {
 
     "EUR/USD": {
         type: "forex",
-        pipMultiplier: 10000
+        pipMultiplier: 10000,
+        pipValuePerLot: 10
     },
 
     "GBP/USD": {
         type: "forex",
-        pipMultiplier: 10000
+        pipMultiplier: 10000,
+        pipValuePerLot: 10
     },
 
     "AUD/USD": {
         type: "forex",
-        pipMultiplier: 10000
+        pipMultiplier: 10000,
+        pipValuePerLot: 10
     },
 
     "NZD/USD": {
         type: "forex",
-        pipMultiplier: 10000
+        pipMultiplier: 10000,
+        pipValuePerLot: 10
     },
 
     "USD/CAD": {
         type: "forex",
-        pipMultiplier: 10000
+        pipMultiplier: 10000,
+        pipValuePerLot: 10
     },
 
     "USD/CHF": {
         type: "forex",
-        pipMultiplier: 10000
+        pipMultiplier: 10000,
+        pipValuePerLot: 10
     },
 
     "USD/JPY": {
         type: "jpy",
-        pipMultiplier: 100
+        pipMultiplier: 100,
+        pipValuePerLot: null
     },
 
     "XAUUSD": {
         type: "gold",
-        pipMultiplier: 100
+        pipMultiplier: 100,
+        contractSize: 100
+    },
+
+    "BTCUSD": {
+        type: "crypto",
+        pipMultiplier: 100,
+        contractSize: 1
     }
 };
 
@@ -169,7 +183,11 @@ function normalizeAsset(asset) {
         "XAU/USD": "XAUUSD",
         "XAUUSDC": "XAUUSD",
         "XAUUSD C": "XAUUSD",
-        "GOLD": "XAUUSD"
+        "GOLD": "XAUUSD",
+
+        "BTCUSD": "BTCUSD",
+        "BTC/USD": "BTCUSD",
+        "BITCOIN": "BTCUSD"
     };
 
     return aliases[value] || value;
@@ -184,6 +202,10 @@ function getAssetSpec(asset) {
     return ASSET_SPECS[normalized] || null;
 }
 
+
+// ============================================================
+// CALCUL PIPS
+// ============================================================
 
 function calculatePips(
     asset,
@@ -205,19 +227,16 @@ function calculatePips(
         return null;
     }
 
-    // BE = 0 pip réalisé
     if (result === "BE") {
         return 0;
     }
 
     let exitPrice = NaN;
 
-    // TP = sortie au TP
     if (result === "TP") {
         exitPrice = tp;
     }
 
-    // SL = sortie au SL
     if (result === "SL") {
         exitPrice = sl;
     }
@@ -264,6 +283,486 @@ function formatPips(pips) {
     }
 
     return "0.0";
+}
+
+
+// ============================================================
+// MM DU CAPITAL
+// ============================================================
+
+function getCapitalRisk() {
+
+    if (!activeCapital) {
+        return 0;
+    }
+
+    return Number(
+        activeCapital.riskPerTrade
+    ) || 0;
+}
+
+
+function getCapitalObjective() {
+
+    if (!activeCapital) {
+        return 0;
+    }
+
+    return Number(
+        activeCapital.objectivePerTrade
+    ) || 0;
+}
+
+
+function calculateCapitalRR() {
+
+    const risk =
+        getCapitalRisk();
+
+    const objective =
+        getCapitalObjective();
+
+    if (
+        risk <= 0 ||
+        objective <= 0
+    ) {
+        return 0;
+    }
+
+    return objective / risk;
+}
+
+
+// ============================================================
+// CALCUL LOT AUTOMATIQUE
+// ============================================================
+
+function calculateAutomaticLot(
+    asset,
+    entry,
+    sl,
+    riskAmount
+) {
+
+    const spec =
+        getAssetSpec(asset);
+
+    if (
+        !spec ||
+        !Number.isFinite(entry) ||
+        !Number.isFinite(sl) ||
+        !Number.isFinite(riskAmount) ||
+        riskAmount <= 0
+    ) {
+        return null;
+    }
+
+    const distance =
+        Math.abs(entry - sl);
+
+    if (distance <= 0) {
+        return null;
+    }
+
+
+    let lot = 0;
+
+
+    // --------------------------------------------------------
+    // FOREX USD QUOTE
+    // EUR/USD, GBP/USD, AUD/USD, NZD/USD,
+    // USD/CAD, USD/CHF
+    // --------------------------------------------------------
+
+    if (
+        spec.type === "forex"
+    ) {
+
+        const pips =
+            distance *
+            spec.pipMultiplier;
+
+        lot =
+            riskAmount /
+            (
+                pips *
+                spec.pipValuePerLot
+            );
+    }
+
+
+    // --------------------------------------------------------
+    // USD/JPY
+    // Valeur approximative du pip pour 1 lot :
+    // 1000 / prix USDJPY
+    // --------------------------------------------------------
+
+    else if (
+        spec.type === "jpy"
+    ) {
+
+        const pips =
+            distance *
+            spec.pipMultiplier;
+
+        const pipValuePerLot =
+            1000 / entry;
+
+        lot =
+            riskAmount /
+            (
+                pips *
+                pipValuePerLot
+            );
+    }
+
+
+    // --------------------------------------------------------
+    // XAUUSD
+    // Convention : 1 lot = 100 oz
+    // --------------------------------------------------------
+
+    else if (
+        spec.type === "gold"
+    ) {
+
+        lot =
+            riskAmount /
+            (
+                distance *
+                spec.contractSize
+            );
+    }
+
+
+    // --------------------------------------------------------
+    // BTCUSD
+    // Convention du journal : 1 lot = 1 BTC
+    // --------------------------------------------------------
+
+    else if (
+        spec.type === "crypto"
+    ) {
+
+        lot =
+            riskAmount /
+            distance;
+    }
+
+
+    if (
+        !Number.isFinite(lot) ||
+        lot <= 0
+    ) {
+        return null;
+    }
+
+
+    // --------------------------------------------------------
+    // Arrondi au pas de 0.01
+    // On arrondit vers le bas pour ne pas dépasser
+    // le risque souhaité.
+    // --------------------------------------------------------
+
+    lot =
+        Math.floor(
+            lot * 100
+        ) / 100;
+
+
+    if (lot < 0.01) {
+        return 0;
+    }
+
+
+    return lot;
+}
+
+
+// ============================================================
+// CALCUL TP AUTOMATIQUE
+// ============================================================
+
+function calculateAutomaticTP(
+    direction,
+    entry,
+    sl,
+    riskAmount,
+    objectiveAmount
+) {
+
+    if (
+        !Number.isFinite(entry) ||
+        !Number.isFinite(sl) ||
+        !Number.isFinite(riskAmount) ||
+        !Number.isFinite(objectiveAmount)
+    ) {
+        return null;
+    }
+
+    if (
+        riskAmount <= 0 ||
+        objectiveAmount <= 0
+    ) {
+        return null;
+    }
+
+    const riskDistance =
+        Math.abs(entry - sl);
+
+    if (
+        riskDistance <= 0
+    ) {
+        return null;
+    }
+
+    const rr =
+        objectiveAmount /
+        riskAmount;
+
+    const rewardDistance =
+        riskDistance *
+        rr;
+
+
+    if (
+        direction === "BUY"
+    ) {
+
+        return (
+            entry +
+            rewardDistance
+        );
+
+    } else {
+
+        return (
+            entry -
+            rewardDistance
+        );
+    }
+}
+
+
+// ============================================================
+// MISE À JOUR AUTOMATIQUE DU MM
+// ============================================================
+
+function updateAutomaticTradeValues() {
+
+    const assetElement =
+        document.getElementById(
+            "asset"
+        );
+
+    const entryElement =
+        document.getElementById(
+            "entry"
+        );
+
+    const slElement =
+        document.getElementById(
+            "sl"
+        );
+
+    const tpElement =
+        document.getElementById(
+            "tp"
+        );
+
+    const lotElement =
+        document.getElementById(
+            "lot"
+        );
+
+    const rrElement =
+        document.getElementById(
+            "calculatedRR"
+        );
+
+    const mmInfo =
+        document.getElementById(
+            "tradeMMInfo"
+        );
+
+
+    if (
+        !assetElement ||
+        !entryElement ||
+        !slElement ||
+        !tpElement ||
+        !lotElement ||
+        !rrElement
+    ) {
+        return;
+    }
+
+
+    const asset =
+        normalizeAsset(
+            assetElement.value
+        );
+
+    const entry =
+        parseNumber(
+            entryElement.value
+        );
+
+    const sl =
+        parseNumber(
+            slElement.value
+        );
+
+    const risk =
+        getCapitalRisk();
+
+    const objective =
+        getCapitalObjective();
+
+
+    tpElement.value = "";
+
+    lotElement.value = "";
+
+    rrElement.value = "0.00";
+
+
+    if (
+        risk <= 0 ||
+        objective <= 0
+    ) {
+
+        if (mmInfo) {
+
+            mmInfo.textContent =
+                "Configurez le risque et l'objectif du capital actif.";
+
+        }
+
+        return;
+    }
+
+
+    const rr =
+        objective / risk;
+
+
+    rrElement.value =
+        rr.toFixed(2);
+
+
+    if (
+        !asset ||
+        !getAssetSpec(asset)
+    ) {
+
+        if (mmInfo) {
+
+            mmInfo.textContent =
+                `Risque : ${money(risk)} | Objectif : ${money(objective)} | RR ${rr.toFixed(2)}`;
+
+        }
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(entry) ||
+        !Number.isFinite(sl)
+    ) {
+
+        if (mmInfo) {
+
+            mmInfo.textContent =
+                `Risque : ${money(risk)} | Objectif : ${money(objective)} | RR ${rr.toFixed(2)}`;
+
+        }
+
+        return;
+    }
+
+
+    if (entry === sl) {
+
+        if (mmInfo) {
+
+            mmInfo.textContent =
+                "Entry et SL doivent être différents.";
+
+        }
+
+        return;
+    }
+
+
+    const lot =
+        calculateAutomaticLot(
+            asset,
+            entry,
+            sl,
+            risk
+        );
+
+
+    const tp =
+        calculateAutomaticTP(
+            document.getElementById(
+                "direction"
+            ).value,
+            entry,
+            sl,
+            risk,
+            objective
+        );
+
+
+    if (
+        lot === null ||
+        lot <= 0
+    ) {
+
+        lotElement.value = "";
+
+        if (mmInfo) {
+
+            mmInfo.textContent =
+                "Le risque demandé est trop faible pour atteindre le lot minimum de 0.01.";
+
+        }
+
+        return;
+    }
+
+
+    if (
+        tp === null
+    ) {
+
+        if (mmInfo) {
+
+            mmInfo.textContent =
+                "Impossible de calculer le TP.";
+
+        }
+
+        return;
+    }
+
+
+    lotElement.value =
+        lot.toFixed(2);
+
+
+    tpElement.value =
+        tp.toFixed(5);
+
+
+    if (mmInfo) {
+
+        mmInfo.textContent =
+            `Risque : ${money(risk)} | Objectif : ${money(objective)} | RR ${rr.toFixed(2)} | Lot : ${lot.toFixed(2)}`;
+    }
 }
 
 
@@ -343,11 +842,20 @@ function loadData() {
 
         activeCapital = {
 
-            id: generateId(),
+            id:
+                generateId(),
 
-            name: "Capital 1",
+            name:
+                "Capital 1",
 
-            initialCapital: 0,
+            initialCapital:
+                0,
+
+            riskPerTrade:
+                0,
+
+            objectivePerTrade:
+                0,
 
             createdAt:
                 new Date().toISOString()
@@ -357,105 +865,122 @@ function loadData() {
     }
 
 
+    // Compatibilité avec les anciens capitaux
+    if (
+        activeCapital.riskPerTrade === undefined
+    ) {
+
+        activeCapital.riskPerTrade = 0;
+    }
+
+
+    if (
+        activeCapital.objectivePerTrade === undefined
+    ) {
+
+        activeCapital.objectivePerTrade = 0;
+    }
+
+
+    saveActiveCapital();
+
+
     let changed = false;
 
 
-    trades.forEach(trade => {
+    trades.forEach(
+        trade => {
 
-        // Compatibilité anciens trades
-        if (!trade.capitalId) {
+            if (!trade.capitalId) {
 
-            trade.capitalId =
-                activeCapital.id;
+                trade.capitalId =
+                    activeCapital.id;
 
-            changed = true;
-        }
+                changed = true;
+            }
 
-
-        // Ancien trade sans lot
-        if (
-            trade.lot === undefined ||
-            trade.lot === null ||
-            trade.lot === ""
-        ) {
-
-            trade.lot = 0;
-
-            changed = true;
-        }
-
-
-        // Ancien P/L
-        if (
-            trade.pnl === undefined &&
-            trade.profit !== undefined
-        ) {
-
-            trade.pnl =
-                parseNumber(
-                    trade.profit
-                );
-
-            changed = true;
-        }
-
-
-        // Ancienne direction
-        if (
-            trade.position === undefined &&
-            trade.direction !== undefined
-        ) {
-
-            trade.position =
-                trade.direction;
-
-            changed = true;
-        }
-
-
-        // Normalisation actif
-        if (trade.asset) {
-
-            const normalizedAsset =
-                normalizeAsset(
-                    trade.asset
-                );
 
             if (
-                normalizedAsset &&
-                normalizedAsset !== trade.asset
+                trade.lot === undefined ||
+                trade.lot === null ||
+                trade.lot === ""
             ) {
 
-                trade.asset =
-                    normalizedAsset;
+                trade.lot = 0;
+
+                changed = true;
+            }
+
+
+            if (
+                trade.pnl === undefined &&
+                trade.profit !== undefined
+            ) {
+
+                trade.pnl =
+                    parseNumber(
+                        trade.profit
+                    );
+
+                changed = true;
+            }
+
+
+            if (
+                trade.position === undefined &&
+                trade.direction !== undefined
+            ) {
+
+                trade.position =
+                    trade.direction;
+
+                changed = true;
+            }
+
+
+            if (trade.asset) {
+
+                const normalizedAsset =
+                    normalizeAsset(
+                        trade.asset
+                    );
+
+                if (
+                    normalizedAsset &&
+                    normalizedAsset !== trade.asset
+                ) {
+
+                    trade.asset =
+                        normalizedAsset;
+
+                    changed = true;
+                }
+            }
+
+
+            const calculatedPips =
+                calculatePips(
+                    trade.asset,
+                    trade.position,
+                    parseNumber(trade.entry),
+                    parseNumber(trade.sl),
+                    parseNumber(trade.tp),
+                    trade.result
+                );
+
+
+            if (
+                calculatedPips !== null &&
+                trade.pips !== calculatedPips
+            ) {
+
+                trade.pips =
+                    calculatedPips;
 
                 changed = true;
             }
         }
-
-
-        // Recalcul des pips pour les anciens trades
-        const calculatedPips =
-            calculatePips(
-                trade.asset,
-                trade.position,
-                parseNumber(trade.entry),
-                parseNumber(trade.sl),
-                parseNumber(trade.tp),
-                trade.result
-            );
-
-        if (
-            calculatedPips !== null &&
-            trade.pips !== calculatedPips
-        ) {
-
-            trade.pips =
-                calculatedPips;
-
-            changed = true;
-        }
-    });
+    );
 
 
     if (changed) {
@@ -870,14 +1395,12 @@ function updateCapitalDisplay() {
         );
 
 
-    const balance =
-        calculateCurrentBalance();
-
-
     document.getElementById(
         "currentBalance"
     ).textContent =
-        money(balance);
+        money(
+            calculateCurrentBalance()
+        );
 
 
     const currentTrades =
@@ -894,6 +1417,49 @@ function updateCapitalDisplay() {
         "totalProfit"
     ).textContent =
         money(totalProfit);
+
+
+    const riskElement =
+        document.getElementById(
+            "activeRisk"
+        );
+
+
+    const objectiveElement =
+        document.getElementById(
+            "activeObjective"
+        );
+
+
+    const rrElement =
+        document.getElementById(
+            "activeCapitalRR"
+        );
+
+
+    if (riskElement) {
+
+        riskElement.textContent =
+            money(
+                activeCapital.riskPerTrade
+            );
+    }
+
+
+    if (objectiveElement) {
+
+        objectiveElement.textContent =
+            money(
+                activeCapital.objectivePerTrade
+            );
+    }
+
+
+    if (rrElement) {
+
+        rrElement.textContent =
+            calculateCapitalRR().toFixed(2);
+    }
 }
 
 
@@ -1187,7 +1753,8 @@ function renderHistory() {
                     Number(trade.tp)
                 )
                     ? formatNumber(
-                        trade.tp
+                        trade.tp,
+                        5
                     )
                     : "-";
 
@@ -1197,7 +1764,8 @@ function renderHistory() {
                     Number(trade.entry)
                 )
                     ? formatNumber(
-                        trade.entry
+                        trade.entry,
+                        5
                     )
                     : "-";
 
@@ -1269,7 +1837,6 @@ function renderHistory() {
                     )}
                 </td>
 
-
                 <td>
                     ${escapeHtml(
                         normalizeAsset(
@@ -1277,7 +1844,6 @@ function renderHistory() {
                         ) || "-"
                     )}
                 </td>
-
 
                 <td>
 
@@ -1294,33 +1860,27 @@ function renderHistory() {
 
                 </td>
 
-
                 <td>
                     <strong>
                         ${lotValue}
                     </strong>
                 </td>
 
-
                 <td>
                     ${entry}
                 </td>
-
 
                 <td>
                     ${sl}
                 </td>
 
-
                 <td>
                     ${tp}
                 </td>
 
-
                 <td>
                     ${rr}
                 </td>
-
 
                 <td class="${pipsClass}">
                     ${
@@ -1330,13 +1890,11 @@ function renderHistory() {
                     }
                 </td>
 
-
                 <td>
                     ${escapeHtml(
                         trade.setup || "-"
                     )}
                 </td>
-
 
                 <td>
                     ${escapeHtml(
@@ -1344,11 +1902,9 @@ function renderHistory() {
                     )}
                 </td>
 
-
                 <td class="${pnlClass}">
                     ${money(pnl)}
                 </td>
-
 
                 <td>
 
@@ -1380,10 +1936,9 @@ function renderHistory() {
                     "click",
                     () => {
 
-                        const id =
-                            button.dataset.id;
-
-                        deleteTrade(id);
+                        deleteTrade(
+                            button.dataset.id
+                        );
                     }
                 );
             }
@@ -1439,99 +1994,7 @@ function deleteTrade(id) {
 
 function calculateRR() {
 
-    const direction =
-        document.getElementById(
-            "direction"
-        ).value;
-
-
-    const entry =
-        parseNumber(
-            document.getElementById(
-                "entry"
-            ).value
-        );
-
-
-    const sl =
-        parseNumber(
-            document.getElementById(
-                "sl"
-            ).value
-        );
-
-
-    const tp =
-        parseNumber(
-            document.getElementById(
-                "tp"
-            ).value
-        );
-
-
-    const rrInput =
-        document.getElementById(
-            "calculatedRR"
-        );
-
-
-    if (
-        !Number.isFinite(entry) ||
-        !Number.isFinite(sl) ||
-        !Number.isFinite(tp)
-    ) {
-
-        rrInput.value =
-            "0.00";
-
-        return;
-    }
-
-
-    let risk = 0;
-
-    let reward = 0;
-
-
-    if (
-        direction ===
-        "BUY"
-    ) {
-
-        risk =
-            entry - sl;
-
-        reward =
-            tp - entry;
-
-    } else {
-
-        risk =
-            sl - entry;
-
-        reward =
-            entry - tp;
-    }
-
-
-    if (
-        risk <= 0 ||
-        reward <= 0
-    ) {
-
-        rrInput.value =
-            "0.00";
-
-        return;
-    }
-
-
-    const rr =
-        reward / risk;
-
-
-    rrInput.value =
-        rr.toFixed(2);
+    updateAutomaticTradeValues();
 }
 
 
@@ -1553,6 +2016,30 @@ function validateTrade(
 
         alert(
             "Veuillez entrer un prix d'entrée valide."
+        );
+
+        return false;
+    }
+
+
+    if (
+        !Number.isFinite(sl)
+    ) {
+
+        alert(
+            "Veuillez entrer un Stop Loss valide."
+        );
+
+        return false;
+    }
+
+
+    if (
+        !Number.isFinite(tp)
+    ) {
+
+        alert(
+            "Le Take Profit n'a pas pu être calculé."
         );
 
         return false;
@@ -1591,7 +2078,6 @@ function validateTrade(
     ) {
 
         if (
-            Number.isFinite(sl) &&
             sl >= entry
         ) {
 
@@ -1604,7 +2090,6 @@ function validateTrade(
 
 
         if (
-            Number.isFinite(tp) &&
             tp <= entry
         ) {
 
@@ -1618,7 +2103,6 @@ function validateTrade(
     } else {
 
         if (
-            Number.isFinite(sl) &&
             sl <= entry
         ) {
 
@@ -1631,7 +2115,6 @@ function validateTrade(
 
 
         if (
-            Number.isFinite(tp) &&
             tp >= entry
         ) {
 
@@ -1657,15 +2140,11 @@ function addTrade(event) {
     event.preventDefault();
 
 
-    const assetInput =
-        document.getElementById(
-            "asset"
-        );
-
-
     const asset =
         normalizeAsset(
-            assetInput.value
+            document.getElementById(
+                "asset"
+            ).value
         );
 
 
@@ -1745,7 +2224,35 @@ function addTrade(event) {
         ).value.trim();
 
 
+    const risk =
+        getCapitalRisk();
+
+
+    const objective =
+        getCapitalObjective();
+
+
+    // --------------------------------------------------------
+    // Vérifications MM
+    // --------------------------------------------------------
+
+    if (
+        risk <= 0 ||
+        objective <= 0
+    ) {
+
+        alert(
+            "Veuillez d'abord configurer le Risque par trade et l'Objectif par trade du capital actif."
+        );
+
+        return;
+    }
+
+
+    // --------------------------------------------------------
     // Vérification actif
+    // --------------------------------------------------------
+
     if (
         !getAssetSpec(asset)
     ) {
@@ -1758,21 +2265,27 @@ function addTrade(event) {
     }
 
 
+    // --------------------------------------------------------
     // Vérification lot
+    // --------------------------------------------------------
+
     if (
         !Number.isFinite(lot) ||
-        lot <= 0
+        lot < 0.01
     ) {
 
         alert(
-            "Veuillez entrer un lot valide. Exemple : 0.01"
+            "Le lot automatique est inférieur au minimum de 0.01 pour cet actif."
         );
 
         return;
     }
 
 
+    // --------------------------------------------------------
     // Vérification P/L
+    // --------------------------------------------------------
+
     if (
         !Number.isFinite(pnl)
     ) {
@@ -1785,7 +2298,10 @@ function addTrade(event) {
     }
 
 
+    // --------------------------------------------------------
     // Vérification prix
+    // --------------------------------------------------------
+
     if (
         !validateTrade(
             direction,
@@ -1800,54 +2316,19 @@ function addTrade(event) {
     }
 
 
-    // Calcul RR
-    let rr = 0;
+    // --------------------------------------------------------
+    // RR
+    // --------------------------------------------------------
+
+    const rr =
+        objective /
+        risk;
 
 
-    if (
-        Number.isFinite(entry) &&
-        Number.isFinite(sl) &&
-        Number.isFinite(tp)
-    ) {
+    // --------------------------------------------------------
+    // PIPS
+    // --------------------------------------------------------
 
-        let risk;
-
-        let reward;
-
-
-        if (
-            direction ===
-            "BUY"
-        ) {
-
-            risk =
-                entry - sl;
-
-            reward =
-                tp - entry;
-
-        } else {
-
-            risk =
-                sl - entry;
-
-            reward =
-                entry - tp;
-        }
-
-
-        if (
-            risk > 0 &&
-            reward > 0
-        ) {
-
-            rr =
-                reward / risk;
-        }
-    }
-
-
-    // Calcul PIPS
     const pips =
         calculatePips(
             asset,
@@ -1898,19 +2379,14 @@ function addTrade(event) {
             entry,
 
         sl:
-            Number.isFinite(sl)
-                ? sl
-                : null,
+            sl,
 
         tp:
-            Number.isFinite(tp)
-                ? tp
-                : null,
+            tp,
 
         rr:
             rr,
 
-        // NOUVEAU
         pips:
             pips,
 
@@ -1920,7 +2396,6 @@ function addTrade(event) {
         result:
             result,
 
-        // Conservé comme dans ta version actuelle
         pnl:
             pnl,
 
@@ -1929,7 +2404,10 @@ function addTrade(event) {
     };
 
 
-    trades.push(trade);
+    trades.push(
+        trade
+    );
+
 
     saveTrades();
 
@@ -1968,7 +2446,10 @@ function addTrade(event) {
     document.getElementById(
         "calculatedRR"
     ).value =
-        "0.00";
+        calculateCapitalRR().toFixed(2);
+
+
+    updateAutomaticTradeValues();
 
 
     refreshAll();
@@ -3224,6 +3705,51 @@ function renderArchives() {
                     <div>
 
                         <span>
+                            Risque
+                        </span>
+
+                        <strong>
+                            ${money(
+                                archive.riskPerTrade
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Objectif
+                        </span>
+
+                        <strong>
+                            ${money(
+                                archive.objectivePerTrade
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            RR
+                        </span>
+
+                        <strong>
+                            ${Number(
+                                archive.rr || 0
+                            ).toFixed(2)}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
                             Profit
                         </span>
 
@@ -3419,6 +3945,19 @@ function createArchiveFromCurrentCapital() {
                 activeCapital.initialCapital
             ) || 0,
 
+        riskPerTrade:
+            Number(
+                activeCapital.riskPerTrade
+            ) || 0,
+
+        objectivePerTrade:
+            Number(
+                activeCapital.objectivePerTrade
+            ) || 0,
+
+        rr:
+            calculateCapitalRR(),
+
         finalBalance:
             finalBalance,
 
@@ -3464,18 +4003,6 @@ function createArchiveFromCurrentCapital() {
 
 function createNewCapital() {
 
-    const currentTrades =
-        getCurrentCapitalTrades();
-
-
-    if (
-        currentTrades.length > 0
-    ) {
-
-        createArchiveFromCurrentCapital();
-    }
-
-
     const name =
         document.getElementById(
             "capitalNameInput"
@@ -3486,6 +4013,22 @@ function createNewCapital() {
         parseNumber(
             document.getElementById(
                 "capitalAmountInput"
+            ).value
+        );
+
+
+    const risk =
+        parseNumber(
+            document.getElementById(
+                "capitalRiskInput"
+            ).value
+        );
+
+
+    const objective =
+        parseNumber(
+            document.getElementById(
+                "capitalObjectiveInput"
             ).value
         );
 
@@ -3513,6 +4056,44 @@ function createNewCapital() {
     }
 
 
+    if (
+        !Number.isFinite(risk) ||
+        risk <= 0
+    ) {
+
+        alert(
+            "Veuillez entrer un Risque par trade valide."
+        );
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(objective) ||
+        objective <= 0
+    ) {
+
+        alert(
+            "Veuillez entrer un Objectif par trade valide."
+        );
+
+        return;
+    }
+
+
+    const currentTrades =
+        getCurrentCapitalTrades();
+
+
+    if (
+        currentTrades.length > 0
+    ) {
+
+        createArchiveFromCurrentCapital();
+    }
+
+
     activeCapital = {
 
         id:
@@ -3523,6 +4104,12 @@ function createNewCapital() {
 
         initialCapital:
             amount,
+
+        riskPerTrade:
+            risk,
+
+        objectivePerTrade:
+            objective,
 
         createdAt:
             new Date().toISOString()
@@ -3536,6 +4123,11 @@ function createNewCapital() {
 
 
     refreshAll();
+
+
+    alert(
+        `Capital créé avec succès ! RR configuré : ${(objective / risk).toFixed(2)}`
+    );
 }
 
 
@@ -3559,6 +4151,22 @@ function saveCapitalModification() {
         );
 
 
+    const risk =
+        parseNumber(
+            document.getElementById(
+                "capitalRiskInput"
+            ).value
+        );
+
+
+    const objective =
+        parseNumber(
+            document.getElementById(
+                "capitalObjectiveInput"
+            ).value
+        );
+
+
     if (!name) {
 
         alert(
@@ -3576,6 +4184,32 @@ function saveCapitalModification() {
 
         alert(
             "Veuillez entrer un capital valide."
+        );
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(risk) ||
+        risk <= 0
+    ) {
+
+        alert(
+            "Veuillez entrer un Risque par trade valide."
+        );
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(objective) ||
+        objective <= 0
+    ) {
+
+        alert(
+            "Veuillez entrer un Objectif par trade valide."
         );
 
         return;
@@ -3620,6 +4254,12 @@ function saveCapitalModification() {
             initialCapital:
                 amount,
 
+            riskPerTrade:
+                risk,
+
+            objectivePerTrade:
+                objective,
+
             createdAt:
                 new Date().toISOString()
         };
@@ -3628,6 +4268,12 @@ function saveCapitalModification() {
 
         activeCapital.name =
             name;
+
+        activeCapital.riskPerTrade =
+            risk;
+
+        activeCapital.objectivePerTrade =
+            objective;
     }
 
 
@@ -3640,6 +4286,11 @@ function saveCapitalModification() {
 
 
     refreshAll();
+
+
+    alert(
+        `Capital modifié ! RR configuré : ${(objective / risk).toFixed(2)}`
+    );
 }
 
 
@@ -3687,6 +4338,12 @@ function archiveCurrentCapital() {
             ),
 
         initialCapital:
+            0,
+
+        riskPerTrade:
+            0,
+
+        objectivePerTrade:
             0,
 
         createdAt:
@@ -3766,6 +4423,18 @@ function openCapitalModal(
         );
 
 
+    const riskInput =
+        document.getElementById(
+            "capitalRiskInput"
+        );
+
+
+    const objectiveInput =
+        document.getElementById(
+            "capitalObjectiveInput"
+        );
+
+
     if (
         mode === "edit"
     ) {
@@ -3781,6 +4450,14 @@ function openCapitalModal(
         amountInput.value =
             activeCapital.initialCapital;
 
+
+        riskInput.value =
+            activeCapital.riskPerTrade;
+
+
+        objectiveInput.value =
+            activeCapital.objectivePerTrade;
+
     } else {
 
         title.textContent =
@@ -3794,7 +4471,14 @@ function openCapitalModal(
             );
 
 
-        amountInput.value = "";
+        amountInput.value =
+            "";
+
+        riskInput.value =
+            "";
+
+        objectiveInput.value =
+            "";
     }
 
 
@@ -4044,6 +4728,8 @@ function refreshAll() {
     renderArchives();
 
     drawCapitalChart();
+
+    updateAutomaticTradeValues();
 }
 
 
@@ -4064,12 +4750,12 @@ function setupEvents() {
         );
 
 
-    // Calcul RR
+    // MM automatique
     [
+        "asset",
         "direction",
         "entry",
-        "sl",
-        "tp"
+        "sl"
     ].forEach(
         id => {
 
@@ -4083,13 +4769,13 @@ function setupEvents() {
 
                 element.addEventListener(
                     "input",
-                    calculateRR
+                    updateAutomaticTradeValues
                 );
 
 
                 element.addEventListener(
                     "change",
-                    calculateRR
+                    updateAutomaticTradeValues
                 );
             }
         }
