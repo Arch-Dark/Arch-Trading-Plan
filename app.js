@@ -43,15 +43,13 @@ const ASSET_SPECS = {
     },
 
     "USD/CAD": {
-        type: "forex",
-        pipMultiplier: 10000,
-        pipValuePerLot: 10
+        type: "forexQuoteConversion",
+        pipMultiplier: 10000
     },
 
     "USD/CHF": {
-        type: "forex",
-        pipMultiplier: 10000,
-        pipValuePerLot: 10
+        type: "forexQuoteConversion",
+        pipMultiplier: 10000
     },
 
     "USD/JPY": {
@@ -314,13 +312,16 @@ function getCapitalObjective() {
 }
 
 
-function calculateCapitalRR() {
+function calculateCapitalRR(
+    risk = getCapitalRisk(),
+    objective = getCapitalObjective()
+) {
 
-    const risk =
-        getCapitalRisk();
+    risk =
+        Number(risk) || 0;
 
-    const objective =
-        getCapitalObjective();
+    objective =
+        Number(objective) || 0;
 
     if (
         risk <= 0 ||
@@ -334,10 +335,84 @@ function calculateCapitalRR() {
 
 
 // ============================================================
-// CALCUL LOT AUTOMATIQUE
+// VALEUR DU PIP SELON L'ACTIF
 // ============================================================
 
-function calculateAutomaticLot(
+function getPipValuePerLotUSD(
+    asset,
+    entry
+) {
+
+    const normalized =
+        normalizeAsset(asset);
+
+    const spec =
+        getAssetSpec(normalized);
+
+    if (!spec) {
+        return null;
+    }
+
+
+    // EUR/USD, GBP/USD, AUD/USD, NZD/USD
+    if (
+        spec.type === "forex"
+    ) {
+
+        return spec.pipValuePerLot;
+    }
+
+
+    // USD/CAD et USD/CHF
+    // 1 lot = 100000 unités de devise de base
+    // 1 pip = 0.0001
+    // Valeur = 10 unités de devise quote
+    // Conversion approximate en USD :
+    // 10 / prix
+    if (
+        spec.type === "forexQuoteConversion"
+    ) {
+
+        if (
+            !Number.isFinite(entry) ||
+            entry <= 0
+        ) {
+            return null;
+        }
+
+        return 10 / entry;
+    }
+
+
+    // USD/JPY
+    // 1 lot = 100000 USD
+    // 1 pip = 0.01 JPY
+    // = 1000 JPY
+    // Conversion approximative en USD :
+    // 1000 / prix
+    if (
+        spec.type === "jpy"
+    ) {
+
+        if (
+            !Number.isFinite(entry) ||
+            entry <= 0
+        ) {
+            return null;
+        }
+
+        return 1000 / entry;
+    }
+
+    return null;
+}
+
+
+// ============================================================
+// CALCUL LOT THÉORIQUE
+// ============================================================
+
+function calculateRawLot(
     asset,
     entry,
     sl,
@@ -369,9 +444,7 @@ function calculateAutomaticLot(
 
 
     // --------------------------------------------------------
-    // FOREX USD QUOTE
-    // EUR/USD, GBP/USD, AUD/USD, NZD/USD,
-    // USD/CAD, USD/CHF
+    // FOREX
     // --------------------------------------------------------
 
     if (
@@ -392,9 +465,43 @@ function calculateAutomaticLot(
 
 
     // --------------------------------------------------------
+    // USD/CAD et USD/CHF
+    // --------------------------------------------------------
+
+    else if (
+        spec.type === "forexQuoteConversion"
+    ) {
+
+        const pips =
+            distance *
+            spec.pipMultiplier;
+
+        const pipValuePerLot =
+            getPipValuePerLotUSD(
+                asset,
+                entry
+            );
+
+        if (
+            !Number.isFinite(
+                pipValuePerLot
+            ) ||
+            pipValuePerLot <= 0
+        ) {
+            return null;
+        }
+
+        lot =
+            riskAmount /
+            (
+                pips *
+                pipValuePerLot
+            );
+    }
+
+
+    // --------------------------------------------------------
     // USD/JPY
-    // Valeur approximative du pip pour 1 lot :
-    // 1000 / prix USDJPY
     // --------------------------------------------------------
 
     else if (
@@ -406,7 +513,19 @@ function calculateAutomaticLot(
             spec.pipMultiplier;
 
         const pipValuePerLot =
-            1000 / entry;
+            getPipValuePerLotUSD(
+                asset,
+                entry
+            );
+
+        if (
+            !Number.isFinite(
+                pipValuePerLot
+            ) ||
+            pipValuePerLot <= 0
+        ) {
+            return null;
+        }
 
         lot =
             riskAmount /
@@ -419,7 +538,7 @@ function calculateAutomaticLot(
 
     // --------------------------------------------------------
     // XAUUSD
-    // Convention : 1 lot = 100 oz
+    // 1 lot = 100 oz
     // --------------------------------------------------------
 
     else if (
@@ -437,7 +556,8 @@ function calculateAutomaticLot(
 
     // --------------------------------------------------------
     // BTCUSD
-    // Convention du journal : 1 lot = 1 BTC
+    // Convention du journal :
+    // 1 lot = 1 BTC
     // --------------------------------------------------------
 
     else if (
@@ -458,24 +578,207 @@ function calculateAutomaticLot(
     }
 
 
-    // --------------------------------------------------------
-    // Arrondi au pas de 0.01
-    // On arrondit vers le bas pour ne pas dépasser
-    // le risque souhaité.
-    // --------------------------------------------------------
+    return lot;
+}
 
-    lot =
+
+// ============================================================
+// CALCUL LOT AUTOMATIQUE
+// ============================================================
+
+function calculateAutomaticLot(
+    asset,
+    entry,
+    sl,
+    riskAmount
+) {
+
+    const rawLot =
+        calculateRawLot(
+            asset,
+            entry,
+            sl,
+            riskAmount
+        );
+
+    if (
+        rawLot === null
+    ) {
+        return null;
+    }
+
+
+    // Arrondi vers le bas au pas de 0.01
+    const lot =
         Math.floor(
-            lot * 100
+            rawLot * 100
         ) / 100;
 
 
-    if (lot < 0.01) {
+    if (
+        lot < 0.01
+    ) {
         return 0;
     }
 
 
     return lot;
+}
+
+
+// ============================================================
+// CALCUL DU RISQUE RÉEL POUR UN LOT
+// ============================================================
+
+function calculateRiskForLot(
+    asset,
+    entry,
+    sl,
+    lot
+) {
+
+    const spec =
+        getAssetSpec(asset);
+
+    if (
+        !spec ||
+        !Number.isFinite(entry) ||
+        !Number.isFinite(sl) ||
+        !Number.isFinite(lot) ||
+        lot <= 0
+    ) {
+        return null;
+    }
+
+    const distance =
+        Math.abs(entry - sl);
+
+    if (distance <= 0) {
+        return null;
+    }
+
+
+    // --------------------------------------------------------
+    // FOREX
+    // --------------------------------------------------------
+
+    if (
+        spec.type === "forex"
+    ) {
+
+        const pips =
+            distance *
+            spec.pipMultiplier;
+
+        return (
+            pips *
+            spec.pipValuePerLot *
+            lot
+        );
+    }
+
+
+    // --------------------------------------------------------
+    // USD/CAD / USD/CHF
+    // --------------------------------------------------------
+
+    if (
+        spec.type ===
+        "forexQuoteConversion"
+    ) {
+
+        const pips =
+            distance *
+            spec.pipMultiplier;
+
+        const pipValuePerLot =
+            getPipValuePerLotUSD(
+                asset,
+                entry
+            );
+
+        if (
+            !Number.isFinite(
+                pipValuePerLot
+            )
+        ) {
+            return null;
+        }
+
+        return (
+            pips *
+            pipValuePerLot *
+            lot
+        );
+    }
+
+
+    // --------------------------------------------------------
+    // USD/JPY
+    // --------------------------------------------------------
+
+    if (
+        spec.type === "jpy"
+    ) {
+
+        const pips =
+            distance *
+            spec.pipMultiplier;
+
+        const pipValuePerLot =
+            getPipValuePerLotUSD(
+                asset,
+                entry
+            );
+
+        if (
+            !Number.isFinite(
+                pipValuePerLot
+            )
+        ) {
+            return null;
+        }
+
+        return (
+            pips *
+            pipValuePerLot *
+            lot
+        );
+    }
+
+
+    // --------------------------------------------------------
+    // XAUUSD
+    // --------------------------------------------------------
+
+    if (
+        spec.type === "gold"
+    ) {
+
+        return (
+            distance *
+            spec.contractSize *
+            lot
+        );
+    }
+
+
+    // --------------------------------------------------------
+    // BTCUSD
+    // --------------------------------------------------------
+
+    if (
+        spec.type === "crypto"
+    ) {
+
+        return (
+            distance *
+            lot
+        );
+    }
+
+
+    return null;
 }
 
 
@@ -580,6 +883,11 @@ function updateAutomaticTradeValues() {
             "calculatedRR"
         );
 
+    const directionElement =
+        document.getElementById(
+            "direction"
+        );
+
     const mmInfo =
         document.getElementById(
             "tradeMMInfo"
@@ -592,7 +900,8 @@ function updateAutomaticTradeValues() {
         !slElement ||
         !tpElement ||
         !lotElement ||
-        !rrElement
+        !rrElement ||
+        !directionElement
     ) {
         return;
     }
@@ -612,6 +921,10 @@ function updateAutomaticTradeValues() {
         parseNumber(
             slElement.value
         );
+
+    const direction =
+        directionElement.value;
+
 
     const risk =
         getCapitalRisk();
@@ -644,7 +957,8 @@ function updateAutomaticTradeValues() {
 
 
     const rr =
-        objective / risk;
+        objective /
+        risk;
 
 
     rrElement.value =
@@ -659,7 +973,7 @@ function updateAutomaticTradeValues() {
         if (mmInfo) {
 
             mmInfo.textContent =
-                `Risque : ${money(risk)} | Objectif : ${money(objective)} | RR ${rr.toFixed(2)}`;
+                `Risque souhaité : ${money(risk)} | Objectif : ${money(objective)} | RR : ${rr.toFixed(2)}`;
 
         }
 
@@ -675,7 +989,7 @@ function updateAutomaticTradeValues() {
         if (mmInfo) {
 
             mmInfo.textContent =
-                `Risque : ${money(risk)} | Objectif : ${money(objective)} | RR ${rr.toFixed(2)}`;
+                `Risque souhaité : ${money(risk)} | Objectif : ${money(objective)} | RR : ${rr.toFixed(2)}`;
 
         }
 
@@ -683,7 +997,9 @@ function updateAutomaticTradeValues() {
     }
 
 
-    if (entry === sl) {
+    if (
+        entry === sl
+    ) {
 
         if (mmInfo) {
 
@@ -694,6 +1010,15 @@ function updateAutomaticTradeValues() {
 
         return;
     }
+
+
+    const rawLot =
+        calculateRawLot(
+            asset,
+            entry,
+            sl,
+            risk
+        );
 
 
     const lot =
@@ -707,9 +1032,7 @@ function updateAutomaticTradeValues() {
 
     const tp =
         calculateAutomaticTP(
-            document.getElementById(
-                "direction"
-            ).value,
+            direction,
             entry,
             sl,
             risk,
@@ -717,19 +1040,64 @@ function updateAutomaticTradeValues() {
         );
 
 
-    if (
-        lot === null ||
-        lot <= 0
-    ) {
+    // --------------------------------------------------------
+    // Le lot théorique est inférieur à 0.01
+    // --------------------------------------------------------
 
-        lotElement.value = "";
+    if (
+        rawLot === null
+    ) {
 
         if (mmInfo) {
 
             mmInfo.textContent =
-                "Le risque demandé est trop faible pour atteindre le lot minimum de 0.01.";
+                "Impossible de calculer le lot automatiquement. Vérifiez Entry, SL et le risque.";
 
         }
+
+        return;
+    }
+
+
+    if (
+        rawLot < 0.01 ||
+        lot === 0
+    ) {
+
+        const minimumLotRisk =
+            calculateRiskForLot(
+                asset,
+                entry,
+                sl,
+                0.01
+            );
+
+
+        let message =
+            `Risque souhaité : ${money(risk)} | Lot théorique : ${rawLot.toFixed(4)} | Minimum broker : 0.01 lot`;
+
+
+        if (
+            Number.isFinite(
+                minimumLotRisk
+            )
+        ) {
+
+            message +=
+                ` | Risque à 0.01 lot : ${money(minimumLotRisk)}`;
+        }
+
+
+        message +=
+            " | 0.01 lot dépasserait le risque souhaité.";
+
+
+        if (mmInfo) {
+
+            mmInfo.textContent =
+                message;
+        }
+
 
         return;
     }
@@ -750,6 +1118,21 @@ function updateAutomaticTradeValues() {
     }
 
 
+    const realRisk =
+        calculateRiskForLot(
+            asset,
+            entry,
+            sl,
+            lot
+        );
+
+
+    const riskDifference =
+        Number.isFinite(realRisk)
+            ? risk - realRisk
+            : null;
+
+
     lotElement.value =
         lot.toFixed(2);
 
@@ -760,8 +1143,66 @@ function updateAutomaticTradeValues() {
 
     if (mmInfo) {
 
+        let message =
+            `Risque souhaité : ${money(risk)} | Lot : ${lot.toFixed(2)}`;
+
+
+        if (
+            Number.isFinite(
+                rawLot
+            )
+        ) {
+
+            message +=
+                ` | Théorique : ${rawLot.toFixed(4)}`;
+        }
+
+
+        if (
+            Number.isFinite(
+                realRisk
+            )
+        ) {
+
+            message +=
+                ` | Risque réel : ${money(realRisk)}`;
+        }
+
+
+        if (
+            Number.isFinite(
+                riskDifference
+            )
+        ) {
+
+            if (
+                riskDifference > 0.004
+            ) {
+
+                message +=
+                    ` | Sous-risque : ${money(riskDifference)}`;
+
+            } else if (
+                riskDifference < -0.004
+            ) {
+
+                message +=
+                    ` | Dépassement : ${money(Math.abs(riskDifference))}`;
+
+            } else {
+
+                message +=
+                    " | Risque atteint";
+            }
+        }
+
+
+        message +=
+            ` | Objectif : ${money(objective)} | RR : ${rr.toFixed(2)}`;
+
+
         mmInfo.textContent =
-            `Risque : ${money(risk)} | Objectif : ${money(objective)} | RR ${rr.toFixed(2)} | Lot : ${lot.toFixed(2)}`;
+            message;
     }
 }
 
@@ -2352,6 +2793,15 @@ function addTrade(event) {
     }
 
 
+    const realRisk =
+        calculateRiskForLot(
+            asset,
+            entry,
+            sl,
+            lot
+        );
+
+
     const trade = {
 
         id:
@@ -2400,7 +2850,15 @@ function addTrade(event) {
             pnl,
 
         comment:
-            comment
+            comment,
+
+        riskTarget:
+            risk,
+
+        realRisk:
+            Number.isFinite(realRisk)
+                ? realRisk
+                : null
     };
 
 
@@ -4395,6 +4853,58 @@ function deleteArchive(id) {
 // MODAL CAPITAL
 // ============================================================
 
+function updateCapitalModalRR() {
+
+    const riskInput =
+        document.getElementById(
+            "capitalRiskInput"
+        );
+
+    const objectiveInput =
+        document.getElementById(
+            "capitalObjectiveInput"
+        );
+
+    const rrDisplay =
+        document.getElementById(
+            "capitalModalRR"
+        );
+
+
+    if (
+        !riskInput ||
+        !objectiveInput ||
+        !rrDisplay
+    ) {
+        return;
+    }
+
+
+    const risk =
+        parseNumber(
+            riskInput.value
+        );
+
+    const objective =
+        parseNumber(
+            objectiveInput.value
+        );
+
+
+    const rr =
+        calculateCapitalRR(
+            risk,
+            objective
+        );
+
+
+    rrDisplay.textContent =
+        rr > 0
+            ? rr.toFixed(2)
+            : "0.00";
+}
+
+
 function openCapitalModal(
     mode = "new"
 ) {
@@ -4480,6 +4990,9 @@ function openCapitalModal(
         objectiveInput.value =
             "";
     }
+
+
+    updateCapitalModalRR();
 
 
     modal.classList.add(
@@ -4776,6 +5289,36 @@ function setupEvents() {
                 element.addEventListener(
                     "change",
                     updateAutomaticTradeValues
+                );
+            }
+        }
+    );
+
+
+    // Mise à jour RR dans la fenêtre Capital
+    [
+        "capitalRiskInput",
+        "capitalObjectiveInput"
+    ].forEach(
+        id => {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+
+            if (element) {
+
+                element.addEventListener(
+                    "input",
+                    updateCapitalModalRR
+                );
+
+
+                element.addEventListener(
+                    "change",
+                    updateCapitalModalRR
                 );
             }
         }
