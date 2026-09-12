@@ -3,245 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Trading Dashboard</title>
-
     <link rel="stylesheet" href="style.css">
 
-    <style>
-        /* ============================================================
-           NAVIGATION MULTI-PAGES
-           ============================================================ */
+<style>
+/* ============================================================
+   NAVIGATION MULTI-PAGES
+   ============================================================ */
 
-        .app-nav {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            padding: 12px 20px;
-            background: rgba(15, 23, 42, 0.94);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
+.app-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px 20px;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
 
-        .app-nav a {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            border-radius: 10px;
-            text-decoration: none;
-            color: inherit;
-            font-weight: 600;
-            transition: .2s ease;
-        }
+.app-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    font-weight: 600;
+    transition: .2s ease;
+}
 
-        .app-nav a:hover {
-            transform: translateY(-1px);
-        }
+.app-nav a:hover {
+    transform: translateY(-1px);
+}
 
-        .app-nav a.active {
-            background: rgba(59,130,246,.18);
-            box-shadow: inset 0 0 0 1px rgba(96,165,250,.28);
-        }
+.app-nav a.active {
+    background: rgba(59,130,246,.18);
+    box-shadow: inset 0 0 0 1px rgba(96,165,250,.28);
+}
 
-        /* ============================================================
-           PAGES
-           ============================================================ */
+.page-title {
+    margin: 8px 0 18px;
+}
 
-        .page-section {
-            display: none !important;
-        }
+.page-title h2 {
+    margin: 0 0 4px;
+}
 
-        body[data-page="dashboard"] .dashboard-section {
-            display: block !important;
-        }
+.page-title p {
+    margin: 0;
+    opacity: .72;
+}
 
-        body[data-page="analysis"] .analysis-section {
-            display: block !important;
-        }
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
 
-        body[data-page="performance"] .performance-section {
-            display: block !important;
-        }
+body[data-page="dashboard"] #dashboardCapitalCard,
+body[data-page="dashboard"] #dashboardChartCard,
+body[data-page="dashboard"] #performanceSummaryCard,
+body[data-page="dashboard"] #dashboardTradeCard,
+body[data-page="dashboard"] #historyCard {
+    display: block;
+}
 
-        body[data-page="archives"] .archives-section {
-            display: block !important;
-        }
+/* ============================================================
+   ANALYSES
+   ============================================================ */
 
-        .page-title {
-            margin: 8px 0 18px;
-        }
+body[data-page="analysis"] #analysisPageHeader {
+    display: block;
+}
 
-        .page-title h2,
-        .page-title h1 {
-            margin: 0 0 4px;
-        }
+body[data-page="analysis"] #v51FilterCard {
+    display: block !important;
+}
 
-        .page-title p {
-            margin: 0;
-            opacity: .72;
-        }
+body[data-page="analysis"] #performanceSummaryCard {
+    display: none !important;
+}
 
-        /* ============================================================
-           ANCRE POUR V51
+/* ============================================================
+   PERFORMANCES
+   ============================================================ */
 
-           v51-filters.js cherche .period-buttons dans une .card
-           et insère ensuite #v51FilterCard après cette card.
+body[data-page="performance"] #performancePageHeader {
+    display: block;
+}
 
-           Cette ancre est invisible mais reste présente dans le DOM.
-           ============================================================ */
+body[data-page="performance"] #setupPerformanceCard,
+body[data-page="performance"] #assetPerformanceCard {
+    display: block;
+}
 
-        .v51-analysis-anchor {
-            display: none !important;
-        }
+body[data-page="performance"] #performanceSummaryCard {
+    display: none !important;
+}
 
-        /* ============================================================
-           MODAL TRADE
-           ============================================================ */
+/* ============================================================
+   ARCHIVES
+   ============================================================ */
 
-        .modal.trade-modal {
-            display: none;
-        }
+body[data-page="archives"] #archivesPageHeader {
+    display: block;
+}
 
-        .modal.trade-modal.open {
-            display: flex;
-        }
+body[data-page="archives"] #archivesCard {
+    display: block;
+}
 
-        .trade-modal .modal-content {
-            width: min(1100px, 96vw);
-            max-height: 92vh;
-            overflow: auto;
-        }
+body[data-page="archives"] #performanceSummaryCard {
+    display: none !important;
+}
 
-        /* ============================================================
-           BOUTON AJOUT TRADE
-           ============================================================ */
+/* ============================================================
+   SECTIONS CACHEES PAR DEFAUT
+   ============================================================ */
 
-        .trade-launcher-card {
-            display: block;
-        }
+#dashboardCapitalCard,
+#dashboardChartCard,
+#performanceSummaryCard,
+#dashboardTradeCard,
+#historyCard,
+#setupPerformanceCard,
+#assetPerformanceCard,
+#archivesCard,
+#analysisPageHeader,
+#performancePageHeader,
+#archivesPageHeader {
+    display: none;
+}
 
-        .trade-launcher {
-            width: 100%;
-            min-height: 96px;
-            border: 0;
-            border-radius: 16px;
-            cursor: pointer;
-            font-size: 1.05rem;
-            font-weight: 800;
-            letter-spacing: .2px;
-            padding: 20px;
-            background: linear-gradient(
-                135deg,
-                rgba(59,130,246,.20),
-                rgba(34,197,94,.14)
-            );
-            box-shadow: 0 12px 32px rgba(0,0,0,.12);
-        }
+/* V51 est créé dynamiquement par v51-filters.js */
+#v51FilterCard {
+    display: none;
+}
 
-        .trade-launcher small {
-            display: block;
-            margin-top: 6px;
-            opacity: .7;
-            font-weight: 500;
-        }
+/* ============================================================
+   BOUTON AJOUT TRADE
+   ============================================================ */
 
-        /* ============================================================
-           RESPONSIVE
-           ============================================================ */
+.trade-launcher-card {
+    display: none;
+}
 
-        @media (max-width: 760px) {
+body[data-page="dashboard"] .trade-launcher-card {
+    display: block;
+}
 
-            .app-nav {
-                padding: 10px 12px;
-                gap: 6px;
-            }
+.trade-launcher {
+    width: 100%;
+    min-height: 96px;
+    border: 0;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: .2px;
+    padding: 20px;
+    background: linear-gradient(
+        135deg,
+        rgba(59,130,246,.20),
+        rgba(34,197,94,.14)
+    );
+    box-shadow: 0 12px 32px rgba(0,0,0,.12);
+}
 
-            .app-nav a {
-                flex: 1 1 calc(50% - 6px);
-                justify-content: center;
-                font-size: .9rem;
-            }
+.trade-launcher small {
+    display: block;
+    margin-top: 6px;
+    opacity: .7;
+    font-weight: 500;
+}
 
-            .container {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-        }
-    </style>
+/* ============================================================
+   MODAL TRADE
+   ============================================================ */
 
-    <!-- ============================================================
-         DÉTERMINATION DE LA PAGE
-         ============================================================ -->
+.modal.trade-modal {
+    display: none;
+}
 
-    <script>
-        (function () {
+.modal.trade-modal.open {
+    display: flex;
+}
 
-            const allowedPages = [
-                "dashboard",
-                "analysis",
-                "performance",
-                "archives"
-            ];
+.trade-modal .modal-content {
+    width: min(1100px, 96vw);
+    max-height: 92vh;
+    overflow: auto;
+}
 
-            const params =
-                new URLSearchParams(
-                    window.location.search
-                );
+/* ============================================================
+   TABLEAU PERFORMANCE
+   ============================================================ */
 
-            const requestedPage =
-                params.get("page");
+#assetPerformanceCard .table-wrapper {
+    overflow-x: auto;
+}
 
-            const page =
-                allowedPages.includes(requestedPage)
-                    ? requestedPage
-                    : "dashboard";
+#assetPerformanceCard table {
+    min-width: 900px;
+}
 
-            window.__TRADING_DASHBOARD_PAGE__ = page;
+/* ============================================================
+   MOBILE
+   ============================================================ */
 
-            document.addEventListener(
-                "DOMContentLoaded",
-                function () {
+@media (max-width: 760px) {
 
-                    document.body.dataset.page =
-                        page;
+    .app-nav {
+        padding: 10px 12px;
+        gap: 6px;
+    }
 
-                }
-            );
+    .app-nav a {
+        flex: 1 1 calc(50% - 6px);
+        justify-content: center;
+        font-size: .9rem;
+    }
 
-        })();
-    </script>
-
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+</style>
 </head>
 
 <body>
 
 <!-- ============================================================
-     HEADER GLOBAL
+     HEADER
      ============================================================ -->
 
 <header class="topbar">
 
     <div>
-
-        <h1>
-            Trading Dashboard
-        </h1>
-
-        <p>
-            Journal &amp; performance de trading
-        </p>
-
+        <h1>Trading Dashboard</h1>
+        <p>Journal & performance de trading</p>
     </div>
 
-    <button
-        id="themeToggle"
-        class="theme-btn"
-        type="button"
-    >
+    <button id="themeToggle" class="theme-btn">
         🌙
     </button>
 
@@ -249,13 +255,10 @@
 
 
 <!-- ============================================================
-     NAVIGATION GLOBALE
+     NAVIGATION
      ============================================================ -->
 
-<nav
-    class="app-nav"
-    aria-label="Navigation principale"
->
+<nav class="app-nav" aria-label="Navigation principale">
 
     <a
         href="index.html?page=dashboard"
@@ -268,7 +271,7 @@
         href="index.html?page=analysis"
         data-page-link="analysis"
     >
-        📊 Analyses &amp; Risque
+        📊 Analyses & Risque
     </a>
 
     <a
@@ -288,657 +291,165 @@
 </nav>
 
 
+<!-- ============================================================
+     CONTENU PRINCIPAL
+     ============================================================ -->
+
 <main class="container">
 
 
-    <!-- ============================================================
-         ============================================================
-         🏠 DASHBOARD
-         ============================================================
-         ============================================================ -->
+    <!-- ========================================================
+         TITRE ANALYSES
+         ======================================================== -->
 
-    <section
-        class="page-section dashboard-section"
-        data-page-section="dashboard"
+    <div
+        id="analysisPageHeader"
+        class="page-title"
     >
 
-        <div class="page-title">
+        <h2>
+            📊 Analyses & Risque
+        </h2>
 
-            <h2>
-                🏠 Dashboard
-            </h2>
+        <p>
+            Analyse filtrée, régularité du risque,
+            calendrier et recommandations.
+        </p>
 
-            <p>
-                Vue générale de votre activité de trading.
-            </p>
+    </div>
+
+
+    <!-- ========================================================
+         TITRE PERFORMANCES
+         ======================================================== -->
+
+    <div
+        id="performancePageHeader"
+        class="page-title"
+    >
+
+        <h2>
+            🎯 Performances
+        </h2>
+
+        <p>
+            Comparez vos setups et vos actifs
+            pour identifier vos meilleures performances.
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================
+         TITRE ARCHIVES
+         ======================================================== -->
+
+    <div
+        id="archivesPageHeader"
+        class="page-title"
+    >
+
+        <h2>
+            🗄️ Archives des capitaux
+        </h2>
+
+        <p>
+            Chaque capital conserve son historique
+            et son évolution indépendamment.
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================
+         CAPITAL ACTIF
+         ======================================================== -->
+
+    <section
+        id="dashboardCapitalCard"
+        class="card active-capital-card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    💰 Capital actif
+                </h2>
+
+                <p id="activeCapitalName">
+                    Capital 1
+                </p>
+
+            </div>
+
+
+            <div class="capital-actions">
+
+                <button
+                    id="changeCapitalBtn"
+                    class="secondary-btn"
+                >
+                    Modifier
+                </button>
+
+                <button
+                    id="archiveCapitalBtn"
+                    class="warning-btn"
+                >
+                    Archiver
+                </button>
+
+                <button
+                    id="newCapitalBtn"
+                    class="primary-btn"
+                >
+                    Nouveau capital
+                </button>
+
+            </div>
 
         </div>
 
 
-        <!-- ========================================================
-             CAPITAL ACTIF
-             ======================================================== -->
+        <div class="capital-summary">
 
-        <section
-            id="dashboardCapitalCard"
-            class="card active-capital-card"
-        >
+            <div class="capital-box">
 
-            <div class="section-header">
+                <span>
+                    Capital initial
+                </span>
 
-                <div>
-
-                    <h2>
-                        💰 Capital actif
-                    </h2>
-
-                    <p id="activeCapitalName">
-                        Capital 1
-                    </p>
-
-                    <small id="activeCapitalCreatedAt">
-                    </small>
-
-                </div>
-
-
-                <div class="capital-actions">
-
-                    <button
-                        id="changeCapitalBtn"
-                        class="secondary-btn"
-                        type="button"
-                    >
-                        Modifier
-                    </button>
-
-                    <button
-                        id="archiveCapitalBtn"
-                        class="warning-btn"
-                        type="button"
-                    >
-                        Archiver
-                    </button>
-
-                    <button
-                        id="newCapitalBtn"
-                        class="primary-btn"
-                        type="button"
-                    >
-                        Nouveau capital
-                    </button>
-
-                </div>
+                <strong id="initialCapital">
+                    $0.00
+                </strong>
 
             </div>
 
 
-            <div class="capital-summary">
+            <div class="capital-box">
 
-                <div class="capital-box">
+                <span>
+                    Solde actuel
+                </span>
 
-                    <span>
-                        Capital initial
-                    </span>
-
-                    <strong id="initialCapital">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="capital-box">
-
-                    <span>
-                        Solde actuel
-                    </span>
-
-                    <strong id="currentBalance">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="capital-box">
-
-                    <span>
-                        Profit total
-                    </span>
-
-                    <strong id="totalProfit">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="capital-box">
-
-                    <span>
-                        Risque de référence
-                    </span>
-
-                    <strong id="riskReference">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="capital-box">
-
-                    <span>
-                        RR cible
-                    </span>
-
-                    <strong id="rrTarget">
-                        0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="capital-box">
-
-                    <span>
-                        Objectif théorique
-                    </span>
-
-                    <strong id="theoreticalObjective">
-                        $0.00
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ========================================================
-             GRAPHIQUE CAPITAL
-             ======================================================== -->
-
-        <section
-            id="dashboardChartCard"
-            class="card chart-card"
-        >
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        📈 Évolution du capital
-                    </h2>
-
-                    <p>
-                        Évolution du solde après chaque trade
-                    </p>
-
-                </div>
+                <strong id="currentBalance">
+                    $0.00
+                </strong>
 
             </div>
 
 
-            <div class="chart-container">
-
-                <canvas
-                    id="capitalChart"
-                ></canvas>
-
-                <div
-                    id="emptyChartMessage"
-                    class="empty-chart-message"
-                >
-                    Aucun trade enregistré pour afficher le graphique.
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ========================================================
-             RÉSUMÉ PERFORMANCE
-
-             Les period-btn sont conservés car app.js les utilise.
-             ======================================================== -->
-
-        <section
-            id="performanceSummaryCard"
-            class="card"
-        >
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        📊 Performance
-                    </h2>
-
-                    <p>
-                        Analyse de vos résultats
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="period-buttons">
-
-                <button
-                    class="period-btn active"
-                    data-period="today"
-                    type="button"
-                >
-                    Aujourd'hui
-                </button>
-
-                <button
-                    class="period-btn"
-                    data-period="week"
-                    type="button"
-                >
-                    Cette semaine
-                </button>
-
-                <button
-                    class="period-btn"
-                    data-period="month"
-                    type="button"
-                >
-                    Ce mois
-                </button>
-
-                <button
-                    class="period-btn"
-                    data-period="year"
-                    type="button"
-                >
-                    Cette année
-                </button>
-
-                <button
-                    class="period-btn"
-                    data-period="all"
-                    type="button"
-                >
-                    Tout l'historique
-                </button>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Capital / Solde
-                    </span>
-
-                    <strong id="statBalance">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Profit total
-                    </span>
-
-                    <strong id="statProfit">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Winrate
-                    </span>
-
-                    <strong id="statWinrate">
-                        0%
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        RR moyen
-                    </span>
-
-                    <strong id="statAverageRR">
-                        0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Nombre de trades
-                    </span>
-
-                    <strong id="statTrades">
-                        0
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Meilleur setup
-                    </span>
-
-                    <strong id="statBestSetup">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Dernier trade
-                    </span>
-
-                    <strong id="statLastTrade">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Profit Factor
-                    </span>
-
-                    <strong id="statProfitFactor">
-                        0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Trade moyen
-                    </span>
-
-                    <strong id="statAverageTrade">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Gain moyen
-                    </span>
-
-                    <strong id="statAverageWin">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Perte moyenne
-                    </span>
-
-                    <strong id="statAverageLoss">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Meilleur trade
-                    </span>
-
-                    <strong id="statBestTrade">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Pire trade
-                    </span>
-
-                    <strong id="statWorstTrade">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Max série gagnante
-                    </span>
-
-                    <strong id="statMaxWinStreak">
-                        0
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Max série perdante
-                    </span>
-
-                    <strong id="statMaxLossStreak">
-                        0
-                    </strong>
-
-                </div>
-
-
-                <div class="stat-box">
-
-                    <span>
-                        Max Drawdown
-                    </span>
-
-                    <strong id="statMaxDrawdown">
-                        $0.00
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ========================================================
-             AJOUT TRADE
-             ======================================================== -->
-
-        <section
-            id="dashboardTradeCard"
-            class="card trade-launcher-card"
-        >
-
-            <button
-                id="openTradeModalBtn"
-                class="trade-launcher"
-                type="button"
-            >
-
-                ➕ Ajouter un trade
-
-                <small>
-                    Ouvrir le formulaire d'enregistrement
-                </small>
-
-            </button>
-
-        </section>
-
-
-        <!-- ========================================================
-             HISTORIQUE
-             ======================================================== -->
-
-        <section
-            id="historyCard"
-            class="card"
-        >
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        📜 Historique des trades
-                    </h2>
-
-                    <p>
-                        Tous les trades du capital actif
-                    </p>
-
-                </div>
-
-
-                <button
-                    id="clearBtn"
-                    class="danger-btn"
-                    type="button"
-                >
-                    Effacer les trades
-                </button>
-
-            </div>
-
-
-            <div class="table-wrapper">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Date</th>
-                            <th>Actif</th>
-                            <th>Position</th>
-                            <th>Lot</th>
-                            <th>Entry</th>
-                            <th>SL</th>
-                            <th>TP</th>
-                            <th>RR</th>
-                            <th>Setup</th>
-                            <th>Résultat</th>
-                            <th>P/L</th>
-                            <th>Action</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody id="historyBody">
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
-
-    </section>
-
-
-    <!-- ============================================================
-         ============================================================
-         📊 ANALYSES & RISQUE
-         ============================================================
-         ============================================================ -->
-
-    <section
-        class="page-section analysis-section"
-        data-page-section="analysis"
-    >
-
-        <div
-            id="analysisPageHeader"
-            class="page-title"
-        >
-
-            <h2>
-                📊 Analyses &amp; Risque
-            </h2>
-
-            <p>
-                Analyse filtrée, régularité du risque,
-                calendrier et recommandations.
-            </p>
-
-        </div>
-
-
-        <!-- ========================================================
-             ANCRE V51
-
-             IMPORTANT :
-             v51-filters.js va détecter cette .period-buttons
-             et insérer #v51FilterCard juste après cette .card.
-
-             L'ancre est invisible mais reste dans le DOM.
-             ======================================================== -->
-
-        <div
-            class="card v51-analysis-anchor"
-        >
-
-            <div class="period-buttons">
-
-                <button
-                    class="period-btn"
-                    data-period="today"
-                    type="button"
-                >
-                    Aujourd'hui
-                </button>
+            <div class="capital-box">
+
+                <span>
+                    Profit total
+                </span>
+
+                <strong id="totalProfit">
+                    $0.00
+                </strong>
 
             </div>
 
@@ -947,219 +458,526 @@
     </section>
 
 
-    <!-- ============================================================
-         ============================================================
-         🎯 PERFORMANCES
-         ============================================================
-         ============================================================ -->
+    <!-- ========================================================
+         GRAPHIQUE CAPITAL
+         ======================================================== -->
 
     <section
-        class="page-section performance-section"
-        data-page-section="performance"
+        id="dashboardChartCard"
+        class="card chart-card"
     >
 
-        <div
-            id="performancePageHeader"
-            class="page-title"
-        >
+        <div class="section-header">
 
-            <h2>
-                🎯 Performances
-            </h2>
+            <div>
 
-            <p>
-                Comparez vos setups et vos actifs
-                pour identifier vos meilleures performances.
-            </p>
+                <h2>
+                    📈 Évolution du capital
+                </h2>
+
+                <p>
+                    Évolution du solde après chaque trade
+                </p>
+
+            </div>
 
         </div>
 
 
-        <!-- ========================================================
-             PERFORMANCE SETUPS
-             ======================================================== -->
+        <div class="chart-container">
 
-        <section
-            id="setupPerformanceCard"
-            class="card"
-        >
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        🎯 Performance des setups
-                    </h2>
-
-                    <p>
-                        Résultats par stratégie
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="table-wrapper">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Setup</th>
-                            <th>Trades</th>
-                            <th>Gagnants</th>
-                            <th>Winrate</th>
-                            <th>Profit</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody id="setupTableBody">
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
-
-
-        <!-- ========================================================
-             PERFORMANCE ACTIFS
-             ======================================================== -->
-
-        <section
-            id="assetPerformanceCard"
-            class="card"
-        >
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        📈 Performance par actif
-                    </h2>
-
-                    <p>
-                        Résultats détaillés pour chaque actif.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="table-wrapper">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Actif</th>
-                            <th>Trades</th>
-                            <th>Gagnants</th>
-                            <th>Perdants</th>
-                            <th>BE</th>
-                            <th>Winrate</th>
-                            <th>Profit</th>
-                            <th>RR moyen</th>
-                            <th>Meilleur</th>
-                            <th>Pire</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody id="assetTableBody">
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
-
-    </section>
-
-
-    <!-- ============================================================
-         ============================================================
-         🗄️ ARCHIVES
-         ============================================================
-         ============================================================ -->
-
-    <section
-        class="page-section archives-section"
-        data-page-section="archives"
-    >
-
-        <div
-            id="archivesPageHeader"
-            class="page-title"
-        >
-
-            <h2>
-                🗄️ Archives des capitaux
-            </h2>
-
-            <p>
-                Chaque capital conserve son historique
-                et son évolution indépendamment.
-            </p>
-
-        </div>
-
-
-        <section
-            id="archivesCard"
-            class="card"
-        >
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        🗄️ Archives des capitaux
-                    </h2>
-
-                    <p>
-                        Historique indépendant de chaque capital
-                    </p>
-
-                </div>
-
-            </div>
-
+            <canvas id="capitalChart"></canvas>
 
             <div
-                id="archivesList"
-                class="archives-list"
+                id="emptyChartMessage"
+                class="empty-chart-message"
             >
+                Aucun trade enregistré pour afficher le graphique.
             </div>
 
-        </section>
+        </div>
 
     </section>
 
+
+    <!-- ========================================================
+         PERFORMANCE / PERIODES
+         ======================================================== -->
+
+    <section
+        id="performanceSummaryCard"
+        class="card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    📊 Performance
+                </h2>
+
+                <p>
+                    Analyse de vos résultats
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="period-buttons">
+
+            <button
+                class="period-btn active"
+                data-period="today"
+            >
+                Aujourd'hui
+            </button>
+
+            <button
+                class="period-btn"
+                data-period="week"
+            >
+                Cette semaine
+            </button>
+
+            <button
+                class="period-btn"
+                data-period="month"
+            >
+                Ce mois
+            </button>
+
+            <button
+                class="period-btn"
+                data-period="year"
+            >
+                Cette année
+            </button>
+
+            <button
+                class="period-btn"
+                data-period="all"
+            >
+                Tout l'historique
+            </button>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-box">
+
+                <span>
+                    Capital / Solde
+                </span>
+
+                <strong id="statBalance">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Profit total
+                </span>
+
+                <strong id="statProfit">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Winrate
+                </span>
+
+                <strong id="statWinrate">
+                    0%
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    RR moyen
+                </span>
+
+                <strong id="statAverageRR">
+                    0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Nombre de trades
+                </span>
+
+                <strong id="statTrades">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Meilleur setup
+                </span>
+
+                <strong id="statBestSetup">
+                    -
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================
+         AJOUT TRADE
+         ======================================================== -->
+
+    <section
+        id="dashboardTradeCard"
+        class="card trade-launcher-card"
+    >
+
+        <button
+            id="openTradeModalBtn"
+            class="trade-launcher"
+            type="button"
+        >
+
+            ➕ Ajouter un trade
+
+            <small>
+                Ouvrir le formulaire d'enregistrement
+            </small>
+
+        </button>
+
+    </section>
+
+
+    <!-- ========================================================
+         PERFORMANCE DES SETUPS
+         ======================================================== -->
+
+    <section
+        id="setupPerformanceCard"
+        class="card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    🎯 Performance des setups
+                </h2>
+
+                <p>
+                    Résultats par stratégie
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Setup
+                        </th>
+
+                        <th>
+                            Trades
+                        </th>
+
+                        <th>
+                            Gagnants
+                        </th>
+
+                        <th>
+                            Winrate
+                        </th>
+
+                        <th>
+                            Profit
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="setupTableBody">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================
+         PERFORMANCE PAR ACTIF
+         ======================================================== -->
+
+    <section
+        id="assetPerformanceCard"
+        class="card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    📈 Performance par actif
+                </h2>
+
+                <p>
+                    Résultats détaillés pour chaque actif.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Actif
+                        </th>
+
+                        <th>
+                            Trades
+                        </th>
+
+                        <th>
+                            Gagnants
+                        </th>
+
+                        <th>
+                            Perdants
+                        </th>
+
+                        <th>
+                            BE
+                        </th>
+
+                        <th>
+                            Winrate
+                        </th>
+
+                        <th>
+                            Profit
+                        </th>
+
+                        <th>
+                            RR moyen
+                        </th>
+
+                        <th>
+                            Meilleur
+                        </th>
+
+                        <th>
+                            Pire
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="assetTableBody">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================
+         HISTORIQUE
+         ======================================================== -->
+
+    <section
+        id="historyCard"
+        class="card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    📜 Historique des trades
+                </h2>
+
+                <p>
+                    Tous les trades du capital actif
+                </p>
+
+            </div>
+
+
+            <button
+                id="clearBtn"
+                class="danger-btn"
+            >
+                Effacer les trades
+            </button>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Actif
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Lot
+                        </th>
+
+                        <th>
+                            Entry
+                        </th>
+
+                        <th>
+                            SL
+                        </th>
+
+                        <th>
+                            TP
+                        </th>
+
+                        <th>
+                            RR
+                        </th>
+
+                        <th>
+                            Setup
+                        </th>
+
+                        <th>
+                            Résultat
+                        </th>
+
+                        <th>
+                            P/L
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="historyBody">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================
+         ARCHIVES
+         ======================================================== -->
+
+    <section
+        id="archivesCard"
+        class="card"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    🗄️ Archives des capitaux
+                </h2>
+
+                <p>
+                    Historique indépendant de chaque capital
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="archivesList"
+            class="archives-list"
+        >
+        </div>
+
+    </section>
 
 </main>
 
 
 <!-- ============================================================
-     ============================================================
      MODAL AJOUT TRADE
-     ============================================================
      ============================================================ -->
 
 <div
@@ -1199,11 +1017,7 @@
 
             <form id="tradeForm">
 
-
                 <div class="form-grid">
-
-
-                    <!-- ACTIF -->
 
                     <div>
 
@@ -1221,8 +1035,6 @@
                     </div>
 
 
-                    <!-- DATE -->
-
                     <div>
 
                         <label for="date">
@@ -1237,8 +1049,6 @@
 
                     </div>
 
-
-                    <!-- DIRECTION -->
 
                     <div>
 
@@ -1263,8 +1073,6 @@
 
                     </div>
 
-
-                    <!-- TYPE ORDRE -->
 
                     <div>
 
@@ -1294,8 +1102,6 @@
                     </div>
 
 
-                    <!-- LOT -->
-
                     <div>
 
                         <label for="lot">
@@ -1314,8 +1120,6 @@
                     </div>
 
 
-                    <!-- ENTRY -->
-
                     <div>
 
                         <label for="entry">
@@ -1333,8 +1137,6 @@
                     </div>
 
 
-                    <!-- SL -->
-
                     <div>
 
                         <label for="sl">
@@ -1350,8 +1152,6 @@
 
                     </div>
 
-
-                    <!-- TP -->
 
                     <div>
 
@@ -1369,8 +1169,6 @@
                     </div>
 
 
-                    <!-- RR -->
-
                     <div>
 
                         <label for="calculatedRR">
@@ -1386,8 +1184,6 @@
 
                     </div>
 
-
-                    <!-- RESULTAT -->
 
                     <div>
 
@@ -1416,8 +1212,6 @@
 
                     </div>
 
-
-                    <!-- SETUP -->
 
                     <div>
 
@@ -1479,8 +1273,6 @@
                     </div>
 
 
-                    <!-- PROFIT -->
-
                     <div>
 
                         <label for="profit">
@@ -1500,8 +1292,6 @@
                 </div>
 
 
-                <!-- INFORMATIONS MM -->
-
                 <div
                     id="tradeMMInfo"
                     class="form-full"
@@ -1509,8 +1299,6 @@
                 >
                 </div>
 
-
-                <!-- BE MANUEL -->
 
                 <div
                     id="beProfitGroup"
@@ -1532,8 +1320,6 @@
                 </div>
 
 
-                <!-- COMMENTAIRE -->
-
                 <div class="form-full">
 
                     <label for="comment">
@@ -1548,8 +1334,6 @@
 
                 </div>
 
-
-                <!-- ACTIONS -->
 
                 <div class="form-actions">
 
@@ -1580,9 +1364,7 @@
 
 
 <!-- ============================================================
-     ============================================================
-     MODAL CAPITAL
-     ============================================================
+     MODAL NOUVEAU CAPITAL
      ============================================================ -->
 
 <div
@@ -1610,7 +1392,6 @@
             <button
                 id="cancelCapitalBtn"
                 class="close-btn"
-                type="button"
             >
                 ✕
             </button>
@@ -1619,9 +1400,6 @@
 
 
         <div class="modal-body">
-
-
-            <!-- NOM -->
 
             <div>
 
@@ -1637,8 +1415,6 @@
 
             </div>
 
-
-            <!-- MONTANT -->
 
             <div>
 
@@ -1656,8 +1432,6 @@
             </div>
 
 
-            <!-- RISQUE -->
-
             <div>
 
                 <label for="capitalRiskInput">
@@ -1673,18 +1447,12 @@
 
                 <small
                     id="capitalAmountHelp"
-                    style="
-                        display:block;
-                        margin-top:6px;
-                        opacity:.7;
-                    "
+                    style="display:block;margin-top:6px;opacity:.7;"
                 >
                 </small>
 
             </div>
 
-
-            <!-- RR -->
 
             <div>
 
@@ -1700,10 +1468,14 @@
                     placeholder="2.00"
                 >
 
+                <small
+                    style="display:block;margin-top:6px;opacity:.7;"
+                >
+                    Minimum autorisé : 2.00
+                </small>
+
             </div>
 
-
-            <!-- PREVIEW -->
 
             <div class="form-full">
 
@@ -1719,9 +1491,7 @@
                 >
                 </div>
 
-                <strong
-                    id="capitalModalObjective"
-                >
+                <strong id="capitalModalObjective">
                 </strong>
 
             </div>
@@ -1729,14 +1499,11 @@
         </div>
 
 
-        <!-- ACTIONS -->
-
         <div class="modal-actions">
 
             <button
                 id="cancelCapitalBtn2"
                 class="secondary-btn"
-                type="button"
             >
                 Annuler
             </button>
@@ -1744,7 +1511,6 @@
             <button
                 id="saveCapitalBtn"
                 class="primary-btn"
-                type="button"
             >
                 Enregistrer
             </button>
@@ -1757,9 +1523,7 @@
 
 
 <!-- ============================================================
-     ============================================================
      MODAL GRAPHIQUE ARCHIVE
-     ============================================================
      ============================================================ -->
 
 <div
@@ -1767,9 +1531,7 @@
     class="modal"
 >
 
-    <div
-        class="modal-content archive-chart-modal-content"
-    >
+    <div class="modal-content archive-chart-modal-content">
 
         <div class="modal-header">
 
@@ -1789,7 +1551,6 @@
             <button
                 id="closeArchiveChartBtn"
                 class="close-btn"
-                type="button"
             >
                 ✕
             </button>
@@ -1852,9 +1613,7 @@
 
 
 <!-- ============================================================
-     SCRIPTS
-     
-     NE PAS MODIFIER L'ORDRE
+     SCRIPTS PRINCIPAUX
      ============================================================ -->
 
 <script src="app.js"></script>
@@ -1862,7 +1621,7 @@
 
 
 <!-- ============================================================
-     NAVIGATION + MODAL TRADE
+     NAVIGATION + MODAL
      ============================================================ -->
 
 <script>
@@ -1890,21 +1649,13 @@
             : "dashboard";
 
 
-    /*
-     * app.js et v51-filters.js utilisent déjà
-     * le DOM et leurs propres systèmes.
-     *
-     * Ici on ne fait que définir la page
-     * et la navigation visuelle.
-     */
-
     document.body.dataset.page =
         page;
 
 
     document
         .querySelectorAll("[data-page-link]")
-        .forEach(function (link) {
+        .forEach(link => {
 
             link.classList.toggle(
                 "active",
@@ -1914,9 +1665,9 @@
         });
 
 
-    /* ============================================================
-       MODAL TRADE
-       ============================================================ */
+    /* ========================================================
+       OUVERTURE MODAL TRADE
+       ======================================================== */
 
     function openTradeModal() {
 
@@ -1925,9 +1676,7 @@
                 "tradeModal"
             );
 
-        if (!modal) {
-            return;
-        }
+        if (!modal) return;
 
         modal.classList.add("open");
 
@@ -1941,6 +1690,10 @@
     }
 
 
+    /* ========================================================
+       FERMETURE MODAL TRADE
+       ======================================================== */
+
     function closeTradeModal() {
 
         const modal =
@@ -1948,9 +1701,7 @@
                 "tradeModal"
             );
 
-        if (!modal) {
-            return;
-        }
+        if (!modal) return;
 
         modal.classList.remove("open");
 
@@ -1964,20 +1715,20 @@
     }
 
 
+    /* ========================================================
+       BOUTONS MODAL
+       ======================================================== */
+
     document.addEventListener(
         "click",
         function (event) {
 
             const target =
                 event.target.closest(
-                    "#openTradeModalBtn, " +
-                    "#closeTradeModalBtn, " +
-                    "#cancelTradeModalBtn"
+                    "#openTradeModalBtn, #closeTradeModalBtn, #cancelTradeModalBtn"
                 );
 
-            if (!target) {
-                return;
-            }
+            if (!target) return;
 
 
             if (
@@ -1997,17 +1748,20 @@
     );
 
 
+    /* ========================================================
+       CLICK EXTERIEUR
+       ======================================================== */
+
     const tradeModal =
         document.getElementById(
             "tradeModal"
         );
 
-
     if (tradeModal) {
 
         tradeModal.addEventListener(
             "click",
-            function (event) {
+            event => {
 
                 if (
                     event.target ===
@@ -2024,9 +1778,13 @@
     }
 
 
+    /* ========================================================
+       TOUCHE ESCAPE
+       ======================================================== */
+
     document.addEventListener(
         "keydown",
-        function (event) {
+        event => {
 
             if (
                 event.key ===
@@ -2041,19 +1799,14 @@
     );
 
 
-    /*
-     * Après l'enregistrement d'un trade,
-     * app.js réinitialise le formulaire.
-     *
-     * On referme simplement la fenêtre.
-     * Aucun calcul n'est effectué ici.
-     */
+    /* ========================================================
+       FERMETURE APRES ENREGISTREMENT
+       ======================================================== */
 
     const tradeForm =
         document.getElementById(
             "tradeForm"
         );
-
 
     if (tradeForm) {
 
@@ -2069,6 +1822,400 @@
             },
             true
         );
+
+    }
+
+})();
+
+</script>
+
+
+<!-- ============================================================
+     PERFORMANCE PAR ACTIF
+     ------------------------------------------------------------
+     AFFICHAGE UNIQUEMENT.
+     LES CALCULS PRINCIPAUX RESTENT DANS app.js.
+     ============================================================ -->
+
+<script>
+
+(function () {
+
+    function renderAssetPerformanceTable() {
+
+        const tbody =
+            document.getElementById(
+                "assetTableBody"
+            );
+
+        if (!tbody) {
+            return;
+        }
+
+
+        /*
+         * On utilise directement les fonctions
+         * déjà présentes dans app.js.
+         *
+         * Aucun calcul principal de l'application
+         * n'est modifié.
+         */
+
+        if (
+            typeof getCurrentCapitalTrades !==
+            "function"
+        ) {
+            return;
+        }
+
+        if (
+            typeof filterByPeriod !==
+            "function"
+        ) {
+            return;
+        }
+
+        if (
+            typeof calculateProfit !==
+            "function"
+        ) {
+            return;
+        }
+
+        if (
+            typeof calculateWinrate !==
+            "function"
+        ) {
+            return;
+        }
+
+        if (
+            typeof calculateAverageRR !==
+            "function"
+        ) {
+            return;
+        }
+
+        if (
+            typeof money !==
+            "function"
+        ) {
+            return;
+        }
+
+
+        const currentTrades =
+            getCurrentCapitalTrades();
+
+
+        const periodTrades =
+            filterByPeriod(
+                currentTrades
+            );
+
+
+        tbody.innerHTML =
+            "";
+
+
+        /* ====================================================
+           AUCUN TRADE
+           ==================================================== */
+
+        if (
+            !periodTrades.length
+        ) {
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="10"
+                        style="
+                            text-align:center;
+                            opacity:.7;
+                            padding:20px;
+                        "
+                    >
+
+                        Aucun trade pour
+                        la période sélectionnée.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        /* ====================================================
+           GROUPEMENT PAR ACTIF
+           ==================================================== */
+
+        const assetStats = {};
+
+
+        periodTrades.forEach(
+            trade => {
+
+                const asset =
+                    String(
+                        trade.asset || "-"
+                    ).trim() || "-";
+
+
+                if (
+                    !assetStats[asset]
+                ) {
+
+                    assetStats[asset] =
+                        [];
+
+                }
+
+
+                assetStats[asset].push(
+                    trade
+                );
+
+            }
+        );
+
+
+        /* ====================================================
+           AFFICHAGE
+           ==================================================== */
+
+        Object
+            .entries(assetStats)
+            .sort(
+                (a, b) =>
+                    a[0].localeCompare(
+                        b[0]
+                    )
+            )
+            .forEach(
+                ([asset, trades]) => {
+
+                    const winners =
+                        trades.filter(
+                            trade =>
+                                trade.result ===
+                                "TP"
+                        ).length;
+
+
+                    const losers =
+                        trades.filter(
+                            trade =>
+                                trade.result ===
+                                "SL"
+                        ).length;
+
+
+                    const breakeven =
+                        trades.filter(
+                            trade =>
+                                trade.result ===
+                                "BE"
+                        ).length;
+
+
+                    const winrate =
+                        calculateWinrate(
+                            trades
+                        );
+
+
+                    const profit =
+                        calculateProfit(
+                            trades
+                        );
+
+
+                    const averageRR =
+                        calculateAverageRR(
+                            trades
+                        );
+
+
+                    const pnlValues =
+                        trades
+                            .map(
+                                trade =>
+                                    Number(
+                                        trade.pnl
+                                    )
+                            )
+                            .filter(
+                                value =>
+                                    Number.isFinite(
+                                        value
+                                    )
+                            );
+
+
+                    const best =
+                        pnlValues.length
+                            ? Math.max(
+                                ...pnlValues
+                            )
+                            : 0;
+
+
+                    const worst =
+                        pnlValues.length
+                            ? Math.min(
+                                ...pnlValues
+                            )
+                            : 0;
+
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            <strong>
+                                ${escapeHtmlForAssetTable(asset)}
+                            </strong>
+                        </td>
+
+                        <td>
+                            ${trades.length}
+                        </td>
+
+                        <td>
+                            ${winners}
+                        </td>
+
+                        <td>
+                            ${losers}
+                        </td>
+
+                        <td>
+                            ${breakeven}
+                        </td>
+
+                        <td>
+                            ${Number(
+                                winrate
+                            ).toFixed(1)}%
+                        </td>
+
+                        <td>
+                            ${money(
+                                profit
+                            )}
+                        </td>
+
+                        <td>
+                            ${Number(
+                                averageRR
+                            ).toFixed(2)}
+                        </td>
+
+                        <td>
+                            ${money(
+                                best
+                            )}
+                        </td>
+
+                        <td>
+                            ${money(
+                                worst
+                            )}
+                        </td>
+
+                    `;
+
+
+                    tbody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* ========================================================
+       SECURITE HTML
+       ======================================================== */
+
+    function escapeHtmlForAssetTable(
+        value
+    ) {
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    /* ========================================================
+       ACTUALISATION
+       ======================================================== */
+
+    function startAssetPerformanceRefresh() {
+
+        renderAssetPerformanceTable();
+
+        setInterval(
+            renderAssetPerformanceTable,
+            1000
+        );
+
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            startAssetPerformanceRefresh
+        );
+
+    } else {
+
+        startAssetPerformanceRefresh();
 
     }
 
