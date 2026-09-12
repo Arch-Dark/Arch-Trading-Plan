@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
 
 <style>
-
 /* ============================================================
    NAVIGATION
    ============================================================ */
@@ -46,11 +45,6 @@
     box-shadow: inset 0 0 0 1px rgba(96,165,250,.28);
 }
 
-
-/* ============================================================
-   TITRES DE PAGES
-   ============================================================ */
-
 .page-title {
     margin: 8px 0 18px;
 }
@@ -64,9 +58,9 @@
     opacity: .72;
 }
 
-
 /* ============================================================
-   AFFICHAGE GLOBAL
+   IMPORTANT :
+   UNE SEULE VUE VISIBLE À LA FOIS
    ============================================================ */
 
 #dashboardCapitalCard,
@@ -83,7 +77,6 @@
     display: none;
 }
 
-
 /* ============================================================
    DASHBOARD
    ============================================================ */
@@ -93,61 +86,87 @@ body[data-page="dashboard"] #dashboardChartCard,
 body[data-page="dashboard"] #performanceSummaryCard,
 body[data-page="dashboard"] #dashboardTradeCard,
 body[data-page="dashboard"] #historyCard {
-    display: block !important;
+    display: block;
 }
 
-
 /* ============================================================
-   ANALYSES
+   ANALYSES & RISQUE
    ============================================================ */
 
 body[data-page="analysis"] #analysisPageHeader {
-    display: block !important;
+    display: block;
 }
 
 body[data-page="analysis"] #v51FilterCard {
     display: block !important;
 }
 
+/* Empêche le résumé Dashboard d'apparaître */
 body[data-page="analysis"] #performanceSummaryCard {
     display: none !important;
 }
 
+body[data-page="analysis"] #dashboardCapitalCard,
+body[data-page="analysis"] #dashboardChartCard,
+body[data-page="analysis"] #dashboardTradeCard,
+body[data-page="analysis"] #historyCard,
+body[data-page="analysis"] #setupPerformanceCard,
+body[data-page="analysis"] #assetPerformanceCard,
+body[data-page="analysis"] #archivesCard {
+    display: none !important;
+}
 
 /* ============================================================
-   PERFORMANCES
+   PERFORMANCE
    ============================================================ */
 
 body[data-page="performance"] #performancePageHeader {
-    display: block !important;
+    display: block;
 }
 
-body[data-page="performance"] #performanceSummaryCard,
 body[data-page="performance"] #setupPerformanceCard,
 body[data-page="performance"] #assetPerformanceCard {
-    display: block !important;
+    display: block;
 }
 
+/* TRÈS IMPORTANT :
+   le résumé "Performance" du Dashboard n'est PAS affiché ici */
+body[data-page="performance"] #performanceSummaryCard {
+    display: none !important;
+}
 
-/*
- * IMPORTANT :
- * Le résumé Performance est également affiché ici.
- * Il contient les statistiques déjà calculées par app.js.
- */
-
+body[data-page="performance"] #dashboardCapitalCard,
+body[data-page="performance"] #dashboardChartCard,
+body[data-page="performance"] #dashboardTradeCard,
+body[data-page="performance"] #historyCard,
+body[data-page="performance"] #archivesCard {
+    display: none !important;
+}
 
 /* ============================================================
    ARCHIVES
    ============================================================ */
 
 body[data-page="archives"] #archivesPageHeader {
-    display: block !important;
+    display: block;
 }
 
 body[data-page="archives"] #archivesCard {
-    display: block !important;
+    display: block;
 }
 
+body[data-page="archives"] #performanceSummaryCard {
+    display: none !important;
+}
+
+body[data-page="archives"] #dashboardCapitalCard,
+body[data-page="archives"] #dashboardChartCard,
+body[data-page="archives"] #dashboardTradeCard,
+body[data-page="archives"] #historyCard,
+body[data-page="archives"] #setupPerformanceCard,
+body[data-page="archives"] #assetPerformanceCard {
+    display: none !important;
+}
 
 /* ============================================================
    V51
@@ -156,7 +175,6 @@ body[data-page="archives"] #archivesCard {
 #v51FilterCard {
     display: none;
 }
-
 
 /* ============================================================
    BOUTON AJOUT TRADE
@@ -167,7 +185,7 @@ body[data-page="archives"] #archivesCard {
 }
 
 body[data-page="dashboard"] .trade-launcher-card {
-    display: block !important;
+    display: block;
 }
 
 .trade-launcher {
@@ -195,47 +213,6 @@ body[data-page="dashboard"] .trade-launcher-card {
     font-weight: 500;
 }
 
-
-/* ============================================================
-   PERFORMANCE
-   ============================================================ */
-
-body[data-page="performance"] #setupPerformanceCard,
-body[data-page="performance"] #assetPerformanceCard,
-body[data-page="performance"] #performanceSummaryCard {
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-body[data-page="performance"] #setupTableBody,
-body[data-page="performance"] #assetTableBody {
-    visibility: visible !important;
-}
-
-
-/* ============================================================
-   ARCHIVES
-   ============================================================ */
-
-body[data-page="archives"] #archivesCard {
-    width: 100%;
-}
-
-body[data-page="archives"] #archivesList {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.empty-archives {
-    width: 100%;
-    padding: 30px 20px;
-    text-align: center;
-    opacity: .7;
-}
-
-
 /* ============================================================
    MODAL TRADE
    ============================================================ */
@@ -254,6 +231,29 @@ body[data-page="archives"] #archivesList {
     overflow: auto;
 }
 
+/* ============================================================
+   MODAL CAPITAL
+   ============================================================ */
+
+#capitalModal {
+    display: none;
+}
+
+#capitalModal.show {
+    display: flex;
+}
+
+/* ============================================================
+   MODAL ARCHIVE
+   ============================================================ */
+
+#archiveChartModal {
+    display: none;
+}
+
+#archiveChartModal.show {
+    display: flex;
+}
 
 /* ============================================================
    MOBILE
@@ -277,29 +277,20 @@ body[data-page="archives"] #archivesList {
         padding-right: 12px;
     }
 }
-
 </style>
 </head>
 
-
 <body>
 
-
-<!-- ============================================================
-     HEADER
-     ============================================================ -->
-
 <header class="topbar">
-
     <div>
         <h1>Trading Dashboard</h1>
         <p>Journal & performance de trading</p>
     </div>
 
-    <button id="themeToggle" class="theme-btn">
+    <button id="themeToggle" class="theme-btn" type="button">
         🌙
     </button>
-
 </header>
 
 
@@ -340,64 +331,56 @@ body[data-page="archives"] #archivesList {
 </nav>
 
 
-<!-- ============================================================
-     MAIN
-     ============================================================ -->
-
 <main class="container">
 
-
     <!-- ========================================================
-         ANALYSES
+         TITRE ANALYSES
          ======================================================== -->
 
-    <div id="analysisPageHeader" class="page-title">
-
-        <h2>
-            📊 Analyses & Risque
-        </h2>
+    <div
+        id="analysisPageHeader"
+        class="page-title"
+    >
+        <h2>📊 Analyses & Risque</h2>
 
         <p>
             Analyse filtrée, régularité du risque,
             calendrier et recommandations.
         </p>
-
     </div>
 
 
     <!-- ========================================================
-         PERFORMANCES
+         TITRE PERFORMANCE
          ======================================================== -->
 
-    <div id="performancePageHeader" class="page-title">
-
-        <h2>
-            🎯 Performances
-        </h2>
+    <div
+        id="performancePageHeader"
+        class="page-title"
+    >
+        <h2>🎯 Performances</h2>
 
         <p>
             Comparez vos setups et vos actifs
             pour identifier vos meilleures performances.
         </p>
-
     </div>
 
 
     <!-- ========================================================
-         ARCHIVES
+         TITRE ARCHIVES
          ======================================================== -->
 
-    <div id="archivesPageHeader" class="page-title">
-
-        <h2>
-            🗄️ Archives des capitaux
-        </h2>
+    <div
+        id="archivesPageHeader"
+        class="page-title"
+    >
+        <h2>🗄️ Archives des capitaux</h2>
 
         <p>
             Chaque capital conserve son historique
             et son évolution indépendamment.
         </p>
-
     </div>
 
 
@@ -414,9 +397,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <h2>
-                    💰 Capital actif
-                </h2>
+                <h2>💰 Capital actif</h2>
 
                 <p id="activeCapitalName">
                     Capital 1
@@ -430,20 +411,25 @@ body[data-page="archives"] #archivesList {
                 <button
                     id="changeCapitalBtn"
                     class="secondary-btn"
+                    type="button"
                 >
                     Modifier
                 </button>
 
+
                 <button
                     id="archiveCapitalBtn"
                     class="warning-btn"
+                    type="button"
                 >
                     Archiver
                 </button>
 
+
                 <button
                     id="newCapitalBtn"
                     class="primary-btn"
+                    type="button"
                 >
                     Nouveau capital
                 </button>
@@ -457,9 +443,7 @@ body[data-page="archives"] #archivesList {
 
             <div class="capital-box">
 
-                <span>
-                    Capital initial
-                </span>
+                <span>Capital initial</span>
 
                 <strong id="initialCapital">
                     $0.00
@@ -470,9 +454,7 @@ body[data-page="archives"] #archivesList {
 
             <div class="capital-box">
 
-                <span>
-                    Solde actuel
-                </span>
+                <span>Solde actuel</span>
 
                 <strong id="currentBalance">
                     $0.00
@@ -483,9 +465,7 @@ body[data-page="archives"] #archivesList {
 
             <div class="capital-box">
 
-                <span>
-                    Profit total
-                </span>
+                <span>Profit total</span>
 
                 <strong id="totalProfit">
                     $0.00
@@ -511,9 +491,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <h2>
-                    📈 Évolution du capital
-                </h2>
+                <h2>📈 Évolution du capital</h2>
 
                 <p>
                     Évolution du solde après chaque trade
@@ -532,7 +510,8 @@ body[data-page="archives"] #archivesList {
                 id="emptyChartMessage"
                 class="empty-chart-message"
             >
-                Aucun trade enregistré pour afficher le graphique.
+                Aucun trade enregistré
+                pour afficher le graphique.
             </div>
 
         </div>
@@ -542,6 +521,7 @@ body[data-page="archives"] #archivesList {
 
     <!-- ========================================================
          RÉSUMÉ PERFORMANCE
+         UNIQUEMENT SUR DASHBOARD
          ======================================================== -->
 
     <section
@@ -553,12 +533,10 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <h2>
-                    📊 Résumé des performances
-                </h2>
+                <h2>📊 Performance</h2>
 
                 <p>
-                    Statistiques calculées par le système
+                    Analyse de vos résultats
                 </p>
 
             </div>
@@ -571,6 +549,7 @@ body[data-page="archives"] #archivesList {
             <button
                 class="period-btn active"
                 data-period="today"
+                type="button"
             >
                 Aujourd'hui
             </button>
@@ -578,6 +557,7 @@ body[data-page="archives"] #archivesList {
             <button
                 class="period-btn"
                 data-period="week"
+                type="button"
             >
                 Cette semaine
             </button>
@@ -585,6 +565,7 @@ body[data-page="archives"] #archivesList {
             <button
                 class="period-btn"
                 data-period="month"
+                type="button"
             >
                 Ce mois
             </button>
@@ -592,6 +573,7 @@ body[data-page="archives"] #archivesList {
             <button
                 class="period-btn"
                 data-period="year"
+                type="button"
             >
                 Cette année
             </button>
@@ -599,6 +581,7 @@ body[data-page="archives"] #archivesList {
             <button
                 class="period-btn"
                 data-period="all"
+                type="button"
             >
                 Tout l'historique
             </button>
@@ -609,80 +592,38 @@ body[data-page="archives"] #archivesList {
         <div class="stats-grid">
 
             <div class="stat-box">
-
-                <span>
-                    Capital / Solde
-                </span>
-
-                <strong id="statBalance">
-                    $0.00
-                </strong>
-
+                <span>Capital / Solde</span>
+                <strong id="statBalance">$0.00</strong>
             </div>
 
 
             <div class="stat-box">
-
-                <span>
-                    Profit total
-                </span>
-
-                <strong id="statProfit">
-                    $0.00
-                </strong>
-
+                <span>Profit total</span>
+                <strong id="statProfit">$0.00</strong>
             </div>
 
 
             <div class="stat-box">
-
-                <span>
-                    Winrate
-                </span>
-
-                <strong id="statWinrate">
-                    0%
-                </strong>
-
+                <span>Winrate</span>
+                <strong id="statWinrate">0%</strong>
             </div>
 
 
             <div class="stat-box">
-
-                <span>
-                    RR moyen
-                </span>
-
-                <strong id="statAverageRR">
-                    0.00
-                </strong>
-
+                <span>RR moyen</span>
+                <strong id="statAverageRR">0.00</strong>
             </div>
 
 
             <div class="stat-box">
-
-                <span>
-                    Nombre de trades
-                </span>
-
-                <strong id="statTrades">
-                    0
-                </strong>
-
+                <span>Nombre de trades</span>
+                <strong id="statTrades">0</strong>
             </div>
 
 
             <div class="stat-box">
-
-                <span>
-                    Meilleur setup
-                </span>
-
-                <strong id="statBestSetup">
-                    -
-                </strong>
-
+                <span>Meilleur setup</span>
+                <strong id="statBestSetup">-</strong>
             </div>
 
         </div>
@@ -729,9 +670,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <h2>
-                    🎯 Performance des setups
-                </h2>
+                <h2>🎯 Performance des setups</h2>
 
                 <p>
                     Résultats par stratégie
@@ -750,33 +689,18 @@ body[data-page="archives"] #archivesList {
 
                     <tr>
 
-                        <th>
-                            Setup
-                        </th>
-
-                        <th>
-                            Trades
-                        </th>
-
-                        <th>
-                            Gagnants
-                        </th>
-
-                        <th>
-                            Winrate
-                        </th>
-
-                        <th>
-                            Profit
-                        </th>
+                        <th>Setup</th>
+                        <th>Trades</th>
+                        <th>Gagnants</th>
+                        <th>Winrate</th>
+                        <th>Profit</th>
 
                     </tr>
 
                 </thead>
 
 
-                <tbody id="setupTableBody">
-                </tbody>
+                <tbody id="setupTableBody"></tbody>
 
             </table>
 
@@ -786,7 +710,7 @@ body[data-page="archives"] #archivesList {
 
 
     <!-- ========================================================
-         PERFORMANCE ACTIFS
+         PERFORMANCE PAR ACTIF
          ======================================================== -->
 
     <section
@@ -798,9 +722,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <h2>
-                    📈 Performance par actif
-                </h2>
+                <h2>📈 Performance par actif</h2>
 
                 <p>
                     Résultats détaillés pour chaque actif.
@@ -835,8 +757,7 @@ body[data-page="archives"] #archivesList {
                 </thead>
 
 
-                <tbody id="assetTableBody">
-                </tbody>
+                <tbody id="assetTableBody"></tbody>
 
             </table>
 
@@ -858,9 +779,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <h2>
-                    📜 Historique des trades
-                </h2>
+                <h2>📜 Historique des trades</h2>
 
                 <p>
                     Tous les trades du capital actif
@@ -872,6 +791,7 @@ body[data-page="archives"] #archivesList {
             <button
                 id="clearBtn"
                 class="danger-btn"
+                type="button"
             >
                 Effacer les trades
             </button>
@@ -905,8 +825,7 @@ body[data-page="archives"] #archivesList {
                 </thead>
 
 
-                <tbody id="historyBody">
-                </tbody>
+                <tbody id="historyBody"></tbody>
 
             </table>
 
@@ -928,9 +847,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <h2>
-                    🗄️ Archives des capitaux
-                </h2>
+                <h2>🗄️ Archives des capitaux</h2>
 
                 <p>
                     Historique indépendant de chaque capital
@@ -944,8 +861,7 @@ body[data-page="archives"] #archivesList {
         <div
             id="archivesList"
             class="archives-list"
-        >
-        </div>
+        ></div>
 
     </section>
 
@@ -953,7 +869,7 @@ body[data-page="archives"] #archivesList {
 
 
 <!-- ============================================================
-     MODAL TRADE
+     MODAL AJOUT TRADE
      ============================================================ -->
 
 <div
@@ -967,9 +883,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <h2>
-                    ➕ Ajouter un trade
-                </h2>
+                <h2>➕ Ajouter un trade</h2>
 
                 <p>
                     Enregistrez votre trade manuellement
@@ -994,7 +908,6 @@ body[data-page="archives"] #archivesList {
             <form id="tradeForm">
 
                 <div class="form-grid">
-
 
                     <div>
 
@@ -1273,8 +1186,7 @@ body[data-page="archives"] #archivesList {
                     id="tradeMMInfo"
                     class="form-full"
                     aria-live="polite"
-                >
-                </div>
+                ></div>
 
 
                 <div
@@ -1341,7 +1253,7 @@ body[data-page="archives"] #archivesList {
 
 
 <!-- ============================================================
-     MODAL CAPITAL
+     MODAL NOUVEAU CAPITAL
      ============================================================ -->
 
 <div
@@ -1369,6 +1281,7 @@ body[data-page="archives"] #archivesList {
             <button
                 id="cancelCapitalBtn"
                 class="close-btn"
+                type="button"
             >
                 ✕
             </button>
@@ -1477,6 +1390,7 @@ body[data-page="archives"] #archivesList {
             <button
                 id="cancelCapitalBtn2"
                 class="secondary-btn"
+                type="button"
             >
                 Annuler
             </button>
@@ -1485,6 +1399,7 @@ body[data-page="archives"] #archivesList {
             <button
                 id="saveCapitalBtn"
                 class="primary-btn"
+                type="button"
             >
                 Enregistrer
             </button>
@@ -1525,6 +1440,7 @@ body[data-page="archives"] #archivesList {
             <button
                 id="closeArchiveChartBtn"
                 class="close-btn"
+                type="button"
             >
                 ✕
             </button>
@@ -1536,9 +1452,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <span>
-                    Capital initial
-                </span>
+                <span>Capital initial</span>
 
                 <strong id="archiveChartInitial">
                     $0.00
@@ -1549,9 +1463,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <span>
-                    Capital final
-                </span>
+                <span>Capital final</span>
 
                 <strong id="archiveChartFinal">
                     $0.00
@@ -1562,9 +1474,7 @@ body[data-page="archives"] #archivesList {
 
             <div>
 
-                <span>
-                    Profit total
-                </span>
+                <span>Profit total</span>
 
                 <strong id="archiveChartProfit">
                     $0.00
@@ -1587,562 +1497,34 @@ body[data-page="archives"] #archivesList {
 
 
 <!-- ============================================================
-     APP PRINCIPALE
+     SCRIPTS
      ============================================================ -->
 
 <script src="app.js"></script>
 <script src="v51-filters.js"></script>
 
 
-<!-- ============================================================
-     PERFORMANCE PAR ACTIF
-     ============================================================ -->
-
 <script>
-
 (function () {
 
-    function escapeHtmlSafe(value) {
-
-        return String(value).replace(
-            /[&<>"']/g,
-            function (c) {
-
-                return {
-                    "&": "&amp;",
-                    "<": "&lt;",
-                    ">": "&gt;",
-                    "\"": "&quot;",
-                    "'": "&#39;"
-                }[c];
-
-            }
-        );
-
-    }
-
-
-    function renderPerformanceByAsset() {
-
-        const tbody =
-            document.getElementById(
-                "assetTableBody"
-            );
-
-        if (!tbody) {
-            return;
-        }
-
-
-        let trades = [];
-
-        try {
-
-            trades = JSON.parse(
-                localStorage.getItem(
-                    "tradingTrades"
-                ) || "[]"
-            );
-
-        } catch (e) {
-
-            trades = [];
-
-        }
-
-
-        /*
-         * On récupère le capital actif déjà utilisé
-         * par app.js.
-         *
-         * Aucun calcul du système n'est modifié.
-         */
-
-        let activeCapitalId = null;
-
-        try {
-
-            const activeCapital =
-                JSON.parse(
-                    localStorage.getItem(
-                        "tradingActiveCapital"
-                    )
-                );
-
-            if (activeCapital) {
-                activeCapitalId =
-                    activeCapital.id;
-            }
-
-        } catch (e) {}
-
-
-
-        if (activeCapitalId) {
-
-            const activeTrades =
-                trades.filter(
-                    trade =>
-                        trade.capitalId ===
-                        activeCapitalId
-                );
-
-            if (activeTrades.length > 0) {
-                trades = activeTrades;
-            }
-
-        }
-
-
-        const groups = {};
-
-
-        trades.forEach(
-            trade => {
-
-                const asset =
-                    String(
-                        trade.asset || "-"
-                    ).trim() || "-";
-
-                if (!groups[asset]) {
-                    groups[asset] = [];
-                }
-
-                groups[asset].push(trade);
-
-            }
-        );
-
-
-        tbody.innerHTML = "";
-
-
-        const assets =
-            Object.keys(groups);
-
-
-        if (!assets.length) {
-
-            tbody.innerHTML =
-                '<tr>' +
-                '<td colspan="10" class="empty-table">' +
-                'Aucun trade enregistré.' +
-                '</td>' +
-                '</tr>';
-
-            return;
-
-        }
-
-
-        assets.sort(
-            (a, b) =>
-                a.localeCompare(b)
-        );
-
-
-        assets.forEach(
-            asset => {
-
-                const list =
-                    groups[asset];
-
-
-                const wins =
-                    list.filter(
-                        t => t.result === "TP"
-                    ).length;
-
-
-                const losses =
-                    list.filter(
-                        t => t.result === "SL"
-                    ).length;
-
-
-                const be =
-                    list.filter(
-                        t => t.result === "BE"
-                    ).length;
-
-
-                const winrate =
-                    list.length
-                        ? (wins / list.length) * 100
-                        : 0;
-
-
-                const profit =
-                    list.reduce(
-                        (sum, t) =>
-                            sum +
-                            (
-                                Number(t.pnl) ||
-                                Number(t.profit) ||
-                                0
-                            ),
-                        0
-                    );
-
-
-                const rrs =
-                    list
-                        .map(t => Number(t.rr))
-                        .filter(Number.isFinite)
-                        .filter(v => v > 0);
-
-
-                const averageRR =
-                    rrs.length
-                        ? rrs.reduce(
-                            (a, b) => a + b,
-                            0
-                        ) / rrs.length
-                        : 0;
-
-
-                const pnls =
-                    list.map(
-                        t =>
-                            Number(t.pnl) ||
-                            Number(t.profit) ||
-                            0
-                    );
-
-
-                const best =
-                    pnls.length
-                        ? Math.max(...pnls)
-                        : 0;
-
-
-                const worst =
-                    pnls.length
-                        ? Math.min(...pnls)
-                        : 0;
-
-
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                row.innerHTML = `
-
-                    <td>
-                        ${escapeHtmlSafe(asset)}
-                    </td>
-
-                    <td>
-                        ${list.length}
-                    </td>
-
-                    <td>
-                        ${wins}
-                    </td>
-
-                    <td>
-                        ${losses}
-                    </td>
-
-                    <td>
-                        ${be}
-                    </td>
-
-                    <td>
-                        ${winrate.toFixed(1)}%
-                    </td>
-
-                    <td>
-                        ${profit.toFixed(2)} $
-                    </td>
-
-                    <td>
-                        ${averageRR.toFixed(2)}
-                    </td>
-
-                    <td>
-                        ${best.toFixed(2)} $
-                    </td>
-
-                    <td>
-                        ${worst.toFixed(2)} $
-                    </td>
-
-                `;
-
-
-                tbody.appendChild(row);
-
-            }
-        );
-
-    }
-
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
-
-            setTimeout(
-                renderPerformanceByAsset,
-                1000
-            );
-
-
-            setInterval(
-                renderPerformanceByAsset,
-                1000
-            );
-
-        }
-    );
-
-
-})();
-
-</script>
-
-
-<!-- ============================================================
-     AFFICHAGE DES SETUPS POUR PERFORMANCE
-     ============================================================ -->
-
-<script>
-
-(function () {
-
-    function renderPerformanceSetups() {
-
-        if (
-            document.body.dataset.page !==
-            "performance"
-        ) {
-            return;
-        }
-
-
-        const tbody =
-            document.getElementById(
-                "setupTableBody"
-            );
-
-        if (!tbody) {
-            return;
-        }
-
-
-        let trades = [];
-
-        try {
-
-            trades = JSON.parse(
-                localStorage.getItem(
-                    "tradingTrades"
-                ) || "[]"
-            );
-
-        } catch (e) {
-
-            trades = [];
-
-        }
-
-
-        let activeCapitalId = null;
-
-        try {
-
-            const activeCapital =
-                JSON.parse(
-                    localStorage.getItem(
-                        "tradingActiveCapital"
-                    )
-                );
-
-            if (activeCapital) {
-
-                activeCapitalId =
-                    activeCapital.id;
-
-            }
-
-        } catch (e) {}
-
-
-        if (activeCapitalId) {
-
-            const activeTrades =
-                trades.filter(
-                    trade =>
-                        trade.capitalId ===
-                        activeCapitalId
-                );
-
-            if (activeTrades.length > 0) {
-                trades = activeTrades;
-            }
-
-        }
-
-
-        const setupNames = [
-
-            "LDP+QML",
-            "LDP+FIBO 50",
-            "OB",
-            "BB",
-            "ZS OA",
-            "SSM1",
-            "SSM2",
-            "SSM3",
-            "SBM1",
-            "SBM2",
-            "SBM3"
-
-        ];
-
-
-        tbody.innerHTML = "";
-
-
-        setupNames.forEach(
-            setup => {
-
-                const setupTrades =
-                    trades.filter(
-                        trade =>
-                            trade.setup ===
-                            setup
-                    );
-
-
-                const winners =
-                    setupTrades.filter(
-                        trade =>
-                            trade.result ===
-                            "TP"
-                    ).length;
-
-
-                const winrate =
-                    setupTrades.length
-                        ? (
-                            winners /
-                            setupTrades.length
-                        ) * 100
-                        : 0;
-
-
-                const profit =
-                    setupTrades.reduce(
-                        (sum, trade) =>
-                            sum +
-                            (
-                                Number(
-                                    trade.pnl
-                                ) ||
-                                Number(
-                                    trade.profit
-                                ) ||
-                                0
-                            ),
-                        0
-                    );
-
-
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                row.innerHTML = `
-
-                    <td>
-                        ${setup}
-                    </td>
-
-                    <td>
-                        ${setupTrades.length}
-                    </td>
-
-                    <td>
-                        ${winners}
-                    </td>
-
-                    <td>
-                        ${winrate.toFixed(1)}%
-                    </td>
-
-                    <td>
-                        ${profit.toFixed(2)} $
-                    </td>
-
-                `;
-
-
-                tbody.appendChild(row);
-
-            }
-        );
-
-    }
-
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
-
-            setTimeout(
-                renderPerformanceSetups,
-                1200
-            );
-
-
-            setInterval(
-                renderPerformanceSetups,
-                1000
-            );
-
-        }
-    );
-
-
-})();
-
-</script>
-
-
-<!-- ============================================================
-     NAVIGATION + MODAL
-     ============================================================ -->
-
-<script>
-
-(function () {
+    /* =========================================================
+       DÉTERMINATION DE LA PAGE
+       ========================================================= */
 
     const allowedPages = [
-
         "dashboard",
         "analysis",
         "performance",
         "archives"
-
     ];
-
 
     const params =
         new URLSearchParams(
             window.location.search
         );
 
-
     const requested =
         params.get("page");
-
 
     const page =
         allowedPages.includes(requested)
@@ -2150,30 +1532,28 @@ body[data-page="archives"] #archivesList {
             : "dashboard";
 
 
-    document.body.dataset.page =
-        page;
+    /* =========================================================
+       PAGE ACTIVE
+       ========================================================= */
+
+    document.body.dataset.page = page;
 
 
     document
-        .querySelectorAll(
-            "[data-page-link]"
-        )
-        .forEach(
-            link => {
+        .querySelectorAll("[data-page-link]")
+        .forEach(link => {
 
-                link.classList.toggle(
-                    "active",
-                    link.dataset.pageLink ===
-                    page
-                );
+            link.classList.toggle(
+                "active",
+                link.dataset.pageLink === page
+            );
 
-            }
-        );
+        });
 
 
-    /* ========================================================
-       TRADE MODAL
-       ======================================================== */
+    /* =========================================================
+       MODAL TRADE
+       ========================================================= */
 
     function openTradeModal() {
 
@@ -2186,20 +1566,13 @@ body[data-page="archives"] #archivesList {
             return;
         }
 
+        modal.classList.add("open");
 
-        modal.classList.add(
-            "open"
-        );
-
-
-        modal.style.display =
-            "flex";
-
+        modal.style.display = "flex";
 
         document.body.classList.add(
             "modal-open"
         );
-
     }
 
 
@@ -2214,20 +1587,13 @@ body[data-page="archives"] #archivesList {
             return;
         }
 
+        modal.classList.remove("open");
 
-        modal.classList.remove(
-            "open"
-        );
-
-
-        modal.style.display =
-            "none";
-
+        modal.style.display = "none";
 
         document.body.classList.remove(
             "modal-open"
         );
-
     }
 
 
@@ -2240,11 +1606,9 @@ body[data-page="archives"] #archivesList {
                     "#openTradeModalBtn, #closeTradeModalBtn, #cancelTradeModalBtn"
                 );
 
-
             if (!target) {
                 return;
             }
-
 
             if (
                 target.id ===
@@ -2267,7 +1631,6 @@ body[data-page="archives"] #archivesList {
         document.getElementById(
             "tradeModal"
         );
-
 
     if (tradeModal) {
 
@@ -2307,11 +1670,14 @@ body[data-page="archives"] #archivesList {
     );
 
 
+    /* =========================================================
+       FERMETURE AUTOMATIQUE APRÈS TRADE
+       ========================================================= */
+
     const tradeForm =
         document.getElementById(
             "tradeForm"
         );
-
 
     if (tradeForm) {
 
@@ -2331,10 +1697,106 @@ body[data-page="archives"] #archivesList {
     }
 
 
+    /* =========================================================
+       SÉCURITÉ CAPITAL
+       =========================================================
+       
+       app.js possède déjà toute la logique de sauvegarde.
+       Ici nous ne recalculons rien.
+       
+       On vérifie simplement que le modal utilise bien
+       l'état "show" attendu par app.js.
+       ========================================================= */
+
+    const capitalModal =
+        document.getElementById(
+            "capitalModal"
+        );
+
+    if (capitalModal) {
+
+        capitalModal.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target ===
+                    capitalModal
+                ) {
+
+                    if (
+                        typeof closeCapitalModal ===
+                        "function"
+                    ) {
+
+                        closeCapitalModal();
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       APRÈS CHARGEMENT :
+       ON RÉAFFIRME LA PAGE ACTIVE
+       ========================================================= */
+
+    window.addEventListener(
+        "load",
+        function () {
+
+            document.body.dataset.page =
+                page;
+
+            document
+                .querySelectorAll(
+                    "[data-page-link]"
+                )
+                .forEach(link => {
+
+                    link.classList.toggle(
+                        "active",
+                        link.dataset.pageLink === page
+                    );
+
+                });
+
+            /*
+             * On laisse app.js conserver
+             * tous ses calculs et son stockage.
+             *
+             * On ne modifie aucune donnée.
+             */
+
+            if (
+                typeof refreshAll ===
+                "function"
+            ) {
+
+                refreshAll();
+
+            }
+
+            if (
+                page === "analysis" &&
+                typeof refreshV51 ===
+                "function"
+            ) {
+
+                refreshV51();
+
+            }
+
+        }
+    );
+
 })();
-
 </script>
-
 
 </body>
 </html>
