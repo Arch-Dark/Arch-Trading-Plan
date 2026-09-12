@@ -68,6 +68,10 @@
                     Capital 1
                 </p>
 
+                <small id="activeCapitalCreatedAt">
+                    Créé le -
+                </small>
+
             </div>
 
 
@@ -139,6 +143,45 @@
                 </span>
 
                 <strong id="totalProfit">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    Risque de référence
+                </span>
+
+                <strong id="riskReference">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    RR cible
+                </span>
+
+                <strong id="rrTarget">
+                    2.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    Objectif théorique / trade
+                </span>
+
+                <strong id="theoreticalObjective">
                     $0.00
                 </strong>
 
@@ -267,7 +310,6 @@
 
         <div class="stats-grid">
 
-
             <div class="stat-box">
 
                 <span>
@@ -345,6 +387,136 @@
 
             </div>
 
+
+            <div class="stat-box">
+
+                <span>
+                    Dernier trade
+                </span>
+
+                <strong id="statLastTrade">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Profit Factor
+                </span>
+
+                <strong id="statProfitFactor">
+                    0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Gain moyen / trade
+                </span>
+
+                <strong id="statAverageTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Gain moyen gagnant
+                </span>
+
+                <strong id="statAverageWin">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Perte moyenne perdant
+                </span>
+
+                <strong id="statAverageLoss">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Meilleur trade
+                </span>
+
+                <strong id="statBestTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Pire trade
+                </span>
+
+                <strong id="statWorstTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Série gagnante max
+                </span>
+
+                <strong id="statMaxWinStreak">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Série perdante max
+                </span>
+
+                <strong id="statMaxLossStreak">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Drawdown maximal
+                </span>
+
+                <strong id="statMaxDrawdown">
+                    $0.00
+                </strong>
+
+            </div>
+
         </div>
 
     </section>
@@ -375,7 +547,6 @@
 
 
         <form id="tradeForm">
-
 
             <div class="form-grid">
 
@@ -546,6 +717,7 @@
                         id="sl"
                         step="any"
                         placeholder="4445.00"
+                        required
                     >
 
                 </div>
@@ -1066,6 +1238,7 @@
 <div
     id="capitalModal"
     class="modal"
+    data-mode="new"
 >
 
     <div class="modal-content">
@@ -1101,6 +1274,8 @@
         <div class="modal-body">
 
 
+            <!-- NOM -->
+
             <div>
 
                 <label for="capitalNameInput">
@@ -1111,11 +1286,14 @@
                     type="text"
                     id="capitalNameInput"
                     placeholder="Capital 1"
+                    autocomplete="off"
                 >
 
             </div>
 
 
+
+            <!-- CAPITAL INITIAL -->
 
             <div>
 
@@ -1128,9 +1306,93 @@
                     step="any"
                     id="capitalAmountInput"
                     placeholder="100"
+                    min="0"
+                >
+
+                <small
+                    id="capitalAmountHelp"
+                    class="form-help"
+                >
+                    Le capital initial sera verrouillé après le premier trade.
+                </small>
+
+            </div>
+
+
+
+            <!-- RISQUE DE REFERENCE -->
+
+            <div>
+
+                <label for="capitalRiskInput">
+                    Risque de référence par trade
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="capitalRiskInput"
+                    placeholder="Exemple : 2.50"
+                    min="0.01"
                 >
 
             </div>
+
+
+
+            <!-- RR CIBLE -->
+
+            <div>
+
+                <label for="capitalRRInput">
+                    RR cible
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    id="capitalRRInput"
+                    placeholder="2.00"
+                    min="2"
+                    value="2.00"
+                >
+
+                <small class="form-help">
+                    Le RR cible minimum est 2.00.
+                </small>
+
+            </div>
+
+
+
+            <!-- PREVIEW MONEY MANAGEMENT -->
+
+            <div
+                class="capital-modal-preview"
+            >
+
+                <div
+                    id="capitalModalRiskPreview"
+                >
+                    Risque : $0.00
+                </div>
+
+
+                <div
+                    id="capitalModalRR"
+                >
+                    RR cible : 2.00
+                </div>
+
+
+                <div
+                    id="capitalModalObjective"
+                >
+                    $0.00
+                </div>
+
+            </div>
+
 
         </div>
 
