@@ -1,5 +1,5 @@
 /* =========================================================
-   TRADING DASHBOARD — FUTURISTIC UI V6
+   TRADING DASHBOARD — FUTURISTIC UI V7
    DESIGN ONLY
    Aucun calcul / aucune logique / aucune donnée modifiée
    ========================================================= */
@@ -89,8 +89,6 @@ body {
 }
 
 
-/* Ligne lumineuse décorative supérieure */
-
 body::before {
     content: "";
 
@@ -118,8 +116,6 @@ body::before {
     pointer-events: none;
 }
 
-
-/* Grille futuriste en arrière-plan */
 
 body::after {
     content: "";
@@ -215,6 +211,8 @@ button {
 
     gap: 20px;
 
+    min-height: 112px;
+
     padding: 24px 5%;
 
     background:
@@ -232,11 +230,134 @@ button {
     box-shadow:
         0 10px 40px rgba(0, 0, 0, 0.25);
 
-    overflow: hidden;
+    overflow: visible;
+
+    isolation: isolate;
 }
 
 
-/* Lumière animée du header */
+/* Le premier bloc = titre */
+
+.topbar > div:first-child {
+    position: relative;
+
+    z-index: 3;
+
+    flex:
+        0 0 auto;
+
+    min-width:
+        max-content;
+}
+
+
+/* Bouton thème */
+
+.topbar > .theme-btn,
+.topbar > button#themeToggle {
+    position: relative;
+
+    z-index: 4;
+
+    flex:
+        0 0 auto;
+
+    margin-left:
+        auto;
+}
+
+
+/* =========================================================
+   SESSION WIDGET
+   =========================================================
+
+   Le panneau est ajouté dynamiquement par session.js.
+   On le sort du système flex du header afin qu'il puisse
+   rester parfaitement centré sans être comprimé.
+   ========================================================= */
+
+#tradingSessionsPanel {
+    position: absolute !important;
+
+    left: 50% !important;
+    top: 50% !important;
+
+    transform:
+        translate(-50%, -50%) !important;
+
+    z-index: 2;
+
+    width: max-content;
+
+    max-width:
+        min(
+            720px,
+            calc(100% - 430px)
+        );
+
+    min-width:
+        430px;
+
+    margin: 0 !important;
+
+    flex:
+        none !important;
+
+    flex-shrink:
+        0 !important;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    pointer-events:
+        auto;
+}
+
+
+/*
+   Protection contre les règles flex héritées
+   des éléments internes du widget.
+*/
+
+#tradingSessionsPanel * {
+    box-sizing:
+        border-box;
+}
+
+
+/*
+   Si le widget utilise une structure horizontale,
+   elle conserve une taille naturelle.
+*/
+
+#tradingSessionsPanel .session-current,
+#tradingSessionsPanel .session-next {
+    min-width:
+        0;
+}
+
+
+/*
+   Évite que les textes longs forcent le header.
+*/
+
+#tradingSessionsPanel span,
+#tradingSessionsPanel strong,
+#tradingSessionsPanel div {
+    max-width:
+        100%;
+}
+
+
+/* =========================================================
+   Lumière animée du header
+   ========================================================= */
 
 .topbar::after {
     content: "";
@@ -264,6 +385,9 @@ button {
 
     animation:
         headerScan 7s linear infinite;
+
+    pointer-events:
+        none;
 }
 
 @keyframes headerScan {
@@ -630,8 +754,6 @@ button {
         box-shadow 0.3s ease;
 }
 
-
-/* reflet lumineux */
 
 .card::before {
     content: "";
@@ -2264,6 +2386,16 @@ body.light-theme td {
 
 
 /* =========================================================
+   SESSION — MODE CLAIR
+   ========================================================= */
+
+body.light-theme #tradingSessionsPanel {
+    color:
+        var(--text);
+}
+
+
+/* =========================================================
    MOBILE / TABLET
    ========================================================= */
 
@@ -2282,6 +2414,20 @@ body.light-theme td {
     .capital-summary {
         grid-template-columns:
             repeat(2, 1fr);
+    }
+
+
+    /*
+       Le widget reste centré mais dispose de moins
+       d'espace sur les écrans moyens.
+    */
+
+    #tradingSessionsPanel {
+        max-width:
+            calc(100% - 360px);
+
+        min-width:
+            360px;
     }
 }
 
@@ -2323,6 +2469,40 @@ body.light-theme td {
         flex:
             0 0 auto;
     }
+
+
+    /*
+       À partir de 900px, on donne au widget
+       une zone plus confortable sous le header.
+    */
+
+    .topbar {
+        min-height:
+            150px;
+    }
+
+    #tradingSessionsPanel {
+        top:
+            auto !important;
+
+        bottom:
+            14px !important;
+
+        left:
+            50% !important;
+
+        transform:
+            translateX(-50%) !important;
+
+        width:
+            calc(100% - 40px);
+
+        max-width:
+            680px;
+
+        min-width:
+            0;
+    }
 }
 
 
@@ -2331,6 +2511,9 @@ body.light-theme td {
     .topbar {
         padding:
             18px 4%;
+
+        min-height:
+            190px;
 
         align-items:
             flex-start;
@@ -2346,6 +2529,38 @@ body.light-theme td {
     .topbar p {
         font-size:
             12px;
+    }
+
+
+    /*
+       Sur téléphone, le widget occupe toute la largeur
+       disponible sous le titre.
+    */
+
+    #tradingSessionsPanel {
+        left:
+            4% !important;
+
+        right:
+            4% !important;
+
+        bottom:
+            12px !important;
+
+        width:
+            auto !important;
+
+        max-width:
+            none !important;
+
+        min-width:
+            0 !important;
+
+        transform:
+            none !important;
+
+        justify-content:
+            center;
     }
 
 
@@ -2484,6 +2699,12 @@ body.light-theme td {
    ========================================================= */
 
 @media (max-width: 420px) {
+
+    .topbar {
+        min-height:
+            205px;
+    }
+
 
     .app-nav {
         gap:
