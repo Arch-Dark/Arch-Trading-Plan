@@ -69,7 +69,8 @@
        PARAMÈTRES
        ===================================================== */
 
-    const MADAGASCAR_TIMEZONE = "Indian/Antananarivo";
+    const MADAGASCAR_TIMEZONE =
+        "Indian/Antananarivo";
 
     let timer = null;
 
@@ -80,46 +81,38 @@
 
     function getParts(date, timezone) {
 
-        const formatter = new Intl.DateTimeFormat(
-            "en-US",
-            {
-                timeZone: timezone,
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hourCycle: "h23"
-            }
-        );
+        const formatter =
+            new Intl.DateTimeFormat(
+                "en-US",
+                {
+                    timeZone: timezone,
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hourCycle: "h23"
+                }
+            );
 
-        const parts = formatter.formatToParts(date);
+        const parts =
+            formatter.formatToParts(date);
 
         const result = {};
 
         parts.forEach(function (part) {
 
             if (part.type !== "literal") {
-                result[part.type] = Number(part.value);
+
+                result[part.type] =
+                    Number(part.value);
+
             }
 
         });
 
         return result;
-    }
-
-
-    function getDateKey(parts) {
-
-        return (
-            parts.year +
-            "-" +
-            String(parts.month).padStart(2, "0") +
-            "-" +
-            String(parts.day).padStart(2, "0")
-        );
-
     }
 
 
@@ -149,13 +142,14 @@
 
     function getDayOfWeek(date, timezone) {
 
-        const formatter = new Intl.DateTimeFormat(
-            "en-US",
-            {
-                timeZone: timezone,
-                weekday: "short"
-            }
-        );
+        const formatter =
+            new Intl.DateTimeFormat(
+                "en-US",
+                {
+                    timeZone: timezone,
+                    weekday: "short"
+                }
+            );
 
         return formatter.format(date);
 
@@ -164,10 +158,11 @@
 
     function isWeekend(date) {
 
-        const day = getDayOfWeek(
-            date,
-            MADAGASCAR_TIMEZONE
-        );
+        const day =
+            getDayOfWeek(
+                date,
+                MADAGASCAR_TIMEZONE
+            );
 
         return (
             day === "Sat" ||
@@ -189,28 +184,27 @@
         second
     ) {
 
-        /*
-         * On utilise une approximation initiale puis
-         * une correction basée sur le fuseau demandé.
-         */
+        const utcGuess =
+            Date.UTC(
+                parts.year,
+                parts.month - 1,
+                parts.day,
+                hour,
+                minute,
+                second
+            );
 
-        const utcGuess = Date.UTC(
-            parts.year,
-            parts.month - 1,
-            parts.day,
-            hour,
-            minute,
-            second
-        );
+        let date =
+            new Date(utcGuess);
 
-        let date = new Date(utcGuess);
 
         for (let i = 0; i < 3; i++) {
 
-            const actual = getParts(
-                date,
-                timezone
-            );
+            const actual =
+                getParts(
+                    date,
+                    timezone
+                );
 
             const desiredMinutes =
                 hour * 60 +
@@ -224,22 +218,28 @@
                 desiredMinutes -
                 actualMinutes;
 
-            /*
-             * Correction du changement de jour.
-             */
 
             if (difference > 720) {
+
                 difference -= 1440;
+
             }
+
 
             if (difference < -720) {
+
                 difference += 1440;
+
             }
 
-            date = new Date(
-                date.getTime() +
-                difference * 60 * 1000
-            );
+
+            date =
+                new Date(
+                    date.getTime() +
+                    difference *
+                    60 *
+                    1000
+                );
 
         }
 
@@ -252,12 +252,16 @@
        ÉTAT D'UNE SESSION
        ===================================================== */
 
-    function getSessionState(session, now) {
+    function getSessionState(
+        session,
+        now
+    ) {
 
-        const parts = getParts(
-            now,
-            session.timezone
-        );
+        const parts =
+            getParts(
+                now,
+                session.timezone
+            );
 
         const currentMinutes =
             parts.hour * 60 +
@@ -274,39 +278,48 @@
             currentMinutes >= openMinutes &&
             currentMinutes < closeMinutes;
 
+
         return {
-            open,
-            parts,
-            currentMinutes,
-            openMinutes,
-            closeMinutes
+            open: open,
+            parts: parts,
+            currentMinutes: currentMinutes,
+            openMinutes: openMinutes,
+            closeMinutes: closeMinutes
         };
 
     }
 
 
     /* =====================================================
-       PROCHAINE OUVERTURE D'UNE SESSION
+       PROCHAINE OUVERTURE
        ===================================================== */
 
-    function getNextOpenDate(session, now) {
+    function getNextOpenDate(
+        session,
+        now
+    ) {
 
-        let candidate = new Date(now);
+        let candidate =
+            new Date(now);
+
 
         for (let i = 0; i < 8; i++) {
 
-            const parts = getParts(
-                candidate,
-                session.timezone
-            );
+            const parts =
+                getParts(
+                    candidate,
+                    session.timezone
+                );
 
-            const candidateDate = createDateFromParts(
-                parts,
-                session.timezone,
-                session.openHour,
-                0,
-                0
-            );
+            const candidateDate =
+                createDateFromParts(
+                    parts,
+                    session.timezone,
+                    session.openHour,
+                    0,
+                    0
+                );
+
 
             if (candidateDate > now) {
 
@@ -314,16 +327,18 @@
 
             }
 
-            /*
-             * Jour suivant.
-             */
 
-            candidate = new Date(
-                candidate.getTime() +
-                24 * 60 * 60 * 1000
-            );
+            candidate =
+                new Date(
+                    candidate.getTime() +
+                    24 *
+                    60 *
+                    60 *
+                    1000
+                );
 
         }
+
 
         return null;
 
@@ -334,29 +349,39 @@
        FERMETURE D'UNE SESSION
        ===================================================== */
 
-    function getCloseDate(session, now) {
+    function getCloseDate(
+        session,
+        now
+    ) {
 
-        const parts = getParts(
-            now,
-            session.timezone
-        );
+        const parts =
+            getParts(
+                now,
+                session.timezone
+            );
 
-        const closeDate = createDateFromParts(
-            parts,
-            session.timezone,
-            session.closeHour,
-            0,
-            0
-        );
+        const closeDate =
+            createDateFromParts(
+                parts,
+                session.timezone,
+                session.closeHour,
+                0,
+                0
+            );
+
 
         if (closeDate <= now) {
 
             return new Date(
                 closeDate.getTime() +
-                24 * 60 * 60 * 1000
+                24 *
+                60 *
+                60 *
+                1000
             );
 
         }
+
 
         return closeDate;
 
@@ -364,34 +389,43 @@
 
 
     /* =====================================================
-       FORMATAGE COMPTE À REBOURS
+       COMPTE À REBOURS
        ===================================================== */
 
-    function formatCountdown(milliseconds) {
+    function formatCountdown(
+        milliseconds
+    ) {
 
         if (milliseconds < 0) {
+
             milliseconds = 0;
+
         }
+
 
         const totalSeconds =
             Math.floor(
                 milliseconds / 1000
             );
 
+
         const days =
             Math.floor(
                 totalSeconds / 86400
             );
+
 
         const hours =
             Math.floor(
                 (totalSeconds % 86400) / 3600
             );
 
+
         const minutes =
             Math.floor(
                 (totalSeconds % 3600) / 60
             );
+
 
         const seconds =
             totalSeconds % 60;
@@ -399,9 +433,15 @@
 
         let result = "";
 
+
         if (days > 0) {
-            result += days + "j ";
+
+            result +=
+                days +
+                "j ";
+
         }
+
 
         result +=
             String(hours).padStart(2, "0") +
@@ -410,6 +450,7 @@
             "m " +
             String(seconds).padStart(2, "0") +
             "s";
+
 
         return result;
 
@@ -422,105 +463,125 @@
 
     function createPanel() {
 
-        if (
+        let panel =
             document.getElementById(
                 "tradingSessionsPanel"
-            )
-        ) {
-            return;
+            );
+
+
+        /*
+         * Si un panneau existe déjà dans le HTML,
+         * on l'utilise.
+         */
+
+        if (!panel) {
+
+            panel =
+                document.createElement("div");
+
+            panel.id =
+                "tradingSessionsPanel";
+
+
+            panel.innerHTML = `
+
+                <div class="sessions-main">
+
+                    <div class="session-current">
+
+                        <div class="session-label">
+                            SESSION ACTUELLE
+                        </div>
+
+                        <div
+                            id="currentSessionName"
+                            class="session-current-name"
+                        >
+                            —
+                        </div>
+
+                        <div
+                            id="currentSessionStatus"
+                            class="session-status"
+                        >
+                            —
+                        </div>
+
+                        <div
+                            id="currentSessionCountdown"
+                            class="session-countdown"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="session-next">
+
+                        <div class="session-label">
+                            PROCHAINE SESSION
+                        </div>
+
+                        <div
+                            id="nextSessionName"
+                            class="session-next-name"
+                        >
+                            —
+                        </div>
+
+                        <div
+                            id="nextSessionTime"
+                            class="session-time-line"
+                        >
+                            —
+                        </div>
+
+                        <div
+                            id="nextSessionCountdown"
+                            class="session-countdown small"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="sessionsWeekend"
+                    class="sessions-weekend"
+                    style="display:none;"
+                >
+                    🛑 Marché fermé — week-end
+                </div>
+
+
+                <div
+                    id="sessionsList"
+                    class="sessions-list"
+                ></div>
+
+            `;
+
         }
 
 
-        const panel =
-            document.createElement("div");
-
-        panel.id =
-            "tradingSessionsPanel";
-
-        panel.innerHTML = `
-
-            <div class="sessions-main">
-
-                <div class="session-current">
-
-                    <div class="session-label">
-                        SESSION ACTUELLE
-                    </div>
-
-                    <div
-                        id="currentSessionName"
-                        class="session-current-name"
-                    >
-                        —
-                    </div>
-
-                    <div
-                        id="currentSessionStatus"
-                        class="session-status"
-                    >
-                        —
-                    </div>
-
-                    <div
-                        id="currentSessionCountdown"
-                        class="session-countdown"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="session-next">
-
-                    <div class="session-label">
-                        PROCHAINE SESSION
-                    </div>
-
-                    <div
-                        id="nextSessionName"
-                        class="session-next-name"
-                    >
-                        —
-                    </div>
-
-                    <div
-                        id="nextSessionTime"
-                        class="session-time-line"
-                    >
-                        —
-                    </div>
-
-                    <div
-                        id="nextSessionCountdown"
-                        class="session-countdown small"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="sessionsWeekend"
-                class="sessions-weekend"
-                style="display:none;"
-            >
-
-                🛑 Marché fermé — week-end
-
-            </div>
-
-
-            <div
-                id="sessionsList"
-                class="sessions-list"
-            ></div>
-
-        `;
-
+        /*
+         * -------------------------------------------------
+         * POSITIONNEMENT
+         * -------------------------------------------------
+         *
+         * Le panneau est placé dans le header,
+         * mais avant le bouton thème.
+         *
+         * On ne fait PLUS :
+         *
+         * topbar.appendChild(panel)
+         *
+         * systématiquement.
+         */
 
         const topbar =
             document.querySelector(
@@ -528,15 +589,63 @@
             );
 
 
+        const themeButton =
+            document.getElementById(
+                "themeToggle"
+            );
+
+
         if (topbar) {
 
-            topbar.appendChild(panel);
+            if (
+                panel.parentElement !== topbar
+            ) {
+
+                if (
+                    themeButton &&
+                    themeButton.parentElement === topbar
+                ) {
+
+                    topbar.insertBefore(
+                        panel,
+                        themeButton
+                    );
+
+                }
+
+                else {
+
+                    topbar.appendChild(
+                        panel
+                    );
+
+                }
+
+            }
+
+        }
+        else if (
+            !panel.parentElement
+        ) {
+
+            document.body.prepend(
+                panel
+            );
 
         }
 
-        else {
 
-            document.body.prepend(panel);
+        /*
+         * Style de positionnement.
+         */
+
+        if (panel) {
+
+            panel.style.flex =
+                "1 1 auto";
+
+            panel.style.minWidth =
+                "0";
 
         }
 
@@ -544,7 +653,7 @@
 
 
     /* =====================================================
-       CRÉATION LISTE DES SESSIONS
+       CRÉATION DES MINI CARTES
        ===================================================== */
 
     function createSessionCards() {
@@ -554,85 +663,95 @@
                 "sessionsList"
             );
 
+
         if (!container) {
+
             return;
+
         }
+
 
         container.innerHTML = "";
 
 
-        SESSIONS.forEach(function (session) {
+        SESSIONS.forEach(
+            function (session) {
 
-            const card =
-                document.createElement("div");
-
-            card.className =
-                "session-mini-card";
-
-            card.dataset.session =
-                session.id;
+                const card =
+                    document.createElement("div");
 
 
-            card.innerHTML = `
-
-                <div class="session-mini-title">
-
-                    <span>
-                        ${session.country}
-                    </span>
-
-                    <strong>
-                        ${session.name}
-                    </strong>
-
-                </div>
+                card.className =
+                    "session-mini-card";
 
 
-                <div
-                    class="session-mini-status"
-                    data-status
-                >
-                    —
-                </div>
+                card.dataset.session =
+                    session.id;
 
 
-                <div class="session-mini-hours">
+                card.innerHTML = `
 
-                    <span>
-                        Local
-                    </span>
+                    <div class="session-mini-title">
 
-                    <strong data-local>
+                        <span>
+                            ${session.country}
+                        </span>
+
+                        <strong>
+                            ${session.name}
+                        </strong>
+
+                    </div>
+
+
+                    <div
+                        class="session-mini-status"
+                        data-status
+                    >
                         —
-                    </strong>
-
-                </div>
+                    </div>
 
 
-                <div class="session-mini-hours">
+                    <div class="session-mini-hours">
 
-                    <span>
-                        Madagascar
-                    </span>
+                        <span>
+                            Local
+                        </span>
 
-                    <strong data-mada>
-                        —
-                    </strong>
+                        <strong data-local>
+                            —
+                        </strong>
 
-                </div>
-
-            `;
+                    </div>
 
 
-            container.appendChild(card);
+                    <div class="session-mini-hours">
 
-        });
+                        <span>
+                            Madagascar
+                        </span>
+
+                        <strong data-mada>
+                            —
+                        </strong>
+
+                    </div>
+
+                `;
+
+
+                container.appendChild(
+                    card
+                );
+
+            }
+        );
 
     }
 
 
     /* =====================================================
-       MISE À JOUR DU PANNEAU
+       MISE À JOUR
        ===================================================== */
 
     function updatePanel() {
@@ -640,10 +759,6 @@
         const now =
             new Date();
 
-
-        /*
-         * Week-end
-         */
 
         const weekend =
             isWeekend(now);
@@ -683,52 +798,46 @@
 
 
         /*
-         * États des sessions
+         * États
          */
 
         const states =
-            SESSIONS.map(function (session) {
+            SESSIONS.map(
+                function (session) {
 
-                return {
-                    session,
-                    state: getSessionState(
-                        session,
-                        now
-                    )
-                };
+                    return {
+                        session: session,
+                        state:
+                            getSessionState(
+                                session,
+                                now
+                            )
+                    };
 
-            });
+                }
+            );
 
 
         /*
-         * Session actuellement ouverte.
+         * Sessions ouvertes
          */
 
         let currentSessions =
-            states.filter(function (item) {
+            states.filter(
+                function (item) {
 
-                return item.state.open;
+                    return item.state.open;
 
-            });
+                }
+            );
 
-
-        /*
-         * Pendant le week-end :
-         * aucune session considérée active.
-         */
 
         if (weekend) {
+
             currentSessions = [];
+
         }
 
-
-        /*
-         * Session principale.
-         *
-         * En cas de chevauchement,
-         * on choisit la première dans
-         * l'ordre Sydney -> Tokyo -> Londres -> NY.
-         */
 
         const current =
             currentSessions.length > 0
@@ -741,10 +850,12 @@
                 "currentSessionName"
             );
 
+
         const currentStatus =
             document.getElementById(
                 "currentSessionStatus"
             );
+
 
         const currentCountdown =
             document.getElementById(
@@ -752,51 +863,58 @@
             );
 
 
-        if (current) {
+        if (
+            currentName &&
+            currentStatus &&
+            currentCountdown
+        ) {
 
-            currentName.textContent =
-                current.session.country +
-                " " +
-                current.session.name;
+            if (current) {
 
-
-            currentStatus.textContent =
-                "🟢 Session ouverte";
-
-
-            const closeDate =
-                getCloseDate(
-                    current.session,
-                    now
-                );
+                currentName.textContent =
+                    current.session.country +
+                    " " +
+                    current.session.name;
 
 
-            currentCountdown.textContent =
-                "Fermeture dans " +
-                formatCountdown(
-                    closeDate.getTime() -
-                    now.getTime()
-                );
-
-        }
-
-        else {
-
-            currentName.textContent =
-                weekend
-                    ? "🛑 Marché fermé"
-                    : "Aucune session ouverte";
+                currentStatus.textContent =
+                    "🟢 Session ouverte";
 
 
-            currentStatus.textContent =
-                weekend
-                    ? "Week-end"
-                    : "Entre deux sessions";
+                const closeDate =
+                    getCloseDate(
+                        current.session,
+                        now
+                    );
 
 
-            currentCountdown.textContent =
-                madaTime +
-                " — heure Madagascar";
+                currentCountdown.textContent =
+                    "Fermeture dans " +
+                    formatCountdown(
+                        closeDate.getTime() -
+                        now.getTime()
+                    );
+
+            }
+            else {
+
+                currentName.textContent =
+                    weekend
+                        ? "🛑 Marché fermé"
+                        : "Aucune session ouverte";
+
+
+                currentStatus.textContent =
+                    weekend
+                        ? "Week-end"
+                        : "Entre deux sessions";
+
+
+                currentCountdown.textContent =
+                    madaTime +
+                    " — heure Madagascar";
+
+            }
 
         }
 
@@ -805,60 +923,56 @@
            PROCHAINE SESSION
            ================================================= */
 
-        const upcoming =
-            [];
+        const upcoming = [];
 
 
-        SESSIONS.forEach(function (session) {
+        SESSIONS.forEach(
+            function (session) {
 
-            let nextDate =
-                getNextOpenDate(
-                    session,
-                    now
-                );
+                const nextDate =
+                    getNextOpenDate(
+                        session,
+                        now
+                    );
 
 
-            /*
-             * Pendant le week-end,
-             * les prochaines ouvertures
-             * restent valides mais on ne
-             * considère aucune session active.
-             */
+                if (nextDate) {
 
-            if (nextDate) {
+                    upcoming.push({
+                        session: session,
+                        date: nextDate
+                    });
 
-                upcoming.push({
-                    session,
-                    date: nextDate
-                });
+                }
 
             }
+        );
 
-        });
 
+        upcoming.sort(
+            function (a, b) {
 
-        upcoming.sort(function (a, b) {
+                return (
+                    a.date.getTime() -
+                    b.date.getTime()
+                );
 
-            return (
-                a.date.getTime() -
-                b.date.getTime()
-            );
-
-        });
+            }
+        );
 
 
         let next = null;
 
 
-        for (let i = 0; i < upcoming.length; i++) {
-
-            /*
-             * Si la session trouvée est actuellement
-             * ouverte, on cherche la suivante.
-             */
+        for (
+            let i = 0;
+            i < upcoming.length;
+            i++
+        ) {
 
             const item =
                 upcoming[i];
+
 
             const state =
                 getSessionState(
@@ -873,6 +987,7 @@
             ) {
 
                 next = item;
+
                 break;
 
             }
@@ -885,10 +1000,12 @@
                 "nextSessionName"
             );
 
+
         const nextTime =
             document.getElementById(
                 "nextSessionTime"
             );
+
 
         const nextCountdown =
             document.getElementById(
@@ -896,61 +1013,70 @@
             );
 
 
-        if (next) {
+        if (
+            nextName &&
+            nextTime &&
+            nextCountdown
+        ) {
 
-            const localParts =
-                getParts(
-                    next.date,
-                    next.session.timezone
-                );
+            if (next) {
 
-
-            const nextMadaParts =
-                getParts(
-                    next.date,
-                    MADAGASCAR_TIMEZONE
-                );
-
-
-            nextName.textContent =
-                next.session.country +
-                " " +
-                next.session.name;
+                const localParts =
+                    getParts(
+                        next.date,
+                        next.session.timezone
+                    );
 
 
-            nextTime.textContent =
-                "Ouverture : " +
-                getTimeString(
-                    localParts
-                ) +
-                " " +
-                next.session.name +
-                " • " +
-                getTimeString(
-                    nextMadaParts
-                ) +
-                " Madagascar";
+                const nextMadaParts =
+                    getParts(
+                        next.date,
+                        MADAGASCAR_TIMEZONE
+                    );
 
 
-            nextCountdown.textContent =
-                "Dans " +
-                formatCountdown(
-                    next.date.getTime() -
-                    now.getTime()
-                );
+                nextName.textContent =
+                    next.session.country +
+                    " " +
+                    next.session.name;
 
-        }
 
-        else {
+                nextTime.textContent =
+                    "Ouverture : " +
+                    getTimeString(
+                        localParts
+                    ) +
+                    " " +
+                    next.session.name +
+                    " • " +
+                    getTimeString(
+                        nextMadaParts
+                    ) +
+                    " Madagascar";
 
-            nextName.textContent =
-                "—";
 
-            nextTime.textContent =
-                "—";
+                nextCountdown.textContent =
+                    "Dans " +
+                    formatCountdown(
+                        next.date.getTime() -
+                        now.getTime()
+                    );
 
-            nextCountdown.textContent =
-                "—";
+            }
+            else {
+
+                nextName.textContent =
+                    "—";
+
+
+                nextTime.textContent =
+                    "—";
+
+
+                nextCountdown.textContent =
+                    "—";
+
+            }
 
         }
 
@@ -959,84 +1085,106 @@
            MINI CARTES
            ================================================= */
 
-        states.forEach(function (item) {
+        states.forEach(
+            function (item) {
 
-            const session =
-                item.session;
-
-            const state =
-                item.state;
+                const session =
+                    item.session;
 
 
-            const card =
-                document.querySelector(
-                    '[data-session="' +
-                    session.id +
-                    '"]'
-                );
+                const state =
+                    item.state;
 
 
-            if (!card) {
-                return;
+                const card =
+                    document.querySelector(
+                        '[data-session="' +
+                        session.id +
+                        '"]'
+                    );
+
+
+                if (!card) {
+
+                    return;
+
+                }
+
+
+                const status =
+                    card.querySelector(
+                        "[data-status]"
+                    );
+
+
+                const local =
+                    card.querySelector(
+                        "[data-local]"
+                    );
+
+
+                const mada =
+                    card.querySelector(
+                        "[data-mada]"
+                    );
+
+
+                if (local) {
+
+                    local.textContent =
+                        getTimeString(
+                            state.parts
+                        );
+
+                }
+
+
+                if (mada) {
+
+                    mada.textContent =
+                        madaTime;
+
+                }
+
+
+                if (
+                    state.open &&
+                    !weekend
+                ) {
+
+                    card.classList.add(
+                        "session-open"
+                    );
+
+
+                    if (status) {
+
+                        status.textContent =
+                            "🟢 Ouverte";
+
+                    }
+
+                }
+                else {
+
+                    card.classList.remove(
+                        "session-open"
+                    );
+
+
+                    if (status) {
+
+                        status.textContent =
+                            weekend
+                                ? "🔴 Fermée"
+                                : "⚪ Fermée";
+
+                    }
+
+                }
+
             }
-
-
-            const status =
-                card.querySelector(
-                    "[data-status]"
-                );
-
-            const local =
-                card.querySelector(
-                    "[data-local]"
-                );
-
-            const mada =
-                card.querySelector(
-                    "[data-mada]"
-                );
-
-
-            local.textContent =
-                getTimeString(
-                    state.parts
-                );
-
-
-            mada.textContent =
-                madaTime;
-
-
-            if (
-                state.open &&
-                !weekend
-            ) {
-
-                card.classList.add(
-                    "session-open"
-                );
-
-
-                status.textContent =
-                    "🟢 Ouverte";
-
-            }
-
-            else {
-
-                card.classList.remove(
-                    "session-open"
-                );
-
-
-                status.textContent =
-                    weekend
-                        ? "🔴 Fermée"
-                        : "⚪ Fermée";
-
-            }
-
-        });
+        );
 
     }
 
@@ -1054,13 +1202,12 @@
         updatePanel();
 
 
-        /*
-         * Actualisation chaque seconde
-         * pour le compte à rebours.
-         */
-
         if (timer) {
-            clearInterval(timer);
+
+            clearInterval(
+                timer
+            );
+
         }
 
 
@@ -1088,7 +1235,6 @@
         );
 
     }
-
     else {
 
         init();
