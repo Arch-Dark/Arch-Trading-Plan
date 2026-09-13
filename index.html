@@ -303,6 +303,10 @@ body[data-page="dashboard"] .trade-launcher-card {
                     Capital 1
                 </p>
 
+                <small id="activeCapitalCreatedAt">
+                    Créé le -
+                </small>
+
             </div>
 
 
@@ -360,6 +364,45 @@ body[data-page="dashboard"] .trade-launcher-card {
                 </span>
 
                 <strong id="totalProfit">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    Risque / trade
+                </span>
+
+                <strong id="riskReference">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    RR cible
+                </span>
+
+                <strong id="rrTarget">
+                    2.00
+                </strong>
+
+            </div>
+
+
+            <div class="capital-box">
+
+                <span>
+                    Objectif théorique
+                </span>
+
+                <strong id="theoreticalObjective">
                     $0.00
                 </strong>
 
@@ -518,10 +561,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                 <span>
                     Meilleur setup
-                </span>
-
-                <strong id="statBestSetup">
-                    -
                 </strong>
 
             </div>
@@ -728,53 +767,18 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     <tr>
 
-                        <th>
-                            Date
-                        </th>
-
-                        <th>
-                            Actif
-                        </th>
-
-                        <th>
-                            Position
-                        </th>
-
-                        <th>
-                            Lot
-                        </th>
-
-                        <th>
-                            Entry
-                        </th>
-
-                        <th>
-                            SL
-                        </th>
-
-                        <th>
-                            TP
-                        </th>
-
-                        <th>
-                            RR
-                        </th>
-
-                        <th>
-                            Setup
-                        </th>
-
-                        <th>
-                            Résultat
-                        </th>
-
-                        <th>
-                            P/L
-                        </th>
-
-                        <th>
-                            Action
-                        </th>
+                        <th>Date</th>
+                        <th>Actif</th>
+                        <th>Position</th>
+                        <th>Lot</th>
+                        <th>Entry</th>
+                        <th>SL</th>
+                        <th>TP</th>
+                        <th>RR</th>
+                        <th>Setup</th>
+                        <th>Résultat</th>
+                        <th>P/L</th>
+                        <th>Action</th>
 
                     </tr>
 
@@ -825,21 +829,17 @@ body[data-page="dashboard"] .trade-launcher-card {
 
     <div class="modal-content">
 
-
         <div class="modal-header">
 
             <div>
 
-                <h2>
-                    ➕ Ajouter un trade
-                </h2>
+                <h2>➕ Ajouter un trade</h2>
 
                 <p>
                     Enregistrez votre trade manuellement
                 </p>
 
             </div>
-
 
             <button
                 id="closeTradeModalBtn"
@@ -856,15 +856,10 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             <form id="tradeForm">
 
-
                 <div class="form-grid">
 
-
                     <div>
-
-                        <label for="asset">
-                            Actif
-                        </label>
+                        <label for="asset">Actif</label>
 
                         <input
                             type="text"
@@ -872,35 +867,24 @@ body[data-page="dashboard"] .trade-launcher-card {
                             placeholder="XAUUSD"
                             required
                         >
-
                     </div>
 
 
                     <div>
-
-                        <label for="date">
-                            Date
-                        </label>
+                        <label for="date">Date</label>
 
                         <input
                             type="date"
                             id="date"
                             required
                         >
-
                     </div>
 
 
                     <div>
+                        <label for="direction">Position</label>
 
-                        <label for="direction">
-                            Position
-                        </label>
-
-                        <select
-                            id="direction"
-                            required
-                        >
+                        <select id="direction" required>
 
                             <option value="BUY">
                                 Buy
@@ -911,20 +895,15 @@ body[data-page="dashboard"] .trade-launcher-card {
                             </option>
 
                         </select>
-
                     </div>
 
 
                     <div>
-
                         <label for="orderType">
                             Type d'ordre
                         </label>
 
-                        <select
-                            id="orderType"
-                            required
-                        >
+                        <select id="orderType" required>
 
                             <option value="Market">
                                 Immediat
@@ -939,15 +918,11 @@ body[data-page="dashboard"] .trade-launcher-card {
                             </option>
 
                         </select>
-
                     </div>
 
 
                     <div>
-
-                        <label for="lot">
-                            Lot
-                        </label>
+                        <label for="lot">Lot</label>
 
                         <input
                             type="number"
@@ -957,15 +932,11 @@ body[data-page="dashboard"] .trade-launcher-card {
                             placeholder="0.01"
                             required
                         >
-
                     </div>
 
 
                     <div>
-
-                        <label for="entry">
-                            Entry
-                        </label>
+                        <label for="entry">Entry</label>
 
                         <input
                             type="number"
@@ -974,15 +945,11 @@ body[data-page="dashboard"] .trade-launcher-card {
                             placeholder="4450.00"
                             required
                         >
-
                     </div>
 
 
                     <div>
-
-                        <label for="sl">
-                            Stop Loss
-                        </label>
+                        <label for="sl">Stop Loss</label>
 
                         <input
                             type="number"
@@ -990,15 +957,11 @@ body[data-page="dashboard"] .trade-launcher-card {
                             step="any"
                             placeholder="4445.00"
                         >
-
                     </div>
 
 
                     <div>
-
-                        <label for="tp">
-                            Take Profit
-                        </label>
+                        <label for="tp">Take Profit</label>
 
                         <input
                             type="number"
@@ -1006,7 +969,6 @@ body[data-page="dashboard"] .trade-launcher-card {
                             step="any"
                             placeholder="4460.00"
                         >
-
                     </div>
 
 
@@ -1016,89 +978,29 @@ body[data-page="dashboard"] .trade-launcher-card {
                             RR du trade
                         </label>
 
-                        <select
-                            id="tradeRR"
-                            required
-                        >
+                        <select id="tradeRR" required>
 
-                            <option value="2">
-                                RR 2
-                            </option>
-
-                            <option value="3">
-                                RR 3
-                            </option>
-
-                            <option value="4">
-                                RR 4
-                            </option>
-
-                            <option value="5">
-                                RR 5
-                            </option>
-
-                            <option value="6">
-                                RR 6
-                            </option>
-
-                            <option value="7">
-                                RR 7
-                            </option>
-
-                            <option value="8">
-                                RR 8
-                            </option>
-
-                            <option value="9">
-                                RR 9
-                            </option>
-
-                            <option value="10">
-                                RR 10
-                            </option>
-
-                            <option value="11">
-                                RR 11
-                            </option>
-
-                            <option value="12">
-                                RR 12
-                            </option>
-
-                            <option value="13">
-                                RR 13
-                            </option>
-
-                            <option value="14">
-                                RR 14
-                            </option>
-
-                            <option value="15">
-                                RR 15
-                            </option>
-
-                            <option value="16">
-                                RR 16
-                            </option>
-
-                            <option value="17">
-                                RR 17
-                            </option>
-
-                            <option value="18">
-                                RR 18
-                            </option>
-
-                            <option value="19">
-                                RR 19
-                            </option>
-
-                            <option value="20">
-                                RR 20
-                            </option>
+                            <option value="2">RR 2</option>
+                            <option value="3">RR 3</option>
+                            <option value="4">RR 4</option>
+                            <option value="5">RR 5</option>
+                            <option value="6">RR 6</option>
+                            <option value="7">RR 7</option>
+                            <option value="8">RR 8</option>
+                            <option value="9">RR 9</option>
+                            <option value="10">RR 10</option>
+                            <option value="11">RR 11</option>
+                            <option value="12">RR 12</option>
+                            <option value="13">RR 13</option>
+                            <option value="14">RR 14</option>
+                            <option value="15">RR 15</option>
+                            <option value="16">RR 16</option>
+                            <option value="17">RR 17</option>
+                            <option value="18">RR 18</option>
+                            <option value="19">RR 19</option>
+                            <option value="20">RR 20</option>
 
                         </select>
-
 
                         <small style="display:block;margin-top:6px;opacity:.7;">
                             Le RR du capital sert de valeur par défaut. Vous pouvez l'adapter pour chaque trade.
@@ -1129,22 +1031,11 @@ body[data-page="dashboard"] .trade-launcher-card {
                             Résultat
                         </label>
 
-                        <select
-                            id="result"
-                            required
-                        >
+                        <select id="result" required>
 
-                            <option value="TP">
-                                TP
-                            </option>
-
-                            <option value="SL">
-                                SL
-                            </option>
-
-                            <option value="BE">
-                                BE
-                            </option>
+                            <option value="TP">TP</option>
+                            <option value="SL">SL</option>
+                            <option value="BE">BE</option>
 
                         </select>
 
@@ -1157,54 +1048,19 @@ body[data-page="dashboard"] .trade-launcher-card {
                             Setup
                         </label>
 
-                        <select
-                            id="setup"
-                            required
-                        >
+                        <select id="setup" required>
 
-                            <option value="LDP+QML">
-                                LDP+QML
-                            </option>
-
-                            <option value="LDP+FIBO 50">
-                                LDP+FIBO 50
-                            </option>
-
-                            <option value="OB">
-                                OB
-                            </option>
-
-                            <option value="BB">
-                                BB
-                            </option>
-
-                            <option value="ZS OA">
-                                ZS OA
-                            </option>
-
-                            <option value="SSM1">
-                                SSM1
-                            </option>
-
-                            <option value="SSM2">
-                                SSM2
-                            </option>
-
-                            <option value="SSM3">
-                                SSM3
-                            </option>
-
-                            <option value="SBM1">
-                                SBM1
-                            </option>
-
-                            <option value="SBM2">
-                                SBM2
-                            </option>
-
-                            <option value="SBM3">
-                                SBM3
-                            </option>
+                            <option value="LDP+QML">LDP+QML</option>
+                            <option value="LDP+FIBO 50">LDP+FIBO 50</option>
+                            <option value="OB">OB</option>
+                            <option value="BB">BB</option>
+                            <option value="ZS OA">ZS OA</option>
+                            <option value="SSM1">SSM1</option>
+                            <option value="SSM2">SSM2</option>
+                            <option value="SSM3">SSM3</option>
+                            <option value="SBM1">SBM1</option>
+                            <option value="SBM2">SBM2</option>
+                            <option value="SBM3">SBM3</option>
 
                         </select>
 
@@ -1226,7 +1082,6 @@ body[data-page="dashboard"] .trade-launcher-card {
                         >
 
                     </div>
-
 
                 </div>
 
@@ -1292,7 +1147,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                 </div>
 
-
             </form>
 
         </div>
@@ -1308,7 +1162,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
     <div class="modal-content">
 
-
         <div class="modal-header">
 
             <div>
@@ -1323,7 +1176,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             </div>
 
-
             <button
                 id="cancelCapitalBtn"
                 class="close-btn"
@@ -1335,7 +1187,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
         <div class="modal-body">
-
 
             <div>
 
@@ -1426,7 +1277,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             </div>
 
-
         </div>
 
 
@@ -1439,7 +1289,6 @@ body[data-page="dashboard"] .trade-launcher-card {
                 Annuler
             </button>
 
-
             <button
                 id="saveCapitalBtn"
                 class="primary-btn"
@@ -1448,7 +1297,6 @@ body[data-page="dashboard"] .trade-launcher-card {
             </button>
 
         </div>
-
 
     </div>
 
@@ -1460,7 +1308,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 <div id="archiveChartModal" class="modal">
 
     <div class="modal-content archive-chart-modal-content">
-
 
         <div class="modal-header">
 
@@ -1476,7 +1323,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             </div>
 
-
             <button
                 id="closeArchiveChartBtn"
                 class="close-btn"
@@ -1488,7 +1334,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
         <div class="archive-chart-info">
-
 
             <div>
 
@@ -1528,7 +1373,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             </div>
 
-
         </div>
 
 
@@ -1537,7 +1381,6 @@ body[data-page="dashboard"] .trade-launcher-card {
             <canvas id="archiveChart"></canvas>
 
         </div>
-
 
     </div>
 
@@ -1552,7 +1395,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 <script src="v51-filters.js"></script>
 
-<!-- Sessions de trading : affichage uniquement -->
 <script src="session.js"></script>
 
 
@@ -1707,9 +1549,6 @@ body[data-page="dashboard"] .trade-launcher-card {
         }
     );
 
-
-    // Si app.js ferme ou réinitialise le formulaire après enregistrement,
-    // on referme automatiquement la fenêtre.
 
     const tradeForm =
         document.getElementById(
