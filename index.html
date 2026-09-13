@@ -1,725 +1,805 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Trading Dashboard</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link rel="stylesheet" href="style.css">
 
+<style>
 
-    <!-- ======================================================
-         NAVIGATION + VUES
-    ======================================================= -->
+/* ============================================================
+   NAVIGATION MULTI-PAGES
+   ============================================================ */
 
-    <style>
+.app-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 
-        /* =====================================================
-           NAVIGATION PRINCIPALE
-        ===================================================== */
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 
-        .app-nav {
+    padding: 12px 20px;
 
-            position: sticky;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(12px);
 
-            top: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
 
-            z-index: 1000;
+.app-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 
-            display: flex;
+    padding: 10px 14px;
 
-            align-items: center;
+    border-radius: 10px;
 
-            justify-content: center;
+    text-decoration: none;
+    color: inherit;
 
-            gap: 8px;
+    font-weight: 600;
 
-            flex-wrap: wrap;
+    transition: .2s ease;
+}
 
-            padding: 12px 20px;
+.app-nav a:hover {
+    transform: translateY(-1px);
+}
 
-            background:
-                rgba(15, 23, 42, 0.94);
+.app-nav a.active {
+    background: rgba(59,130,246,.18);
 
-            backdrop-filter:
-                blur(12px);
+    box-shadow:
+        inset 0 0 0 1px rgba(96,165,250,.28);
+}
 
-            -webkit-backdrop-filter:
-                blur(12px);
 
-            border-bottom:
-                1px solid
-                rgba(255,255,255,0.08);
-        }
+/* ============================================================
+   PAGE TITLES
+   ============================================================ */
 
+.page-title {
+    margin: 8px 0 18px;
+}
 
-        .app-nav a {
+.page-title h2 {
+    margin: 0 0 4px;
+}
 
-            display: inline-flex;
+.page-title p {
+    margin: 0;
+    opacity: .72;
+}
 
-            align-items: center;
+.view-only {
+    display: none !important;
+}
 
-            justify-content: center;
 
-            gap: 8px;
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
 
-            min-height: 42px;
+body[data-page="dashboard"] #dashboardCapitalCard,
+body[data-page="dashboard"] #dashboardChartCard,
+body[data-page="dashboard"] #performanceSummaryCard,
+body[data-page="dashboard"] #dashboardTradeCard,
+body[data-page="dashboard"] #historyCard {
+    display: block;
+}
 
-            padding:
-                9px 17px;
 
-            border-radius: 11px;
+/* ============================================================
+   ANALYSES
+   ============================================================ */
 
-            text-decoration: none;
+body[data-page="analysis"] #analysisPageHeader {
+    display: block;
+}
 
-            color: inherit;
+body[data-page="analysis"] #v51FilterCard {
+    display: block !important;
+}
 
-            font-size: 14px;
+body[data-page="analysis"] #performanceSummaryCard {
+    display: none !important;
+}
 
-            font-weight: 700;
 
-            transition:
-                transform 0.18s ease,
-                background 0.18s ease,
-                box-shadow 0.18s ease;
-        }
+/* ============================================================
+   PERFORMANCES
+   ============================================================ */
 
+body[data-page="performance"] #performancePageHeader {
+    display: block;
+}
 
-        .app-nav a:hover {
+body[data-page="performance"] #setupPerformanceCard,
+body[data-page="performance"] #assetPerformanceCard {
+    display: block;
+}
 
-            transform:
-                translateY(-1px);
+body[data-page="performance"] #performanceSummaryCard {
+    display: none !important;
+}
 
-            background:
-                rgba(255,255,255,0.07);
-        }
 
+/* ============================================================
+   ARCHIVES
+   ============================================================ */
 
-        .app-nav a.active {
+body[data-page="archives"] #archivesPageHeader {
+    display: block;
+}
 
-            background:
-                rgba(59,130,246,0.18);
+body[data-page="archives"] #archivesCard {
+    display: block;
+}
 
-            box-shadow:
-                inset
-                0 0 0 1px
-                rgba(96,165,250,0.28);
-        }
+body[data-page="archives"] #performanceSummaryCard {
+    display: none !important;
+}
 
 
-        /* =====================================================
-           TITRES DES PAGES
-        ===================================================== */
+/* ============================================================
+   SECTIONS MASQUÉES PAR DÉFAUT
+   ============================================================ */
 
-        .page-title {
+#dashboardCapitalCard,
+#dashboardChartCard,
+#performanceSummaryCard,
+#dashboardTradeCard,
+#historyCard,
+#setupPerformanceCard,
+#assetPerformanceCard,
+#archivesCard,
+#analysisPageHeader,
+#performancePageHeader,
+#archivesPageHeader {
+    display: none;
+}
 
-            display: none;
 
-            margin:
-                8px 0 20px;
-        }
+/* ============================================================
+   V51
+   ============================================================ */
 
+#v51FilterCard {
+    display: none;
+}
 
-        .page-title h2 {
 
-            margin:
-                0 0 5px;
-        }
+/* ============================================================
+   BOUTON AJOUTER TRADE
+   ============================================================ */
 
+.trade-launcher-card {
+    display: none;
+}
 
-        .page-title p {
+body[data-page="dashboard"] .trade-launcher-card {
+    display: block;
+}
 
-            margin: 0;
+.trade-launcher {
+    width: 100%;
+    min-height: 96px;
 
-            color:
-                var(--muted);
+    border: 0;
+    border-radius: 16px;
 
-            font-size:
-                13px;
-        }
+    cursor: pointer;
 
+    font-size: 1.05rem;
+    font-weight: 800;
 
-        /* =====================================================
-           TOUT EST CACHE PAR DEFAUT
-        ===================================================== */
+    letter-spacing: .2px;
 
-        #dashboardCapitalCard,
-        #dashboardChartCard,
-        #dashboardTradeLauncher,
-        #performanceSummaryCard,
-        #historyCard,
-        #setupPerformanceCard,
-        #assetPerformanceCard,
-        #archivesCard,
-        #dashboardPageHeader,
-        #analysisPageHeader,
-        #archivesPageHeader {
+    padding: 20px;
 
-            display: none;
-        }
+    background:
+        linear-gradient(
+            135deg,
+            rgba(59,130,246,.20),
+            rgba(34,197,94,.14)
+        );
 
+    box-shadow:
+        0 12px 32px rgba(0,0,0,.12);
+}
 
-        /* =====================================================
-           PAGE DASHBOARD
-        ===================================================== */
+.trade-launcher small {
+    display: block;
 
-        body[data-page="dashboard"]
-        #dashboardPageHeader {
+    margin-top: 6px;
 
-            display: block;
-        }
+    opacity: .7;
 
+    font-weight: 500;
+}
 
-        body[data-page="dashboard"]
-        #dashboardCapitalCard,
 
-        body[data-page="dashboard"]
-        #dashboardChartCard,
+/* ============================================================
+   MODAL TRADE
+   ============================================================ */
 
-        body[data-page="dashboard"]
-        #dashboardTradeLauncher,
+.modal.trade-modal {
+    display: none;
+}
 
-        body[data-page="dashboard"]
-        #performanceSummaryCard,
+.modal.trade-modal.open {
+    display: flex;
+}
 
-        body[data-page="dashboard"]
-        #historyCard {
+.trade-modal .modal-content {
+    width: min(1100px, 96vw);
 
-            display: block;
-        }
+    max-height: 92vh;
 
+    overflow: auto;
+}
 
-        /* =====================================================
-           PAGE ANALYSE
-        ===================================================== */
 
-        body[data-page="analysis"]
-        #analysisPageHeader {
+/* ============================================================
+   ============================================================
+   PANNEAU SESSIONS DE TRADING
+   ============================================================
+   ============================================================ */
 
-            display: block;
-        }
+.session-panel {
 
+    flex: 1;
 
-        body[data-page="analysis"]
-        #v51FilterCard {
+    min-width: 420px;
+    max-width: 850px;
 
-            display: block !important;
-        }
+    display: flex;
 
+    align-items: stretch;
 
-        body[data-page="analysis"]
-        #setupPerformanceCard,
+    gap: 10px;
 
-        body[data-page="analysis"]
-        #assetPerformanceCard {
+    padding: 8px 10px;
 
-            display: block;
-        }
+    border: 1px solid rgba(96,165,250,.18);
 
+    border-radius: 16px;
 
-        /* =====================================================
-           PAGE ARCHIVES
-        ===================================================== */
+    background:
+        linear-gradient(
+            135deg,
+            rgba(15,23,42,.88),
+            rgba(20,30,48,.72)
+        );
 
-        body[data-page="archives"]
-        #archivesPageHeader {
+    box-shadow:
+        0 0 25px rgba(59,130,246,.08),
+        inset 0 0 25px rgba(59,130,246,.025);
 
-            display: block;
-        }
+    backdrop-filter: blur(14px);
 
+    overflow: hidden;
 
-        body[data-page="archives"]
-        #archivesCard {
+    position: relative;
 
-            display: block;
-        }
+}
 
 
-        /* =====================================================
-           BOUTON AJOUT TRADE
-        ===================================================== */
+/* Lueur animée */
 
-        #dashboardTradeLauncher {
+.session-panel::before {
 
-            margin:
-                4px 0 24px;
-        }
+    content: "";
 
+    position: absolute;
 
-        .trade-launcher {
+    top: 0;
+    left: -120%;
 
-            display: flex;
+    width: 80%;
+    height: 100%;
 
-            flex-direction: column;
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(96,165,250,.08),
+            transparent
+        );
 
-            align-items: center;
+    transform: skewX(-20deg);
 
-            justify-content: center;
+    animation:
+        sessionSweep 6s linear infinite;
 
-            width: 100%;
+    pointer-events: none;
+}
 
-            min-height: 96px;
+@keyframes sessionSweep {
 
-            padding: 18px;
+    0% {
+        left: -120%;
+    }
 
-            border: none;
+    100% {
+        left: 150%;
+    }
 
-            border-radius: 16px;
+}
 
-            cursor: pointer;
 
-            color: #ffffff;
+/* Bloc */
 
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(37,99,235,0.96),
-                    rgba(79,70,229,0.96)
-                );
+.session-current,
+.session-next {
 
-            box-shadow:
-                0 12px 32px
-                rgba(37,99,235,0.22);
+    position: relative;
 
-            transition:
-                transform 0.18s ease,
-                box-shadow 0.18s ease,
-                filter 0.18s ease;
-        }
+    flex: 1;
 
+    min-width: 0;
 
-        .trade-launcher:hover {
+    display: flex;
 
-            transform:
-                translateY(-2px);
+    flex-direction: column;
 
-            box-shadow:
-                0 16px 36px
-                rgba(37,99,235,0.30);
+    justify-content: center;
 
-            filter:
-                brightness(1.04);
-        }
+    padding: 8px 12px;
 
+    border-radius: 11px;
 
-        .trade-launcher-main {
+    background:
+        rgba(255,255,255,.025);
 
-            display: flex;
+    border: 1px solid rgba(255,255,255,.05);
 
-            align-items: center;
+}
 
-            justify-content: center;
 
-            gap: 10px;
+/* Séparateur */
 
-            font-size:
-                16px;
+.session-current {
 
-            font-weight:
-                800;
-        }
+    border-color:
+        rgba(34,197,94,.16);
 
+}
 
-        .trade-launcher-icon {
 
-            display: inline-flex;
+/* Petit titre */
 
-            align-items: center;
+.session-label {
 
-            justify-content: center;
+    display: flex;
 
-            width: 30px;
+    align-items: center;
 
-            height: 30px;
+    gap: 7px;
 
-            border-radius: 9px;
+    margin-bottom: 3px;
 
-            background:
-                rgba(255,255,255,0.15);
+    font-size: 10px;
 
-            font-size:
-                21px;
+    text-transform: uppercase;
 
-            line-height:
-                1;
-        }
+    letter-spacing: 1px;
 
+    color: #8c99aa;
 
-        .trade-launcher small {
+}
 
-            display: block;
 
-            margin-top:
-                6px;
+/* Point animé */
 
-            font-size:
-                12px;
+.session-dot {
 
-            font-weight:
-                500;
+    width: 7px;
+    height: 7px;
 
-            opacity:
-                0.82;
-        }
+    border-radius: 50%;
 
+    background: #22c55e;
 
-        /* =====================================================
-           MODAL AJOUT TRADE
-        ===================================================== */
+    box-shadow:
+        0 0 8px rgba(34,197,94,.8);
 
-        .modal.trade-modal {
+    animation:
+        sessionPulse 1.8s ease-in-out infinite;
 
-            display: none;
-        }
+}
 
+@keyframes sessionPulse {
 
-        .modal.trade-modal.open {
+    0%,
+    100% {
+        opacity: .5;
+        transform: scale(.85);
+    }
 
-            display: flex;
-        }
+    50% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
 
+}
 
-        .trade-modal .modal-content {
 
-            width:
-                min(1100px, 96vw);
+/* Nom session */
 
-            max-height:
-                92vh;
+.session-name {
 
-            overflow-y:
-                auto;
-        }
+    font-size: 15px;
 
+    font-weight: 800;
 
-        .trade-modal-header {
+    white-space: nowrap;
 
-            display: flex;
+    overflow: hidden;
 
-            align-items: center;
+    text-overflow: ellipsis;
 
-            justify-content: space-between;
+}
 
-            gap: 20px;
 
-            margin-bottom:
-                20px;
-        }
+/* Horaires */
 
+.session-times {
 
-        .trade-modal-title-area h2 {
+    display: flex;
 
-            margin:
-                0 0 5px;
-        }
+    align-items: center;
 
+    gap: 8px;
 
-        .trade-modal-title-area p {
+    margin-top: 3px;
 
-            margin: 0;
+    font-size: 11px;
 
-            color:
-                var(--muted);
+    color: #8c99aa;
 
-            font-size:
-                13px;
-        }
+}
 
 
-        .trade-modal-close {
+/* Heure locale */
 
-            display: inline-flex;
+.session-origin {
 
-            align-items: center;
+    color: #e8eef7;
 
-            justify-content: center;
+    font-weight: 700;
 
-            width: 40px;
+}
 
-            height: 40px;
 
-            border:
-                1px solid
-                var(--border);
+/* Heure Mada */
 
-            border-radius:
-                10px;
+.session-mada {
 
-            background:
-                var(--panel-2);
+    color: #60a5fa;
 
-            color:
-                var(--muted);
+    font-weight: 700;
 
-            font-size:
-                18px;
+}
 
-            cursor:
-                pointer;
-        }
 
+/* Temps */
 
-        .trade-modal-close:hover {
+.session-countdown {
 
-            color:
-                var(--red);
+    margin-top: 3px;
 
-            border-color:
-                var(--red);
-        }
+    font-size: 11px;
 
+    font-weight: 700;
 
-        .trade-modal-section-title {
+    color: #22c55e;
 
-            display: flex;
+}
 
-            align-items: center;
 
-            gap: 9px;
+/* Prochaine session */
 
-            margin:
-                0 0 15px;
+.session-next .session-dot {
 
-            font-size:
-                14px;
+    background: #3b82f6;
 
-            font-weight:
-                700;
-        }
+    box-shadow:
+        0 0 8px rgba(59,130,246,.8);
 
+}
 
-        .section-dot {
+.session-next .session-countdown {
 
-            width:
-                8px;
+    color: #60a5fa;
 
-            height:
-                8px;
+}
 
-            border-radius:
-                50%;
 
-            background:
-                #3b82f6;
-        }
+/* ============================================================
+   RESPONSIVE SESSION PANEL
+   ============================================================ */
 
+@media (max-width: 1050px) {
 
-        .trade-modal .trade-mm-box {
+    .session-panel {
 
-            margin-top:
-                18px;
+        min-width: 300px;
 
-            padding:
-                14px 16px;
+    }
 
-            border:
-                1px solid
-                rgba(59,130,246,0.18);
+}
 
-            border-radius:
-                12px;
 
-            background:
-                rgba(59,130,246,0.06);
+@media (max-width: 760px) {
 
-            font-size:
-                13px;
+    .session-panel {
 
-            line-height:
-                1.55;
-        }
+        order: 3;
 
+        width: 100%;
 
-        .trade-modal-footer {
+        max-width: none;
 
-            display: flex;
+        min-width: 0;
 
-            justify-content: flex-end;
+        flex-direction: column;
 
-            gap: 10px;
+    }
 
-            margin-top:
-                20px;
+    .session-current,
+    .session-next {
 
-            padding-top:
-                18px;
+        min-height: 58px;
 
-            border-top:
-                1px solid
-                var(--border);
-        }
+    }
 
+}
 
-        .trade-modal-footer button {
 
-            min-width:
-                150px;
-        }
+/* ============================================================
+   MOBILE NAVIGATION
+   ============================================================ */
 
+@media (max-width: 760px) {
 
-        /* =====================================================
-           PAGE ANALYSE
-        ===================================================== */
+    .app-nav {
+        padding: 10px 12px;
+        gap: 6px;
+    }
 
-        body[data-page="analysis"] .container {
+    .app-nav a {
+        flex: 1 1 calc(50% - 6px);
 
-            padding-bottom:
-                30px;
-        }
+        justify-content: center;
 
+        font-size: .9rem;
+    }
 
-        /* =====================================================
-           PAGE ARCHIVES
-        ===================================================== */
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
 
-        body[data-page="archives"] .container {
+}
 
-            padding-bottom:
-                30px;
-        }
 
+/* ============================================================
+   HEADER RESPONSIVE
+   ============================================================ */
 
-        /* =====================================================
-           MODE CLAIR
-        ===================================================== */
+@media (max-width: 900px) {
 
-        body.light-theme .app-nav {
+    .topbar {
 
-            background:
-                rgba(255,255,255,0.94);
+        flex-wrap: wrap;
 
-            border-bottom:
-                1px solid
-                rgba(15,23,42,0.08);
-        }
+    }
 
+}
 
-        body.light-theme .app-nav a:hover {
 
-            background:
-                rgba(15,23,42,0.05);
-        }
+/* ============================================================
+   HEADER SESSION PANEL
+   ============================================================ */
 
+.topbar {
 
-        body.light-theme .trade-launcher {
+    display: flex;
 
-            box-shadow:
-                0 12px 30px
-                rgba(37,99,235,0.18);
-        }
+    align-items: center;
 
+    gap: 18px;
 
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
+}
 
-        @media (max-width: 760px) {
+.topbar > div:first-child {
 
-            .app-nav {
+    flex-shrink: 0;
 
-                justify-content:
-                    stretch;
+}
 
-                padding:
-                    10px 12px;
 
-                gap:
-                    6px;
-            }
+/* ============================================================
+   MODE MOBILE
+   ============================================================ */
 
+@media (max-width: 600px) {
 
-            .app-nav a {
+    .topbar {
 
-                flex:
-                    1 1 calc(33.333% - 6px);
+        padding: 18px 4%;
 
-                padding:
-                    9px 8px;
+        gap: 12px;
 
-                font-size:
-                    12px;
-            }
+    }
 
+    .topbar > div:first-child {
 
-            .trade-launcher {
+        width: calc(100% - 60px);
 
-                min-height:
-                    88px;
-            }
+    }
 
+    .session-panel {
 
-            .trade-modal .modal-content {
+        margin-top: 2px;
 
-                width:
-                    96vw;
+    }
 
-                max-height:
-                    94vh;
-            }
-        }
+}
 
-
-        @media (max-width: 560px) {
-
-            .app-nav a {
-
-                flex:
-                    1 1 100%;
-            }
-
-
-            .trade-modal-footer {
-
-                flex-direction:
-                    column-reverse;
-            }
-
-
-            .trade-modal-footer button {
-
-                width:
-                    100%;
-            }
-        }
-
-    </style>
-
+</style>
 </head>
-
 
 
 <body>
 
 
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+
 <header class="topbar">
 
     <div>
 
-        <h1>
-            Trading Dashboard
-        </h1>
+        <h1>Trading Dashboard</h1>
 
         <p>
-            Journal & performance de trading
+            Journal &amp; performance de trading
         </p>
 
     </div>
 
 
+    <!-- ========================================================
+         PANNEAU SESSION
+         ======================================================== -->
+
+    <div
+        id="sessionPanel"
+        class="session-panel"
+        aria-label="Sessions de trading"
+    >
+
+        <!-- SESSION ACTUELLE -->
+
+        <div class="session-current">
+
+            <div class="session-label">
+
+                <span class="session-dot"></span>
+
+                Session actuelle
+
+            </div>
+
+
+            <div
+                id="currentSessionName"
+                class="session-name"
+            >
+                Chargement...
+            </div>
+
+
+            <div class="session-times">
+
+                <span
+                    id="currentSessionOrigin"
+                    class="session-origin"
+                >
+                    --:--
+                </span>
+
+                <span>•</span>
+
+                <span
+                    id="currentSessionMada"
+                    class="session-mada"
+                >
+                    🇲🇬 --:--
+                </span>
+
+            </div>
+
+
+            <div
+                id="currentSessionCountdown"
+                class="session-countdown"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <!-- PROCHAINE SESSION -->
+
+        <div class="session-next">
+
+            <div class="session-label">
+
+                <span class="session-dot"></span>
+
+                Prochaine ouverture
+
+            </div>
+
+
+            <div
+                id="nextSessionName"
+                class="session-name"
+            >
+                Chargement...
+            </div>
+
+
+            <div class="session-times">
+
+                <span
+                    id="nextSessionOrigin"
+                    class="session-origin"
+                >
+                    --:--
+                </span>
+
+                <span>•</span>
+
+                <span
+                    id="nextSessionMada"
+                    class="session-mada"
+                >
+                    🇲🇬 --:--
+                </span>
+
+            </div>
+
+
+            <div
+                id="nextSessionCountdown"
+                class="session-countdown"
+            >
+                --
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- BOUTON JOUR / NUIT -->
+
     <button
         id="themeToggle"
         class="theme-btn"
-        type="button"
+        aria-label="Changer le thème"
     >
         🌙
     </button>
@@ -728,9 +808,9 @@
 
 
 
-<!-- ==========================================================
+<!-- ============================================================
      NAVIGATION
-=========================================================== -->
+     ============================================================ -->
 
 <nav
     class="app-nav"
@@ -749,7 +829,15 @@
         href="index.html?page=analysis"
         data-page-link="analysis"
     >
-        📊 Analyse & Performance
+        📊 Analyses &amp; Risque
+    </a>
+
+
+    <a
+        href="index.html?page=performance"
+        data-page-link="performance"
+    >
+        🎯 Performances
     </a>
 
 
@@ -764,33 +852,16 @@
 
 
 
+<!-- ============================================================
+     CONTENU PRINCIPAL
+     ============================================================ -->
+
 <main class="container">
 
 
-    <!-- ======================================================
-         TITRE DASHBOARD
-    ======================================================= -->
-
-    <div
-        id="dashboardPageHeader"
-        class="page-title"
-    >
-
-        <h2>
-            🏠 Dashboard
-        </h2>
-
-        <p>
-            Vue générale de votre activité et de votre capital.
-        </p>
-
-    </div>
-
-
-
-    <!-- ======================================================
+    <!-- ========================================================
          TITRE ANALYSE
-    ======================================================= -->
+         ======================================================== -->
 
     <div
         id="analysisPageHeader"
@@ -798,20 +869,41 @@
     >
 
         <h2>
-            📊 Analyse & Performance
+            📊 Analyses &amp; Risque
         </h2>
 
         <p>
-            Analyse filtrée, risque, setups, actifs, recommandations et calendrier.
+            Analyse filtrée, régularité du risque,
+            calendrier et recommandations.
         </p>
 
     </div>
 
 
+    <!-- ========================================================
+         TITRE PERFORMANCE
+         ======================================================== -->
 
-    <!-- ======================================================
+    <div
+        id="performancePageHeader"
+        class="page-title"
+    >
+
+        <h2>
+            🎯 Performances
+        </h2>
+
+        <p>
+            Comparez vos setups et vos actifs
+            pour identifier vos meilleures performances.
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================
          TITRE ARCHIVES
-    ======================================================= -->
+         ======================================================== -->
 
     <div
         id="archivesPageHeader"
@@ -823,16 +915,17 @@
         </h2>
 
         <p>
-            Chaque capital conserve son historique indépendamment.
+            Chaque capital conserve son historique
+            et son évolution indépendamment.
         </p>
 
     </div>
 
 
 
-    <!-- ======================================================
+    <!-- ========================================================
          CAPITAL ACTIF
-    ======================================================= -->
+         ======================================================== -->
 
     <section
         id="dashboardCapitalCard"
@@ -851,10 +944,6 @@
                     Capital 1
                 </p>
 
-                <small id="activeCapitalCreatedAt">
-                    Créé le -
-                </small>
-
             </div>
 
 
@@ -863,7 +952,6 @@
                 <button
                     id="changeCapitalBtn"
                     class="secondary-btn"
-                    type="button"
                 >
                     Modifier
                 </button>
@@ -872,7 +960,6 @@
                 <button
                     id="archiveCapitalBtn"
                     class="warning-btn"
-                    type="button"
                 >
                     Archiver
                 </button>
@@ -881,7 +968,6 @@
                 <button
                     id="newCapitalBtn"
                     class="primary-btn"
-                    type="button"
                 >
                     Nouveau capital
                 </button>
@@ -931,90 +1017,15 @@
 
             </div>
 
-
-            <div class="capital-box">
-
-                <span>
-                    Risque de référence
-                </span>
-
-                <strong id="riskReference">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="capital-box">
-
-                <span>
-                    RR cible
-                </span>
-
-                <strong id="rrTarget">
-                    2.00
-                </strong>
-
-            </div>
-
-
-            <div class="capital-box">
-
-                <span>
-                    Objectif / trade
-                </span>
-
-                <strong id="theoreticalObjective">
-                    $0.00
-                </strong>
-
-            </div>
-
         </div>
 
     </section>
 
 
 
-    <!-- ======================================================
-         AJOUT TRADE
-    ======================================================= -->
-
-    <section
-        id="dashboardTradeLauncher"
-        class="trade-launcher-card"
-    >
-
-        <button
-            id="openTradeModalBtn"
-            class="trade-launcher"
-            type="button"
-        >
-
-            <span class="trade-launcher-main">
-
-                <span class="trade-launcher-icon">
-                    ＋
-                </span>
-
-                Ajouter un trade
-
-            </span>
-
-
-            <small>
-                Enregistrer rapidement un nouveau trade
-            </small>
-
-        </button>
-
-    </section>
-
-
-
-    <!-- ======================================================
+    <!-- ========================================================
          GRAPHIQUE CAPITAL
-    ======================================================= -->
+         ======================================================== -->
 
     <section
         id="dashboardChartCard"
@@ -1040,9 +1051,7 @@
 
         <div class="chart-container">
 
-            <canvas
-                id="capitalChart"
-            ></canvas>
+            <canvas id="capitalChart"></canvas>
 
 
             <div
@@ -1058,9 +1067,9 @@
 
 
 
-    <!-- ======================================================
-         PERFORMANCE GENERALE
-    ======================================================= -->
+    <!-- ========================================================
+         PERFORMANCE
+         ======================================================== -->
 
     <section
         id="performanceSummaryCard"
@@ -1072,11 +1081,11 @@
             <div>
 
                 <h2>
-                    📊 Performance générale
+                    📊 Performance
                 </h2>
 
                 <p>
-                    Résumé de vos résultats
+                    Analyse de vos résultats
                 </p>
 
             </div>
@@ -1089,7 +1098,6 @@
             <button
                 class="period-btn active"
                 data-period="today"
-                type="button"
             >
                 Aujourd'hui
             </button>
@@ -1098,7 +1106,6 @@
             <button
                 class="period-btn"
                 data-period="week"
-                type="button"
             >
                 Cette semaine
             </button>
@@ -1107,7 +1114,6 @@
             <button
                 class="period-btn"
                 data-period="month"
-                type="button"
             >
                 Ce mois
             </button>
@@ -1116,7 +1122,6 @@
             <button
                 class="period-btn"
                 data-period="year"
-                type="button"
             >
                 Cette année
             </button>
@@ -1125,7 +1130,6 @@
             <button
                 class="period-btn"
                 data-period="all"
-                type="button"
             >
                 Tout l'historique
             </button>
@@ -1213,146 +1217,42 @@
 
             </div>
 
-
-            <div class="stat-box">
-
-                <span>
-                    Dernier trade
-                </span>
-
-                <strong id="statLastTrade">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Profit Factor
-                </span>
-
-                <strong id="statProfitFactor">
-                    0.00
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Gain moyen / trade
-                </span>
-
-                <strong id="statAverageTrade">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Gain moyen gagnant
-                </span>
-
-                <strong id="statAverageWin">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Perte moyenne perdant
-                </span>
-
-                <strong id="statAverageLoss">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Meilleur trade
-                </span>
-
-                <strong id="statBestTrade">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Pire trade
-                </span>
-
-                <strong id="statWorstTrade">
-                    $0.00
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Série gagnante max
-                </span>
-
-                <strong id="statMaxWinStreak">
-                    0
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Série perdante max
-                </span>
-
-                <strong id="statMaxLossStreak">
-                    0
-                </strong>
-
-            </div>
-
-
-            <div class="stat-box">
-
-                <span>
-                    Drawdown maximal
-                </span>
-
-                <strong id="statMaxDrawdown">
-                    $0.00
-                </strong>
-
-            </div>
-
         </div>
 
     </section>
 
 
 
-    <!-- ======================================================
+    <!-- ========================================================
+         AJOUT TRADE
+         ======================================================== -->
+
+    <section
+        id="dashboardTradeCard"
+        class="card trade-launcher-card"
+    >
+
+        <button
+            id="openTradeModalBtn"
+            class="trade-launcher"
+            type="button"
+        >
+
+            ➕ Ajouter un trade
+
+            <small>
+                Ouvrir le formulaire d'enregistrement
+            </small>
+
+        </button>
+
+    </section>
+
+
+
+    <!-- ========================================================
          PERFORMANCE SETUPS
-         Visible uniquement sur Analyse
-    ======================================================= -->
+         ======================================================== -->
 
     <section
         id="setupPerformanceCard"
@@ -1368,7 +1268,7 @@
                 </h2>
 
                 <p>
-                    Résultats détaillés par stratégie
+                    Résultats par stratégie
                 </p>
 
             </div>
@@ -1384,25 +1284,11 @@
 
                     <tr>
 
-                        <th>
-                            Setup
-                        </th>
-
-                        <th>
-                            Trades
-                        </th>
-
-                        <th>
-                            Gagnants
-                        </th>
-
-                        <th>
-                            Winrate
-                        </th>
-
-                        <th>
-                            Profit
-                        </th>
+                        <th>Setup</th>
+                        <th>Trades</th>
+                        <th>Gagnants</th>
+                        <th>Winrate</th>
+                        <th>Profit</th>
 
                     </tr>
 
@@ -1420,10 +1306,9 @@
 
 
 
-    <!-- ======================================================
-         PERFORMANCE ACTIFS
-         Visible uniquement sur Analyse
-    ======================================================= -->
+    <!-- ========================================================
+         PERFORMANCE PAR ACTIF
+         ======================================================== -->
 
     <section
         id="assetPerformanceCard"
@@ -1435,11 +1320,11 @@
             <div>
 
                 <h2>
-                    🌍 Performance par actif
+                    📈 Performance par actif
                 </h2>
 
                 <p>
-                    Résultats détaillés par actif
+                    Résultats détaillés pour chaque actif.
                 </p>
 
             </div>
@@ -1455,45 +1340,16 @@
 
                     <tr>
 
-                        <th>
-                            Actif
-                        </th>
-
-                        <th>
-                            Trades
-                        </th>
-
-                        <th>
-                            Gagnants
-                        </th>
-
-                        <th>
-                            Perdants
-                        </th>
-
-                        <th>
-                            BE
-                        </th>
-
-                        <th>
-                            Winrate
-                        </th>
-
-                        <th>
-                            Profit
-                        </th>
-
-                        <th>
-                            RR moyen
-                        </th>
-
-                        <th>
-                            Meilleur
-                        </th>
-
-                        <th>
-                            Pire
-                        </th>
+                        <th>Actif</th>
+                        <th>Trades</th>
+                        <th>Gagnants</th>
+                        <th>Perdants</th>
+                        <th>BE</th>
+                        <th>Winrate</th>
+                        <th>Profit</th>
+                        <th>RR moyen</th>
+                        <th>Meilleur</th>
+                        <th>Pire</th>
 
                     </tr>
 
@@ -1511,9 +1367,9 @@
 
 
 
-    <!-- ======================================================
+    <!-- ========================================================
          HISTORIQUE
-    ======================================================= -->
+         ======================================================== -->
 
     <section
         id="historyCard"
@@ -1538,7 +1394,6 @@
             <button
                 id="clearBtn"
                 class="danger-btn"
-                type="button"
             >
                 Effacer les trades
             </button>
@@ -1554,61 +1409,18 @@
 
                     <tr>
 
-                        <th>
-                            Date du trade
-                        </th>
-
-                        <th>
-                            Enregistré le
-                        </th>
-
-                        <th>
-                            Actif
-                        </th>
-
-                        <th>
-                            Position
-                        </th>
-
-                        <th>
-                            Lot
-                        </th>
-
-                        <th>
-                            Entry
-                        </th>
-
-                        <th>
-                            SL
-                        </th>
-
-                        <th>
-                            TP
-                        </th>
-
-                        <th>
-                            RR
-                        </th>
-
-                        <th>
-                            Pips
-                        </th>
-
-                        <th>
-                            Setup
-                        </th>
-
-                        <th>
-                            Résultat
-                        </th>
-
-                        <th>
-                            P/L
-                        </th>
-
-                        <th>
-                            Action
-                        </th>
+                        <th>Date</th>
+                        <th>Actif</th>
+                        <th>Position</th>
+                        <th>Lot</th>
+                        <th>Entry</th>
+                        <th>SL</th>
+                        <th>TP</th>
+                        <th>RR</th>
+                        <th>Setup</th>
+                        <th>Résultat</th>
+                        <th>P/L</th>
+                        <th>Action</th>
 
                     </tr>
 
@@ -1626,9 +1438,9 @@
 
 
 
-    <!-- ======================================================
+    <!-- ========================================================
          ARCHIVES
-    ======================================================= -->
+         ======================================================== -->
 
     <section
         id="archivesCard"
@@ -1655,38 +1467,31 @@
         <div
             id="archivesList"
             class="archives-list"
-        ></div>
+        >
+        </div>
 
     </section>
-
 
 </main>
 
 
 
-<!-- ==========================================================
-     MODAL AJOUT TRADE
-=========================================================== -->
+<!-- ============================================================
+     MODAL TRADE
+     ============================================================ -->
 
 <div
     id="tradeModal"
     class="modal trade-modal"
-    aria-hidden="true"
 >
 
-    <div
-        class="modal-content"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="tradeModalTitle"
-    >
+    <div class="modal-content">
 
+        <div class="modal-header">
 
-        <div class="trade-modal-header">
+            <div>
 
-            <div class="trade-modal-title-area">
-
-                <h2 id="tradeModalTitle">
+                <h2>
                     ➕ Ajouter un trade
                 </h2>
 
@@ -1699,9 +1504,8 @@
 
             <button
                 id="closeTradeModalBtn"
-                class="trade-modal-close"
+                class="close-btn"
                 type="button"
-                aria-label="Fermer"
             >
                 ✕
             </button>
@@ -1709,408 +1513,403 @@
         </div>
 
 
+        <div class="modal-body">
 
-        <form id="tradeForm">
+            <form id="tradeForm">
 
-
-            <div
-                class="trade-modal-section-title"
-            >
-
-                <span class="section-dot"></span>
-
-                Informations du trade
-
-            </div>
+                <div class="form-grid">
 
 
-            <div class="form-grid">
+                    <div>
+
+                        <label for="asset">
+                            Actif
+                        </label>
+
+                        <input
+                            type="text"
+                            id="asset"
+                            placeholder="XAUUSD"
+                            required
+                        >
+
+                    </div>
 
 
-                <!-- ACTIF -->
+                    <div>
 
-                <div>
+                        <label for="date">
+                            Date
+                        </label>
 
-                    <label for="asset">
-                        Actif
-                    </label>
+                        <input
+                            type="date"
+                            id="date"
+                            required
+                        >
 
-                    <input
-                        type="text"
-                        id="asset"
-                        list="assetList"
-                        placeholder="XAUUSD"
-                        required
-                    >
+                    </div>
 
 
-                    <datalist id="assetList">
+                    <div>
 
-                        <option value="EUR/USD"></option>
-                        <option value="GBP/USD"></option>
-                        <option value="AUD/USD"></option>
-                        <option value="NZD/USD"></option>
-                        <option value="USD/CAD"></option>
-                        <option value="USD/CHF"></option>
-                        <option value="USD/JPY"></option>
-                        <option value="XAUUSD"></option>
-                        <option value="BTCUSD"></option>
+                        <label for="direction">
+                            Position
+                        </label>
 
-                    </datalist>
+                        <select
+                            id="direction"
+                            required
+                        >
+
+                            <option value="BUY">
+                                Buy
+                            </option>
+
+                            <option value="SELL">
+                                Sell
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="orderType">
+                            Type d'ordre
+                        </label>
+
+                        <select
+                            id="orderType"
+                            required
+                        >
+
+                            <option value="Market">
+                                Immediat
+                            </option>
+
+                            <option value="Buy Limit">
+                                Buy Limit
+                            </option>
+
+                            <option value="Sell Limit">
+                                Sell Limit
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="lot">
+                            Lot
+                        </label>
+
+                        <input
+                            type="number"
+                            id="lot"
+                            step="0.01"
+                            min="0.01"
+                            placeholder="0.01"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="entry">
+                            Entry
+                        </label>
+
+                        <input
+                            type="number"
+                            id="entry"
+                            step="any"
+                            placeholder="4450.00"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="sl">
+                            Stop Loss
+                        </label>
+
+                        <input
+                            type="number"
+                            id="sl"
+                            step="any"
+                            placeholder="4445.00"
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="tp">
+                            Take Profit
+                        </label>
+
+                        <input
+                            type="number"
+                            id="tp"
+                            step="any"
+                            placeholder="4460.00"
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="tradeRR">
+                            RR du trade
+                        </label>
+
+                        <select
+                            id="tradeRR"
+                            required
+                        >
+
+                            <option value="2">RR 2</option>
+                            <option value="3">RR 3</option>
+                            <option value="4">RR 4</option>
+                            <option value="5">RR 5</option>
+                            <option value="6">RR 6</option>
+                            <option value="7">RR 7</option>
+                            <option value="8">RR 8</option>
+                            <option value="9">RR 9</option>
+                            <option value="10">RR 10</option>
+                            <option value="11">RR 11</option>
+                            <option value="12">RR 12</option>
+                            <option value="13">RR 13</option>
+                            <option value="14">RR 14</option>
+                            <option value="15">RR 15</option>
+                            <option value="16">RR 16</option>
+                            <option value="17">RR 17</option>
+                            <option value="18">RR 18</option>
+                            <option value="19">RR 19</option>
+                            <option value="20">RR 20</option>
+
+                        </select>
+
+
+                        <small
+                            style="
+                                display:block;
+                                margin-top:6px;
+                                opacity:.7;
+                            "
+                        >
+                            Le RR du capital sert de valeur par défaut.
+                            Vous pouvez l'adapter pour chaque trade.
+                        </small>
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="calculatedRR">
+                            RR appliqué
+                        </label>
+
+                        <input
+                            type="text"
+                            id="calculatedRR"
+                            value="0.00"
+                            readonly
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="result">
+                            Résultat
+                        </label>
+
+                        <select
+                            id="result"
+                            required
+                        >
+
+                            <option value="TP">
+                                TP
+                            </option>
+
+                            <option value="SL">
+                                SL
+                            </option>
+
+                            <option value="BE">
+                                BE
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="setup">
+                            Setup
+                        </label>
+
+                        <select
+                            id="setup"
+                            required
+                        >
+
+                            <option value="LDP+QML">
+                                LDP+QML
+                            </option>
+
+                            <option value="LDP+FIBO 50">
+                                LDP+FIBO 50
+                            </option>
+
+                            <option value="OB">
+                                OB
+                            </option>
+
+                            <option value="BB">
+                                BB
+                            </option>
+
+                            <option value="ZS OA">
+                                ZS OA
+                            </option>
+
+                            <option value="SSM1">
+                                SSM1
+                            </option>
+
+                            <option value="SSM2">
+                                SSM2
+                            </option>
+
+                            <option value="SSM3">
+                                SSM3
+                            </option>
+
+                            <option value="SBM1">
+                                SBM1
+                            </option>
+
+                            <option value="SBM2">
+                                SBM2
+                            </option>
+
+                            <option value="SBM3">
+                                SBM3
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div>
+
+                        <label
+                            id="profitLabel"
+                            for="profit"
+                        >
+                            P/L automatique
+                        </label>
+
+                        <input
+                            type="number"
+                            id="profit"
+                            step="any"
+                            placeholder="20 ou -10"
+                            required
+                        >
+
+                    </div>
 
                 </div>
 
 
-
-                <!-- DATE -->
-
-                <div>
-
-                    <label for="date">
-                        Date
-                    </label>
-
-                    <input
-                        type="date"
-                        id="date"
-                        required
-                    >
-
-                </div>
-
-
-
-                <!-- POSITION -->
-
-                <div>
-
-                    <label for="direction">
-                        Position
-                    </label>
-
-                    <select
-                        id="direction"
-                        required
-                    >
-
-                        <option value="BUY">
-                            Buy
-                        </option>
-
-                        <option value="SELL">
-                            Sell
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- TYPE ORDRE -->
-
-                <div>
-
-                    <label for="orderType">
-                        Type d'ordre
-                    </label>
-
-                    <select
-                        id="orderType"
-                        required
-                    >
-
-                        <option value="Market">
-                            Immediat
-                        </option>
-
-                        <option value="Buy Limit">
-                            Buy Limit
-                        </option>
-
-                        <option value="Sell Limit">
-                            Sell Limit
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- LOT -->
-
-                <div>
-
-                    <label for="lot">
-                        Lot
-                    </label>
-
-                    <input
-                        type="number"
-                        id="lot"
-                        step="0.01"
-                        min="0.01"
-                        placeholder="0.01"
-                        readonly
-                        required
-                    >
-
-                </div>
-
-
-
-                <!-- ENTRY -->
-
-                <div>
-
-                    <label for="entry">
-                        Entry
-                    </label>
-
-                    <input
-                        type="number"
-                        id="entry"
-                        step="any"
-                        placeholder="4450.00"
-                        required
-                    >
-
-                </div>
-
-
-
-                <!-- SL -->
-
-                <div>
-
-                    <label for="sl">
-                        Stop Loss
-                    </label>
-
-                    <input
-                        type="number"
-                        id="sl"
-                        step="any"
-                        placeholder="4445.00"
-                        required
-                    >
-
-                </div>
-
-
-
-                <!-- TP -->
-
-                <div>
-
-                    <label for="tp">
-                        Take Profit
-                    </label>
-
-                    <input
-                        type="number"
-                        id="tp"
-                        step="any"
-                        placeholder="4460.00"
-                        readonly
-                    >
-
-                </div>
-
-
-
-                <!-- RR -->
-
-                <div>
-
-                    <label for="calculatedRR">
-                        RR
-                    </label>
-
-                    <input
-                        type="text"
-                        id="calculatedRR"
-                        value="0.00"
-                        readonly
-                    >
-
-                </div>
-
-
-
-                <!-- RESULTAT -->
-
-                <div>
-
-                    <label for="result">
-                        Résultat
-                    </label>
-
-                    <select
-                        id="result"
-                        required
-                    >
-
-                        <option value="TP">
-                            TP
-                        </option>
-
-                        <option value="SL">
-                            SL
-                        </option>
-
-                        <option value="BE">
-                            BE
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- SETUP -->
-
-                <div>
-
-                    <label for="setup">
-                        Setup
-                    </label>
-
-                    <select
-                        id="setup"
-                        required
-                    >
-
-                        <option value="LDP+QML">
-                            LDP+QML
-                        </option>
-
-                        <option value="LDP+FIBO 50">
-                            LDP+FIBO 50
-                        </option>
-
-                        <option value="OB">
-                            OB
-                        </option>
-
-                        <option value="BB">
-                            BB
-                        </option>
-
-                        <option value="ZS OA">
-                            ZS OA
-                        </option>
-
-                        <option value="SSM1">
-                            SSM1
-                        </option>
-
-                        <option value="SSM2">
-                            SSM2
-                        </option>
-
-                        <option value="SSM3">
-                            SSM3
-                        </option>
-
-                        <option value="SBM1">
-                            SBM1
-                        </option>
-
-                        <option value="SBM2">
-                            SBM2
-                        </option>
-
-                        <option value="SBM3">
-                            SBM3
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- P/L -->
-
-                <div>
-
-                    <label
-                        for="profit"
-                        id="profitLabel"
-                    >
-                        P/L automatique
-                    </label>
-
-                    <input
-                        type="number"
-                        step="any"
-                        id="profit"
-                        placeholder="Calculé automatiquement"
-                        readonly
-                        required
-                    >
-
-                </div>
-
-
-            </div>
-
-
-
-            <!-- INFO MONEY MANAGEMENT -->
-
-            <div
-                id="tradeMMInfo"
-                class="trade-mm-box form-full"
-            ></div>
-
-
-
-            <!-- COMMENTAIRE -->
-
-            <div class="form-full">
-
-                <label for="comment">
-                    Commentaire
-                </label>
-
-                <textarea
-                    id="comment"
-                    rows="3"
-                    placeholder="Commentaire sur le trade..."
-                ></textarea>
-
-            </div>
-
-
-
-            <!-- ACTIONS -->
-
-            <div class="trade-modal-footer">
-
-                <button
-                    id="cancelTradeModalBtn"
-                    class="secondary-btn"
-                    type="button"
+                <div
+                    id="tradeMMInfo"
+                    class="form-full"
+                    aria-live="polite"
                 >
-                    Annuler
-                </button>
+                </div>
 
 
-                <button
-                    type="submit"
-                    class="primary-btn"
+                <div
+                    id="beProfitGroup"
+                    class="form-full"
+                    style="display:none;"
                 >
-                    💾 Enregistrer le trade
-                </button>
 
-            </div>
+                    <label for="beProfit">
+                        P/L réel du BE (manuel)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="beProfit"
+                        step="any"
+                        placeholder="Exemple : -0.20"
+                    >
+
+                </div>
 
 
-        </form>
+                <div class="form-full">
+
+                    <label for="comment">
+                        Commentaire
+                    </label>
+
+                    <textarea
+                        id="comment"
+                        rows="3"
+                        placeholder="Commentaire sur le trade..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        Enregistrer le trade
+                    </button>
+
+
+                    <button
+                        id="cancelTradeModalBtn"
+                        type="button"
+                        class="secondary-btn"
+                    >
+                        Annuler
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
 
@@ -2118,18 +1917,16 @@
 
 
 
-<!-- ==========================================================
-     MODAL CAPITAL
-=========================================================== -->
+<!-- ============================================================
+     MODAL NOUVEAU CAPITAL
+     ============================================================ -->
 
 <div
     id="capitalModal"
     class="modal"
-    data-mode="new"
 >
 
     <div class="modal-content">
-
 
         <div class="modal-header">
 
@@ -2149,13 +1946,11 @@
             <button
                 id="cancelCapitalBtn"
                 class="close-btn"
-                type="button"
             >
                 ✕
             </button>
 
         </div>
-
 
 
         <div class="modal-body">
@@ -2171,11 +1966,9 @@
                     type="text"
                     id="capitalNameInput"
                     placeholder="Capital 1"
-                    autocomplete="off"
                 >
 
             </div>
-
 
 
             <div>
@@ -2189,36 +1982,34 @@
                     step="any"
                     id="capitalAmountInput"
                     placeholder="100"
-                    min="0"
                 >
-
-                <small
-                    id="capitalAmountHelp"
-                    class="form-help"
-                >
-                    Le capital initial sera verrouillé après le premier trade.
-                </small>
 
             </div>
-
 
 
             <div>
 
                 <label for="capitalRiskInput">
-                    Risque de référence par trade
+                    Risque de référence / trade ($)
                 </label>
 
                 <input
                     type="number"
                     step="any"
                     id="capitalRiskInput"
-                    placeholder="Exemple : 2.50"
-                    min="0.01"
+                    placeholder="1"
                 >
 
-            </div>
+                <small
+                    id="capitalAmountHelp"
+                    style="
+                        display:block;
+                        margin-top:6px;
+                        opacity:.7;
+                    "
+                ></small>
 
+            </div>
 
 
             <div>
@@ -2229,42 +2020,44 @@
 
                 <input
                     type="number"
-                    step="0.01"
+                    step="0.10"
+                    min="2"
                     id="capitalRRInput"
                     placeholder="2.00"
-                    min="2"
-                    value="2.00"
                 >
 
-                <small class="form-help">
-                    Le RR cible minimum est 2.00.
+                <small
+                    style="
+                        display:block;
+                        margin-top:6px;
+                        opacity:.7;
+                    "
+                >
+                    Minimum autorisé : 2.00
                 </small>
 
             </div>
 
 
+            <div class="form-full">
 
-            <div class="capital-modal-preview">
+                <div
+                    id="capitalModalRiskPreview"
+                    style="margin-bottom:6px;"
+                ></div>
 
-                <div id="capitalModalRiskPreview">
-                    Risque : $0.00
-                </div>
+                <div
+                    id="capitalModalRR"
+                    style="margin-bottom:6px;"
+                ></div>
 
-
-                <div id="capitalModalRR">
-                    RR cible : 2.00
-                </div>
-
-
-                <div id="capitalModalObjective">
-                    $0.00
-                </div>
+                <strong
+                    id="capitalModalObjective"
+                ></strong>
 
             </div>
 
-
         </div>
-
 
 
         <div class="modal-actions">
@@ -2272,7 +2065,6 @@
             <button
                 id="cancelCapitalBtn2"
                 class="secondary-btn"
-                type="button"
             >
                 Annuler
             </button>
@@ -2281,13 +2073,11 @@
             <button
                 id="saveCapitalBtn"
                 class="primary-btn"
-                type="button"
             >
                 Enregistrer
             </button>
 
         </div>
-
 
     </div>
 
@@ -2295,9 +2085,9 @@
 
 
 
-<!-- ==========================================================
+<!-- ============================================================
      MODAL GRAPHIQUE ARCHIVE
-=========================================================== -->
+     ============================================================ -->
 
 <div
     id="archiveChartModal"
@@ -2305,7 +2095,6 @@
 >
 
     <div class="modal-content archive-chart-modal-content">
-
 
         <div class="modal-header">
 
@@ -2325,13 +2114,11 @@
             <button
                 id="closeArchiveChartBtn"
                 class="close-btn"
-                type="button"
             >
                 ✕
             </button>
 
         </div>
-
 
 
         <div class="archive-chart-info">
@@ -2375,19 +2162,14 @@
 
             </div>
 
-
         </div>
-
 
 
         <div class="chart-container archive-chart-container">
 
-            <canvas
-                id="archiveChart"
-            ></canvas>
+            <canvas id="archiveChart"></canvas>
 
         </div>
-
 
     </div>
 
@@ -2395,9 +2177,14 @@
 
 
 
-<!-- ==========================================================
-     SCRIPTS
-=========================================================== -->
+<!-- ============================================================
+     SCRIPTS PRINCIPAUX
+     
+     IMPORTANT :
+     
+     Les calculs restent entièrement dans app.js.
+     v51-filters.js reste inchangé.
+     ============================================================ -->
 
 <script src="app.js"></script>
 
@@ -2405,13 +2192,21 @@
 
 
 
-<!-- ==========================================================
-     GESTION DES PAGES
-=========================================================== -->
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
 
 <script>
 
 (function () {
+
+    const allowedPages = [
+        "dashboard",
+        "analysis",
+        "performance",
+        "archives"
+    ];
+
 
     const params =
         new URLSearchParams(
@@ -2419,25 +2214,14 @@
         );
 
 
-    let page =
-        params.get("page") ||
-        "dashboard";
+    const requested =
+        params.get("page");
 
 
-    const allowedPages = [
-        "dashboard",
-        "analysis",
-        "archives"
-    ];
-
-
-    if (
-        !allowedPages.includes(page)
-    ) {
-
-        page =
-            "dashboard";
-    }
+    const page =
+        allowedPages.includes(requested)
+            ? requested
+            : "dashboard";
 
 
     document.body.dataset.page =
@@ -2448,44 +2232,15 @@
         .querySelectorAll(
             "[data-page-link]"
         )
-        .forEach(
-            link => {
+        .forEach(link => {
 
-                const linkPage =
-                    link.dataset.pageLink;
+            link.classList.toggle(
+                "active",
+                link.dataset.pageLink === page
+            );
 
+        });
 
-                if (
-                    linkPage === page
-                ) {
-
-                    link.classList.add(
-                        "active"
-                    );
-
-                } else {
-
-                    link.classList.remove(
-                        "active"
-                    );
-                }
-
-            }
-        );
-
-})();
-
-</script>
-
-
-
-<!-- ==========================================================
-     MODAL AJOUT TRADE
-=========================================================== -->
-
-<script>
-
-(function () {
 
     function openTradeModal() {
 
@@ -2505,63 +2260,15 @@
         );
 
 
-        modal.setAttribute(
-            "aria-hidden",
-            "false"
-        );
+        modal.style.display =
+            "flex";
 
 
         document.body.classList.add(
-            "trade-modal-open"
+            "modal-open"
         );
 
-
-        const dateInput =
-            document.getElementById(
-                "date"
-            );
-
-
-        if (
-            dateInput &&
-            !dateInput.value &&
-            typeof getTodayDate ===
-                "function"
-        ) {
-
-            dateInput.value =
-                getTodayDate();
-        }
-
-
-        if (
-            typeof updateAutomaticTradeValues ===
-                "function"
-        ) {
-
-            updateAutomaticTradeValues();
-        }
-
-
-        setTimeout(
-            () => {
-
-                const assetInput =
-                    document.getElementById(
-                        "asset"
-                    );
-
-
-                if (assetInput) {
-
-                    assetInput.focus();
-                }
-
-            },
-            80
-        );
     }
-
 
 
     function closeTradeModal() {
@@ -2582,91 +2289,91 @@
         );
 
 
-        modal.setAttribute(
-            "aria-hidden",
-            "true"
-        );
+        modal.style.display =
+            "none";
 
 
         document.body.classList.remove(
-            "trade-modal-open"
+            "modal-open"
         );
+
     }
 
 
+    document.addEventListener(
+        "click",
+        function (event) {
 
-    const openButton =
-        document.getElementById(
-            "openTradeModalBtn"
-        );
-
-
-    if (openButton) {
-
-        openButton.addEventListener(
-            "click",
-            openTradeModal
-        );
-    }
+            const target =
+                event.target.closest(
+                    "#openTradeModalBtn, #closeTradeModalBtn, #cancelTradeModalBtn"
+                );
 
 
-
-    const closeButton =
-        document.getElementById(
-            "closeTradeModalBtn"
-        );
+            if (!target) {
+                return;
+            }
 
 
-    if (closeButton) {
+            if (
+                target.id ===
+                "openTradeModalBtn"
+            ) {
 
-        closeButton.addEventListener(
-            "click",
-            closeTradeModal
-        );
-    }
+                openTradeModal();
 
+            } else {
 
+                closeTradeModal();
 
-    const cancelButton =
-        document.getElementById(
-            "cancelTradeModalBtn"
-        );
+            }
 
-
-    if (cancelButton) {
-
-        cancelButton.addEventListener(
-            "click",
-            closeTradeModal
-        );
-    }
+        }
+    );
 
 
-
-    const modal =
+    const tradeModal =
         document.getElementById(
             "tradeModal"
         );
 
 
-    if (modal) {
+    if (tradeModal) {
 
-        modal.addEventListener(
+        tradeModal.addEventListener(
             "click",
             event => {
 
                 if (
                     event.target ===
-                    modal
+                    tradeModal
                 ) {
 
                     closeTradeModal();
+
                 }
 
             }
         );
+
     }
 
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Escape"
+            ) {
+
+                closeTradeModal();
+
+            }
+
+        }
+    );
 
 
     const tradeForm =
@@ -2679,90 +2386,843 @@
 
         tradeForm.addEventListener(
             "submit",
-            () => {
-
-                const beforeRaw =
-                    localStorage.getItem(
-                        "tradingTrades"
-                    );
-
-
-                let beforeTrades = [];
-
-
-                try {
-
-                    beforeTrades =
-                        JSON.parse(
-                            beforeRaw
-                        ) || [];
-
-                } catch {
-
-                    beforeTrades = [];
-                }
-
+            function () {
 
                 setTimeout(
-                    () => {
-
-                        const afterRaw =
-                            localStorage.getItem(
-                                "tradingTrades"
-                            );
-
-
-                        let afterTrades = [];
-
-
-                        try {
-
-                            afterTrades =
-                                JSON.parse(
-                                    afterRaw
-                                ) || [];
-
-                        } catch {
-
-                            afterTrades = [];
-                        }
-
-
-                        if (
-                            afterTrades.length >
-                            beforeTrades.length
-                        ) {
-
-                            closeTradeModal();
-                        }
-
-                    },
-                    100
+                    closeTradeModal,
+                    50
                 );
 
-            }
+            },
+            true
         );
+
+    }
+
+})();
+
+</script>
+
+
+
+<!-- ============================================================
+     SYSTÈME DES SESSIONS DE TRADING
+     
+     IMPORTANT :
+     
+     Ce système est totalement indépendant
+     des calculs de trading.
+
+     Il utilise les fuseaux horaires IANA
+     afin de suivre automatiquement les changements
+     été / hiver.
+     ============================================================ -->
+
+<script>
+
+(function () {
+
+
+    /* =========================================================
+       CONFIGURATION DES SESSIONS
+       ========================================================= */
+
+    const sessions = [
+
+        {
+            name: "Sydney",
+            flag: "🇦🇺",
+            timezone: "Australia/Sydney",
+
+            openHour: 8,
+            openMinute: 0,
+
+            closeHour: 17,
+            closeMinute: 0
+        },
+
+
+        {
+            name: "Tokyo",
+            flag: "🇯🇵",
+            timezone: "Asia/Tokyo",
+
+            openHour: 9,
+            openMinute: 0,
+
+            closeHour: 18,
+            closeMinute: 0
+        },
+
+
+        {
+            name: "Londres",
+            flag: "🇬🇧",
+            timezone: "Europe/London",
+
+            openHour: 8,
+            openMinute: 0,
+
+            closeHour: 17,
+            closeMinute: 0
+        },
+
+
+        {
+            name: "New York",
+            flag: "🇺🇸",
+            timezone: "America/New_York",
+
+            openHour: 8,
+            openMinute: 0,
+
+            closeHour: 17,
+            closeMinute: 0
+        }
+
+    ];
+
+
+    /* =========================================================
+       FUSEAU MADAGASCAR
+       ========================================================= */
+
+    const MADAGASCAR_TIMEZONE =
+        "Indian/Antananarivo";
+
+
+    /* =========================================================
+       FORMAT HEURE
+       ========================================================= */
+
+    function formatTime(
+        date,
+        timezone
+    ) {
+
+        return new Intl.DateTimeFormat(
+            "fr-FR",
+            {
+                timeZone: timezone,
+
+                hour: "2-digit",
+                minute: "2-digit",
+
+                hour12: false
+            }
+        ).format(date);
+
     }
 
 
+    /* =========================================================
+       OBTENIR L'HEURE D'UNE ZONE
+       ========================================================= */
 
-    document.addEventListener(
-        "keydown",
-        event => {
+    function getTimeParts(
+        date,
+        timezone
+    ) {
+
+        const parts =
+            new Intl.DateTimeFormat(
+                "en-US",
+                {
+                    timeZone: timezone,
+
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+
+                    hour12: false
+                }
+            ).formatToParts(date);
+
+
+        const result = {};
+
+
+        parts.forEach(
+            part => {
+
+                if (
+                    part.type !==
+                    "literal"
+                ) {
+
+                    result[part.type] =
+                        Number(
+                            part.value
+                        );
+
+                }
+
+            }
+        );
+
+
+        return result;
+
+    }
+
+
+    /* =========================================================
+       MINUTES DEPUIS MINUIT
+       ========================================================= */
+
+    function minutesSinceMidnight(
+        parts
+    ) {
+
+        return (
+            parts.hour * 60 +
+            parts.minute +
+            parts.second / 60
+        );
+
+    }
+
+
+    /* =========================================================
+       SESSION OUVERTE ?
+       ========================================================= */
+
+    function isSessionOpen(
+        session,
+        now
+    ) {
+
+        const parts =
+            getTimeParts(
+                now,
+                session.timezone
+            );
+
+
+        const current =
+            minutesSinceMidnight(
+                parts
+            );
+
+
+        const open =
+            session.openHour * 60 +
+            session.openMinute;
+
+
+        const close =
+            session.closeHour * 60 +
+            session.closeMinute;
+
+
+        return (
+            current >= open &&
+            current < close
+        );
+
+    }
+
+
+    /* =========================================================
+       PROCHAINE OUVERTURE
+       ========================================================= */
+
+    function getNextOpening(
+        session,
+        now
+    ) {
+
+        const parts =
+            getTimeParts(
+                now,
+                session.timezone
+            );
+
+
+        const current =
+            minutesSinceMidnight(
+                parts
+            );
+
+
+        const open =
+            session.openHour * 60 +
+            session.openMinute;
+
+
+        let daysAhead = 0;
+
+
+        if (
+            current >= open
+        ) {
+
+            daysAhead = 1;
+
+        }
+
+
+        return {
+            session,
+            daysAhead
+        };
+
+    }
+
+
+    /* =========================================================
+       DÉCALAGE TEMPOREL ENTRE DEUX INSTANTS
+       ========================================================= */
+
+    function differenceInSeconds(
+        target,
+        now
+    ) {
+
+        return Math.max(
+            0,
+            Math.floor(
+                (
+                    target.getTime() -
+                    now.getTime()
+                ) / 1000
+            )
+        );
+
+    }
+
+
+    /* =========================================================
+       CONSTRUIRE UN INSTANT RÉEL
+       
+       Cette méthode utilise la différence UTC
+       afin de fonctionner correctement avec DST.
+       ========================================================= */
+
+    function getFutureInstant(
+        timezone,
+        hour,
+        minute,
+        daysAhead
+    ) {
+
+        const now =
+            new Date();
+
+
+        const currentParts =
+            getTimeParts(
+                now,
+                timezone
+            );
+
+
+        const desiredDate =
+            new Date(
+                Date.UTC(
+                    currentParts.year,
+                    currentParts.month - 1,
+                    currentParts.day + daysAhead,
+                    hour,
+                    minute,
+                    0
+                )
+            );
+
+
+        /*
+         * Première approximation.
+         */
+
+        let utc =
+            desiredDate.getTime();
+
+
+        /*
+         * Correction selon le décalage
+         * réel du fuseau.
+         */
+
+        for (
+            let i = 0;
+            i < 3;
+            i++
+        ) {
+
+            const check =
+                new Date(
+                    utc
+                );
+
+
+            const checkParts =
+                getTimeParts(
+                    check,
+                    timezone
+                );
+
+
+            const desiredUTC =
+                Date.UTC(
+                    currentParts.year,
+                    currentParts.month - 1,
+                    currentParts.day + daysAhead,
+                    hour,
+                    minute,
+                    0
+                );
+
+
+            const actualUTC =
+                Date.UTC(
+                    checkParts.year,
+                    checkParts.month - 1,
+                    checkParts.day,
+                    checkParts.hour,
+                    checkParts.minute,
+                    checkParts.second
+                );
+
+
+            utc +=
+                desiredUTC -
+                actualUTC;
+
+        }
+
+
+        return new Date(
+            utc
+        );
+
+    }
+
+
+    /* =========================================================
+       FORMAT COMPTE À REBOURS
+       ========================================================= */
+
+    function formatCountdown(
+        seconds
+    ) {
+
+        seconds =
+            Math.max(
+                0,
+                Math.floor(seconds)
+            );
+
+
+        const hours =
+            Math.floor(
+                seconds / 3600
+            );
+
+
+        const minutes =
+            Math.floor(
+                (
+                    seconds % 3600
+                ) / 60
+            );
+
+
+        const secs =
+            seconds % 60;
+
+
+        if (
+            hours > 0
+        ) {
+
+            return (
+                "⏱️ " +
+                hours +
+                "h " +
+                String(
+                    minutes
+                ).padStart(
+                    2,
+                    "0"
+                ) +
+                "m"
+            );
+
+        }
+
+
+        return (
+            "⏱️ " +
+            minutes +
+            "m " +
+            String(
+                secs
+            ).padStart(
+                2,
+                "0"
+            ) +
+            "s"
+        );
+
+    }
+
+
+    /* =========================================================
+       TROUVER LA SESSION ACTUELLE
+       ========================================================= */
+
+    function getCurrentSession(
+        now
+    ) {
+
+        return sessions.find(
+            session =>
+                isSessionOpen(
+                    session,
+                    now
+                )
+        );
+
+    }
+
+
+    /* =========================================================
+       TROUVER LA PROCHAINE SESSION
+       ========================================================= */
+
+    function getNextSession(
+        now,
+        currentSession
+    ) {
+
+        const candidates =
+            sessions.map(
+                session => {
+
+                    const opening =
+                        getNextOpening(
+                            session,
+                            now
+                        );
+
+
+                    const target =
+                        getFutureInstant(
+                            session.timezone,
+
+                            session.openHour,
+                            session.openMinute,
+
+                            opening.daysAhead
+                        );
+
+
+                    return {
+                        session,
+                        target
+                    };
+
+                }
+            );
+
+
+        candidates.sort(
+            (a, b) =>
+                a.target.getTime() -
+                b.target.getTime()
+        );
+
+
+        /*
+         * Si une session est actuellement ouverte,
+         * on cherche la prochaine autre session.
+         */
+
+        if (
+            currentSession &&
+            candidates.length > 1
+        ) {
+
+            const filtered =
+                candidates.filter(
+                    item =>
+                        item.session.name !==
+                        currentSession.name
+                );
+
 
             if (
-                event.key === "Escape" &&
-                document
-                    .getElementById("tradeModal")
-                    ?.classList
-                    .contains("open")
+                filtered.length
             ) {
 
-                closeTradeModal();
+                return filtered[0];
+
             }
 
         }
-    );
+
+
+        return candidates[0];
+
+    }
+
+
+    /* =========================================================
+       MISE À JOUR DU PANNEAU
+       ========================================================= */
+
+    function updateSessions() {
+
+        const now =
+            new Date();
+
+
+        const current =
+            getCurrentSession(
+                now
+            );
+
+
+        const next =
+            getNextSession(
+                now,
+                current
+            );
+
+
+        const currentName =
+            document.getElementById(
+                "currentSessionName"
+            );
+
+
+        const currentOrigin =
+            document.getElementById(
+                "currentSessionOrigin"
+            );
+
+
+        const currentMada =
+            document.getElementById(
+                "currentSessionMada"
+            );
+
+
+        const currentCountdown =
+            document.getElementById(
+                "currentSessionCountdown"
+            );
+
+
+        const nextName =
+            document.getElementById(
+                "nextSessionName"
+            );
+
+
+        const nextOrigin =
+            document.getElementById(
+                "nextSessionOrigin"
+            );
+
+
+        const nextMada =
+            document.getElementById(
+                "nextSessionMada"
+            );
+
+
+        const nextCountdown =
+            document.getElementById(
+                "nextSessionCountdown"
+            );
+
+
+        /* =====================================================
+           SESSION ACTUELLE
+           ===================================================== */
+
+        if (
+            current
+        ) {
+
+            currentName.textContent =
+                current.flag +
+                " " +
+                current.name;
+
+
+            currentOrigin.textContent =
+                formatTime(
+                    now,
+                    current.timezone
+                );
+
+
+            currentMada.textContent =
+                "🇲🇬 " +
+                formatTime(
+                    now,
+                    MADAGASCAR_TIMEZONE
+                );
+
+
+            const closeTarget =
+                getFutureInstant(
+                    current.timezone,
+
+                    current.closeHour,
+                    current.closeMinute,
+
+                    0
+                );
+
+
+            /*
+             * Si la fermeture est déjà passée
+             * à cause d'un problème de calcul,
+             * on prend le lendemain.
+             */
+
+            let closeTime =
+                closeTarget;
+
+
+            if (
+                closeTime.getTime() <=
+                now.getTime()
+            ) {
+
+                closeTime =
+                    getFutureInstant(
+                        current.timezone,
+
+                        current.closeHour,
+                        current.closeMinute,
+
+                        1
+                    );
+
+            }
+
+
+            currentCountdown.textContent =
+                "Fermeture dans " +
+                formatCountdown(
+                    differenceInSeconds(
+                        closeTime,
+                        now
+                    )
+                );
+
+        } else {
+
+            currentName.textContent =
+                "🌙 Marché Forex hors session";
+
+
+            currentOrigin.textContent =
+                "—";
+
+
+            currentMada.textContent =
+                "🇲🇬 " +
+                formatTime(
+                    now,
+                    MADAGASCAR_TIMEZONE
+                );
+
+
+            currentCountdown.textContent =
+                "En attente de la prochaine ouverture";
+
+        }
+
+
+        /* =====================================================
+           PROCHAINE SESSION
+           ===================================================== */
+
+        if (
+            next
+        ) {
+
+            const nextSession =
+                next.session;
+
+
+            nextName.textContent =
+                nextSession.flag +
+                " " +
+                nextSession.name;
+
+
+            nextOrigin.textContent =
+                "Ouverture " +
+                formatTime(
+                    next.target,
+                    nextSession.timezone
+                );
+
+
+            nextMada.textContent =
+                "🇲🇬 " +
+                formatTime(
+                    next.target,
+                    MADAGASCAR_TIMEZONE
+                );
+
+
+            nextCountdown.textContent =
+                "Dans " +
+                formatCountdown(
+                    differenceInSeconds(
+                        next.target,
+                        now
+                    )
+                );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       LANCEMENT
+       ========================================================= */
+
+    function startSessionClock() {
+
+        updateSessions();
+
+
+        setInterval(
+            updateSessions,
+            1000
+        );
+
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            startSessionClock
+        );
+
+    } else {
+
+        startSessionClock();
+
+    }
 
 })();
 
@@ -2770,5 +3230,4 @@
 
 
 </body>
-
 </html>
