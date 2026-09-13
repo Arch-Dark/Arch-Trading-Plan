@@ -3,17 +3,18 @@
    Trading Dashboard
    ---------------------------------------------------------
    Gestion :
+   - Session actuelle
+   - Prochaine session
    - Sydney
    - Tokyo
    - Londres
    - New York
-   - Heure locale de chaque session
+   - Heure locale
    - Heure Madagascar
    - Été / hiver
-   - Week-end = marché fermé
-   - Prochaine session
+   - Week-end
    - Compte à rebours
-   - Affichage compact, large et esthétique
+   - Affichage compact
    ========================================================= */
 
 (function () {
@@ -22,7 +23,7 @@
 
 
     /* =====================================================
-       CONFIGURATION DES SESSIONS
+       CONFIGURATION
        ===================================================== */
 
     const SESSIONS = [
@@ -66,18 +67,15 @@
     ];
 
 
-    /* =====================================================
-       PARAMÈTRES
-       ===================================================== */
-
     const MADAGASCAR_TIMEZONE =
         "Indian/Antananarivo";
+
 
     let timer = null;
 
 
     /* =====================================================
-       STYLE DU PANNEAU
+       STYLE
        ===================================================== */
 
     function injectSessionStyles() {
@@ -109,28 +107,25 @@
 
                 display: flex;
 
-                align-items: stretch;
+                align-items: center;
 
                 justify-content: center;
 
-                gap: 10px;
+                gap: 0;
 
-                width: min(
-                    900px,
-                    calc(100% - 20px)
-                );
+                width: auto;
 
-                max-width: 900px;
+                max-width: 690px;
 
-                min-width: 0;
+                min-width: 500px;
 
                 margin: 0 auto;
 
-                padding: 10px 12px;
+                padding: 9px 12px;
 
                 box-sizing: border-box;
 
-                border-radius: 16px;
+                border-radius: 15px;
 
                 border: 1px solid rgba(
                     255,
@@ -147,17 +142,17 @@
                     );
 
                 box-shadow:
-                    0 10px 30px rgba(
+                    0 8px 26px rgba(
                         0,
                         0,
                         0,
-                        0.20
+                        0.18
                     ),
                     inset 0 1px 0 rgba(
                         255,
                         255,
                         255,
-                        0.07
+                        0.06
                     );
 
                 backdrop-filter: blur(14px);
@@ -172,21 +167,28 @@
 
 
             /* =================================================
-               ZONE ACTUELLE / PROCHAINE
+               ZONE INTERNE
                ================================================= */
 
-            #tradingSessionsPanel .sessions-main {
+            #tradingSessionsPanel
+            .sessions-main {
 
                 display: flex;
 
-                align-items: stretch;
+                align-items: center;
 
-                flex: 0 0 auto;
+                justify-content: center;
 
-                min-width: 390px;
+                width: 100%;
+
+                min-width: 0;
 
             }
 
+
+            /* =================================================
+               SESSION ACTUELLE
+               ================================================= */
 
             #tradingSessionsPanel
             .session-current,
@@ -194,25 +196,17 @@
             #tradingSessionsPanel
             .session-next {
 
-                display: grid;
-
-                align-content: center;
+                display: flex;
 
                 align-items: center;
 
-                grid-template-columns:
-                    auto
-                    auto;
+                gap: 8px;
 
-                column-gap: 10px;
+                min-width: 0;
 
-                row-gap: 5px;
+                padding: 2px 14px;
 
-                min-width: 185px;
-
-                padding: 3px 13px;
-
-                box-sizing: border-box;
+                white-space: nowrap;
 
             }
 
@@ -231,39 +225,31 @@
             }
 
 
-            #tradingSessionsPanel
-            .session-next {
-
-                min-width: 205px;
-
-            }
-
-
             /* =================================================
-               TITRES
+               TITRE
                ================================================= */
 
             #tradingSessionsPanel
             .session-label {
 
-                grid-column: 1 / -1;
-
                 font-size: 8px;
 
                 font-weight: 800;
 
-                letter-spacing: 1.2px;
-
-                line-height: 1;
+                letter-spacing: 1px;
 
                 text-transform: uppercase;
 
-                opacity: 0.52;
+                opacity: 0.50;
 
                 white-space: nowrap;
 
             }
 
+
+            /* =================================================
+               NOM SESSION
+               ================================================= */
 
             #tradingSessionsPanel
             .session-current-name,
@@ -275,25 +261,43 @@
 
                 font-weight: 800;
 
-                line-height: 1.2;
+                line-height: 1;
 
                 white-space: nowrap;
 
             }
 
 
+            /* =================================================
+               STATUT
+               ================================================= */
+
             #tradingSessionsPanel
             .session-status {
 
-                font-size: 10px;
+                font-size: 9px;
 
                 font-weight: 700;
 
-                line-height: 1.2;
+                white-space: nowrap;
+
+                opacity: 0.72;
+
+            }
+
+
+            /* =================================================
+               INFORMATIONS
+               ================================================= */
+
+            #tradingSessionsPanel
+            .session-time-line {
+
+                font-size: 9px;
 
                 white-space: nowrap;
 
-                opacity: 0.78;
+                opacity: 0.68;
 
             }
 
@@ -305,7 +309,17 @@
             #tradingSessionsPanel
             .session-countdown {
 
-                font-size: 10px;
+                display: inline-flex;
+
+                align-items: center;
+
+                justify-content: center;
+
+                padding: 5px 8px;
+
+                border-radius: 8px;
+
+                font-size: 9px;
 
                 font-weight: 800;
 
@@ -313,15 +327,11 @@
 
                 white-space: nowrap;
 
-                padding: 5px 8px;
-
-                border-radius: 8px;
-
                 background: rgba(
                     255,
                     255,
                     255,
-                    0.075
+                    0.07
                 );
 
                 border: 1px solid rgba(
@@ -357,24 +367,6 @@
 
 
             /* =================================================
-               INFORMATIONS PROCHAINE SESSION
-               ================================================= */
-
-            #tradingSessionsPanel
-            .session-time-line {
-
-                font-size: 9px;
-
-                line-height: 1.2;
-
-                white-space: nowrap;
-
-                opacity: 0.68;
-
-            }
-
-
-            /* =================================================
                WEEK-END
                ================================================= */
 
@@ -385,19 +377,19 @@
 
                 align-items: center;
 
-                align-self: center;
+                margin-left: 10px;
+
+                padding: 5px 8px;
+
+                border-radius: 8px;
+
+                font-size: 8px;
+
+                font-weight: 800;
 
                 white-space: nowrap;
 
-                font-size: 9px;
-
-                font-weight: 700;
-
-                line-height: 1;
-
-                padding: 6px 9px;
-
-                border-radius: 8px;
+                color: #fca5a5;
 
                 background: rgba(
                     239,
@@ -410,197 +402,8 @@
                     239,
                     68,
                     68,
-                    0.18
+                    0.16
                 );
-
-            }
-
-
-            /* =================================================
-               LISTE DES SESSIONS
-               ================================================= */
-
-            #tradingSessionsPanel
-            .sessions-list {
-
-                display: grid;
-
-                grid-template-columns:
-                    repeat(4, minmax(105px, 1fr));
-
-                gap: 6px;
-
-                flex: 1 1 auto;
-
-                min-width: 430px;
-
-            }
-
-
-            /* =================================================
-               CARTES SYDNEY / TOKYO / LONDRES / NEW YORK
-               ================================================= */
-
-            #tradingSessionsPanel
-            .session-mini-card {
-
-                display: grid;
-
-                grid-template-columns:
-                    auto 1fr;
-
-                align-content: center;
-
-                align-items: center;
-
-                column-gap: 6px;
-
-                row-gap: 3px;
-
-                min-width: 105px;
-
-                min-height: 58px;
-
-                padding: 7px 9px;
-
-                box-sizing: border-box;
-
-                border-radius: 10px;
-
-                border: 1px solid rgba(
-                    255,
-                    255,
-                    255,
-                    0.075
-                );
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    0.035
-                );
-
-                transition:
-                    transform 0.2s ease,
-                    background 0.2s ease,
-                    border-color 0.2s ease,
-                    box-shadow 0.2s ease;
-
-            }
-
-
-            #tradingSessionsPanel
-            .session-mini-card:hover {
-
-                transform:
-                    translateY(-2px);
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    0.065
-                );
-
-                border-color: rgba(
-                    255,
-                    255,
-                    255,
-                    0.13
-                );
-
-            }
-
-
-            /* =================================================
-               NOM SESSION
-               ================================================= */
-
-            #tradingSessionsPanel
-            .session-mini-title {
-
-                display: flex;
-
-                align-items: center;
-
-                gap: 5px;
-
-                grid-column: 1 / -1;
-
-                font-size: 10px;
-
-                line-height: 1;
-
-                white-space: nowrap;
-
-            }
-
-
-            #tradingSessionsPanel
-            .session-mini-title strong {
-
-                font-size: 10px;
-
-                font-weight: 800;
-
-            }
-
-
-            /* =================================================
-               STATUT
-               ================================================= */
-
-            #tradingSessionsPanel
-            .session-mini-status {
-
-                font-size: 9px;
-
-                font-weight: 700;
-
-                line-height: 1;
-
-                white-space: nowrap;
-
-                opacity: 0.72;
-
-            }
-
-
-            /* =================================================
-               HEURES
-               ================================================= */
-
-            #tradingSessionsPanel
-            .session-mini-hours {
-
-                display: flex;
-
-                align-items: center;
-
-                justify-content: flex-end;
-
-                gap: 4px;
-
-                font-size: 8px;
-
-                line-height: 1;
-
-                white-space: nowrap;
-
-                opacity: 0.52;
-
-            }
-
-
-            #tradingSessionsPanel
-            .session-mini-hours strong {
-
-                font-size: 9px;
-
-                font-weight: 700;
-
-                opacity: 1;
 
             }
 
@@ -610,40 +413,9 @@
                ================================================= */
 
             #tradingSessionsPanel
-            .session-mini-card.session-open {
-
-                border-color: rgba(
-                    34,
-                    197,
-                    94,
-                    0.34
-                );
-
-                background: rgba(
-                    34,
-                    197,
-                    94,
-                    0.08
-                );
-
-                box-shadow:
-                    0 0 16px rgba(
-                        34,
-                        197,
-                        94,
-                        0.08
-                    );
-
-            }
-
-
-            #tradingSessionsPanel
-            .session-mini-card.session-open
-            .session-mini-status {
+            .session-current-name.open {
 
                 color: #4ade80;
-
-                opacity: 1;
 
             }
 
@@ -673,35 +445,27 @@
                     );
 
                 box-shadow:
-                    0 10px 30px rgba(
+                    0 8px 26px rgba(
                         15,
                         23,
                         42,
-                        0.11
+                        0.10
                     );
 
             }
 
 
             /* =================================================
-               ÉCRANS MOYENS
+               ÉCRAN MOYEN
                ================================================= */
 
-            @media (max-width: 1250px) {
+            @media (max-width: 1200px) {
 
                 #tradingSessionsPanel {
 
-                    width: min(
-                        760px,
-                        calc(100% - 16px)
-                    );
+                    max-width: 620px;
 
-                }
-
-                #tradingSessionsPanel
-                .sessions-main {
-
-                    min-width: 350px;
+                    min-width: 440px;
 
                 }
 
@@ -711,25 +475,11 @@
                 #tradingSessionsPanel
                 .session-next {
 
-                    min-width: 165px;
-
                     padding-left: 9px;
 
                     padding-right: 9px;
 
-                }
-
-                #tradingSessionsPanel
-                .sessions-list {
-
-                    min-width: 380px;
-
-                }
-
-                #tradingSessionsPanel
-                .session-mini-card {
-
-                    min-width: 92px;
+                    gap: 6px;
 
                 }
 
@@ -740,30 +490,20 @@
                TABLETTE
                ================================================= */
 
-            @media (max-width: 980px) {
+            @media (max-width: 900px) {
 
                 #tradingSessionsPanel {
 
-                    max-width: 650px;
+                    max-width: 540px;
+
+                    min-width: 0;
 
                 }
 
                 #tradingSessionsPanel
-                .sessions-list {
+                .session-label {
 
-                    grid-template-columns:
-                        repeat(4, minmax(82px, 1fr));
-
-                    min-width: 340px;
-
-                }
-
-                #tradingSessionsPanel
-                .session-mini-card {
-
-                    min-width: 82px;
-
-                    padding: 6px;
+                    display: none;
 
                 }
 
@@ -774,7 +514,7 @@
                PETIT ÉCRAN
                ================================================= */
 
-            @media (max-width: 760px) {
+            @media (max-width: 650px) {
 
                 #tradingSessionsPanel {
 
@@ -782,11 +522,9 @@
 
                     max-width: none;
 
-                    margin: 8px auto;
+                    min-width: 0;
 
-                    flex-wrap: wrap;
-
-                    justify-content: center;
+                    margin: 7px auto;
 
                 }
 
@@ -794,11 +532,9 @@
                 #tradingSessionsPanel
                 .sessions-main {
 
-                    width: 100%;
+                    flex-wrap: wrap;
 
-                    min-width: 0;
-
-                    justify-content: center;
+                    row-gap: 5px;
 
                 }
 
@@ -809,30 +545,15 @@
                 #tradingSessionsPanel
                 .session-next {
 
-                    flex: 1 1 0;
-
-                    min-width: 0;
+                    padding: 2px 7px;
 
                 }
 
 
                 #tradingSessionsPanel
-                .sessions-list {
+                .sessions-weekend {
 
-                    width: 100%;
-
-                    min-width: 0;
-
-                    grid-template-columns:
-                        repeat(4, 1fr);
-
-                }
-
-
-                #tradingSessionsPanel
-                .session-mini-card {
-
-                    min-width: 0;
+                    margin-left: 4px;
 
                 }
 
@@ -843,14 +564,21 @@
                TRÈS PETIT ÉCRAN
                ================================================= */
 
-            @media (max-width: 540px) {
+            @media (max-width: 480px) {
+
+                #tradingSessionsPanel {
+
+                    padding: 8px;
+
+                }
+
 
                 #tradingSessionsPanel
                 .sessions-main {
 
                     flex-direction: column;
 
-                    gap: 4px;
+                    align-items: stretch;
 
                 }
 
@@ -865,8 +593,10 @@
                             255,
                             255,
                             255,
-                            0.09
+                            0.08
                         );
+
+                    padding-bottom: 7px;
 
                 }
 
@@ -877,18 +607,7 @@
                 #tradingSessionsPanel
                 .session-next {
 
-                    width: 100%;
-
-                    min-width: 0;
-
-                }
-
-
-                #tradingSessionsPanel
-                .sessions-list {
-
-                    grid-template-columns:
-                        repeat(2, 1fr);
+                    justify-content: center;
 
                 }
 
@@ -903,10 +622,13 @@
 
 
     /* =====================================================
-       OUTILS DATE / HEURE
+       DATE / HEURE
        ===================================================== */
 
-    function getParts(date, timezone) {
+    function getParts(
+        date,
+        timezone
+    ) {
 
         const formatter =
             new Intl.DateTimeFormat(
@@ -933,7 +655,9 @@
 
         parts.forEach(function (part) {
 
-            if (part.type !== "literal") {
+            if (
+                part.type !== "literal"
+            ) {
 
                 result[part.type] =
                     Number(part.value);
@@ -951,9 +675,15 @@
     function getTimeString(parts) {
 
         return (
-            String(parts.hour).padStart(2, "0") +
+            String(parts.hour).padStart(
+                2,
+                "0"
+            ) +
             ":" +
-            String(parts.minute).padStart(2, "0")
+            String(parts.minute).padStart(
+                2,
+                "0"
+            )
         );
 
     }
@@ -962,17 +692,29 @@
     function getFullTimeString(parts) {
 
         return (
-            String(parts.hour).padStart(2, "0") +
+            String(parts.hour).padStart(
+                2,
+                "0"
+            ) +
             ":" +
-            String(parts.minute).padStart(2, "0") +
+            String(parts.minute).padStart(
+                2,
+                "0"
+            ) +
             ":" +
-            String(parts.second).padStart(2, "0")
+            String(parts.second).padStart(
+                2,
+                "0"
+            )
         );
 
     }
 
 
-    function getDayOfWeek(date, timezone) {
+    function getDayOfWeek(
+        date,
+        timezone
+    ) {
 
         const formatter =
             new Intl.DateTimeFormat(
@@ -1007,7 +749,7 @@
 
 
     /* =====================================================
-       CONVERSION DATE LOCALE
+       CONVERSION DATE
        ===================================================== */
 
     function createDateFromParts(
@@ -1033,7 +775,11 @@
             new Date(utcGuess);
 
 
-        for (let i = 0; i < 3; i++) {
+        for (
+            let i = 0;
+            i < 3;
+            i++
+        ) {
 
             const actual =
                 getParts(
@@ -1057,14 +803,18 @@
                 actualMinutes;
 
 
-            if (difference > 720) {
+            if (
+                difference > 720
+            ) {
 
                 difference -= 1440;
 
             }
 
 
-            if (difference < -720) {
+            if (
+                difference < -720
+            ) {
 
                 difference += 1440;
 
@@ -1088,7 +838,7 @@
 
 
     /* =====================================================
-       ÉTAT D'UNE SESSION
+       ÉTAT SESSION
        ===================================================== */
 
     function getSessionState(
@@ -1118,16 +868,27 @@
 
 
         const open =
-            currentMinutes >= openMinutes &&
-            currentMinutes < closeMinutes;
+            currentMinutes >=
+            openMinutes &&
+            currentMinutes <
+            closeMinutes;
 
 
         return {
+
             open: open,
+
             parts: parts,
-            currentMinutes: currentMinutes,
-            openMinutes: openMinutes,
-            closeMinutes: closeMinutes
+
+            currentMinutes:
+                currentMinutes,
+
+            openMinutes:
+                openMinutes,
+
+            closeMinutes:
+                closeMinutes
+
         };
 
     }
@@ -1146,7 +907,11 @@
             new Date(now);
 
 
-        for (let i = 0; i < 8; i++) {
+        for (
+            let i = 0;
+            i < 8;
+            i++
+        ) {
 
             const parts =
                 getParts(
@@ -1165,7 +930,9 @@
                 );
 
 
-            if (candidateDate > now) {
+            if (
+                candidateDate > now
+            ) {
 
                 return candidateDate;
 
@@ -1190,7 +957,7 @@
 
 
     /* =====================================================
-       FERMETURE
+       FERMETURE SESSION
        ===================================================== */
 
     function getCloseDate(
@@ -1215,7 +982,9 @@
             );
 
 
-        if (closeDate <= now) {
+        if (
+            closeDate <= now
+        ) {
 
             return new Date(
                 closeDate.getTime() +
@@ -1241,7 +1010,9 @@
         milliseconds
     ) {
 
-        if (milliseconds < 0) {
+        if (
+            milliseconds < 0
+        ) {
 
             milliseconds = 0;
 
@@ -1262,13 +1033,17 @@
 
         const hours =
             Math.floor(
-                (totalSeconds % 86400) / 3600
+                (
+                    totalSeconds % 86400
+                ) / 3600
             );
 
 
         const minutes =
             Math.floor(
-                (totalSeconds % 3600) / 60
+                (
+                    totalSeconds % 3600
+                ) / 60
             );
 
 
@@ -1279,7 +1054,9 @@
         let result = "";
 
 
-        if (days > 0) {
+        if (
+            days > 0
+        ) {
 
             result +=
                 days +
@@ -1289,11 +1066,20 @@
 
 
         result +=
-            String(hours).padStart(2, "0") +
+            String(hours).padStart(
+                2,
+                "0"
+            ) +
             "h " +
-            String(minutes).padStart(2, "0") +
+            String(minutes).padStart(
+                2,
+                "0"
+            ) +
             "m " +
-            String(seconds).padStart(2, "0") +
+            String(seconds).padStart(
+                2,
+                "0"
+            ) +
             "s";
 
 
@@ -1317,7 +1103,9 @@
         if (!panel) {
 
             panel =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             panel.id =
@@ -1330,60 +1118,60 @@
 
                     <div class="session-current">
 
-                        <div class="session-label">
+                        <span class="session-label">
                             SESSION ACTUELLE
-                        </div>
+                        </span>
 
-                        <div
+                        <span
                             id="currentSessionName"
                             class="session-current-name"
                         >
                             —
-                        </div>
+                        </span>
 
-                        <div
+                        <span
                             id="currentSessionStatus"
                             class="session-status"
                         >
                             —
-                        </div>
+                        </span>
 
-                        <div
+                        <span
                             id="currentSessionCountdown"
                             class="session-countdown"
                         >
                             —
-                        </div>
+                        </span>
 
                     </div>
 
 
                     <div class="session-next">
 
-                        <div class="session-label">
-                            PROCHAINE SESSION
-                        </div>
+                        <span class="session-label">
+                            PROCHAINE
+                        </span>
 
-                        <div
+                        <span
                             id="nextSessionName"
                             class="session-next-name"
                         >
                             —
-                        </div>
+                        </span>
 
-                        <div
+                        <span
                             id="nextSessionTime"
                             class="session-time-line"
                         >
                             —
-                        </div>
+                        </span>
 
-                        <div
+                        <span
                             id="nextSessionCountdown"
                             class="session-countdown small"
                         >
                             —
-                        </div>
+                        </span>
 
                     </div>
 
@@ -1397,12 +1185,6 @@
                 >
                     🛑 Week-end
                 </div>
-
-
-                <div
-                    id="sessionsList"
-                    class="sessions-list"
-                ></div>
 
             `;
 
@@ -1424,12 +1206,14 @@
         if (topbar) {
 
             if (
-                panel.parentElement !== topbar
+                panel.parentElement !==
+                topbar
             ) {
 
                 if (
                     themeButton &&
-                    themeButton.parentElement === topbar
+                    themeButton.parentElement ===
+                    topbar
                 ) {
 
                     topbar.insertBefore(
@@ -1472,104 +1256,6 @@
 
 
     /* =====================================================
-       CRÉATION DES CARTES
-       ===================================================== */
-
-    function createSessionCards() {
-
-        const container =
-            document.getElementById(
-                "sessionsList"
-            );
-
-
-        if (!container) {
-
-            return;
-
-        }
-
-
-        container.innerHTML = "";
-
-
-        SESSIONS.forEach(
-            function (session) {
-
-                const card =
-                    document.createElement("div");
-
-
-                card.className =
-                    "session-mini-card";
-
-
-                card.dataset.session =
-                    session.id;
-
-
-                card.innerHTML = `
-
-                    <div class="session-mini-title">
-
-                        <span>
-                            ${session.country}
-                        </span>
-
-                        <strong>
-                            ${session.name}
-                        </strong>
-
-                    </div>
-
-
-                    <div
-                        class="session-mini-status"
-                        data-status
-                    >
-                        —
-                    </div>
-
-
-                    <div class="session-mini-hours">
-
-                        <span>
-                            Local
-                        </span>
-
-                        <strong data-local>
-                            —
-                        </strong>
-
-                    </div>
-
-
-                    <div class="session-mini-hours">
-
-                        <span>
-                            MG
-                        </span>
-
-                        <strong data-mada>
-                            —
-                        </strong>
-
-                    </div>
-
-                `;
-
-
-                container.appendChild(
-                    card
-                );
-
-            }
-        );
-
-    }
-
-
-    /* =====================================================
        MISE À JOUR
        ===================================================== */
 
@@ -1581,22 +1267,6 @@
 
         const weekend =
             isWeekend(now);
-
-
-        const weekendElement =
-            document.getElementById(
-                "sessionsWeekend"
-            );
-
-
-        if (weekendElement) {
-
-            weekendElement.style.display =
-                weekend
-                    ? "inline-flex"
-                    : "none";
-
-        }
 
 
         /* =================================================
@@ -1617,7 +1287,7 @@
 
 
         /* =================================================
-           ÉTATS
+           ÉTATS DES SESSIONS
            ================================================= */
 
         const states =
@@ -1625,12 +1295,16 @@
                 function (session) {
 
                     return {
-                        session: session,
+
+                        session:
+                            session,
+
                         state:
                             getSessionState(
                                 session,
                                 now
                             )
+
                     };
 
                 }
@@ -1696,6 +1370,11 @@
                     current.session.name;
 
 
+                currentName.classList.add(
+                    "open"
+                );
+
+
                 currentStatus.textContent =
                     "🟢 Ouverte";
 
@@ -1717,6 +1396,11 @@
             }
 
             else {
+
+                currentName.classList.remove(
+                    "open"
+                );
+
 
                 currentName.textContent =
                     weekend
@@ -1759,8 +1443,13 @@
                 if (nextDate) {
 
                     upcoming.push({
-                        session: session,
-                        date: nextDate
+
+                        session:
+                            session,
+
+                        date:
+                            nextDate
+
                     });
 
                 }
@@ -1902,110 +1591,23 @@
 
 
         /* =================================================
-           MINI CARTES
+           WEEK-END
            ================================================= */
 
-        states.forEach(
-            function (item) {
-
-                const session =
-                    item.session;
-
-
-                const state =
-                    item.state;
+        const weekendElement =
+            document.getElementById(
+                "sessionsWeekend"
+            );
 
 
-                const card =
-                    document.querySelector(
-                        '[data-session="' +
-                        session.id +
-                        '"]'
-                    );
+        if (weekendElement) {
 
+            weekendElement.style.display =
+                weekend
+                    ? "inline-flex"
+                    : "none";
 
-                if (!card) {
-
-                    return;
-
-                }
-
-
-                const status =
-                    card.querySelector(
-                        "[data-status]"
-                    );
-
-
-                const local =
-                    card.querySelector(
-                        "[data-local]"
-                    );
-
-
-                const mada =
-                    card.querySelector(
-                        "[data-mada]"
-                    );
-
-
-                if (local) {
-
-                    local.textContent =
-                        getTimeString(
-                            state.parts
-                        );
-
-                }
-
-
-                if (mada) {
-
-                    mada.textContent =
-                        madaTime;
-
-                }
-
-
-                if (
-                    state.open &&
-                    !weekend
-                ) {
-
-                    card.classList.add(
-                        "session-open"
-                    );
-
-
-                    if (status) {
-
-                        status.textContent =
-                            "🟢 Ouverte";
-
-                    }
-
-                }
-
-                else {
-
-                    card.classList.remove(
-                        "session-open"
-                    );
-
-
-                    if (status) {
-
-                        status.textContent =
-                            weekend
-                                ? "🔴 Fermée"
-                                : "⚪ Fermée";
-
-                    }
-
-                }
-
-            }
-        );
+        }
 
     }
 
@@ -2019,8 +1621,6 @@
         injectSessionStyles();
 
         createPanel();
-
-        createSessionCards();
 
         updatePanel();
 
@@ -2044,7 +1644,7 @@
 
 
     /* =====================================================
-       ATTENTE DOM
+       DOM
        ===================================================== */
 
     if (
