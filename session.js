@@ -13,7 +13,7 @@
    - Week-end = marché fermé
    - Prochaine session
    - Compte à rebours
-   - Affichage compact et esthétique
+   - Affichage compact, large et esthétique
    ========================================================= */
 
 (function () {
@@ -102,59 +102,67 @@
         style.textContent = `
 
             /* =================================================
-               CONTENEUR PRINCIPAL
+               PANNEAU PRINCIPAL
                ================================================= */
 
             #tradingSessionsPanel {
 
-                position: relative;
-
                 display: flex;
 
-                align-items: center;
+                align-items: stretch;
 
-                gap: 12px;
+                justify-content: center;
 
-                width: auto;
+                gap: 10px;
 
-                max-width: 760px;
+                width: min(
+                    900px,
+                    calc(100% - 20px)
+                );
+
+                max-width: 900px;
 
                 min-width: 0;
 
                 margin: 0 auto;
 
-                padding: 8px 10px;
+                padding: 10px 12px;
+
+                box-sizing: border-box;
+
+                border-radius: 16px;
 
                 border: 1px solid rgba(
                     255,
                     255,
                     255,
-                    0.10
+                    0.12
                 );
-
-                border-radius: 14px;
 
                 background:
                     linear-gradient(
                         135deg,
-                        rgba(255,255,255,0.075),
-                        rgba(255,255,255,0.025)
+                        rgba(255,255,255,0.085),
+                        rgba(255,255,255,0.035)
                     );
 
                 box-shadow:
-                    0 8px 24px rgba(0,0,0,0.18),
+                    0 10px 30px rgba(
+                        0,
+                        0,
+                        0,
+                        0.20
+                    ),
                     inset 0 1px 0 rgba(
                         255,
                         255,
                         255,
-                        0.05
+                        0.07
                     );
 
-                backdrop-filter: blur(12px);
+                backdrop-filter: blur(14px);
 
-                -webkit-backdrop-filter: blur(12px);
-
-                box-sizing: border-box;
+                -webkit-backdrop-filter: blur(14px);
 
                 flex: 0 1 auto !important;
 
@@ -173,51 +181,70 @@
 
                 align-items: stretch;
 
-                gap: 0;
+                flex: 0 0 auto;
 
-                min-width: 0;
-
-                flex: 0 1 auto;
+                min-width: 390px;
 
             }
 
 
-            #tradingSessionsPanel .session-current,
+            #tradingSessionsPanel
+            .session-current,
 
-            #tradingSessionsPanel .session-next {
+            #tradingSessionsPanel
+            .session-next {
 
                 display: grid;
 
-                grid-template-columns:
-                    auto
-                    auto
-                    auto;
+                align-content: center;
 
                 align-items: center;
 
-                gap: 5px 8px;
+                grid-template-columns:
+                    auto
+                    auto;
 
-                min-width: 0;
+                column-gap: 10px;
 
-                padding: 3px 11px;
+                row-gap: 5px;
+
+                min-width: 185px;
+
+                padding: 3px 13px;
+
+                box-sizing: border-box;
 
             }
 
 
-            #tradingSessionsPanel .session-current {
+            #tradingSessionsPanel
+            .session-current {
 
                 border-right:
                     1px solid rgba(
                         255,
                         255,
                         255,
-                        0.10
+                        0.11
                     );
 
             }
 
 
-            #tradingSessionsPanel .session-label {
+            #tradingSessionsPanel
+            .session-next {
+
+                min-width: 205px;
+
+            }
+
+
+            /* =================================================
+               TITRES
+               ================================================= */
+
+            #tradingSessionsPanel
+            .session-label {
 
                 grid-column: 1 / -1;
 
@@ -225,11 +252,13 @@
 
                 font-weight: 800;
 
-                letter-spacing: 1px;
+                letter-spacing: 1.2px;
+
+                line-height: 1;
 
                 text-transform: uppercase;
 
-                opacity: 0.55;
+                opacity: 0.52;
 
                 white-space: nowrap;
 
@@ -246,6 +275,8 @@
 
                 font-weight: 800;
 
+                line-height: 1.2;
+
                 white-space: nowrap;
 
             }
@@ -258,12 +289,18 @@
 
                 font-weight: 700;
 
+                line-height: 1.2;
+
                 white-space: nowrap;
 
                 opacity: 0.78;
 
             }
 
+
+            /* =================================================
+               COMPTE À REBOURS
+               ================================================= */
 
             #tradingSessionsPanel
             .session-countdown {
@@ -272,17 +309,26 @@
 
                 font-weight: 800;
 
+                line-height: 1;
+
                 white-space: nowrap;
 
-                padding: 3px 7px;
+                padding: 5px 8px;
 
-                border-radius: 7px;
+                border-radius: 8px;
 
                 background: rgba(
                     255,
                     255,
                     255,
-                    0.07
+                    0.075
+                );
+
+                border: 1px solid rgba(
+                    255,
+                    255,
+                    255,
+                    0.06
                 );
 
             }
@@ -297,20 +343,33 @@
                     56,
                     189,
                     248,
-                    0.10
+                    0.11
+                );
+
+                border-color: rgba(
+                    56,
+                    189,
+                    248,
+                    0.16
                 );
 
             }
 
+
+            /* =================================================
+               INFORMATIONS PROCHAINE SESSION
+               ================================================= */
 
             #tradingSessionsPanel
             .session-time-line {
 
                 font-size: 9px;
 
-                opacity: 0.68;
+                line-height: 1.2;
 
                 white-space: nowrap;
+
+                opacity: 0.68;
 
             }
 
@@ -319,11 +378,14 @@
                WEEK-END
                ================================================= */
 
-            #tradingSessionsPanel .sessions-weekend {
+            #tradingSessionsPanel
+            .sessions-weekend {
 
                 display: inline-flex;
 
                 align-items: center;
+
+                align-self: center;
 
                 white-space: nowrap;
 
@@ -331,9 +393,11 @@
 
                 font-weight: 700;
 
-                padding: 4px 8px;
+                line-height: 1;
 
-                border-radius: 7px;
+                padding: 6px 9px;
+
+                border-radius: 8px;
 
                 background: rgba(
                     239,
@@ -346,7 +410,7 @@
                     239,
                     68,
                     68,
-                    0.16
+                    0.18
                 );
 
             }
@@ -356,23 +420,25 @@
                LISTE DES SESSIONS
                ================================================= */
 
-            #tradingSessionsPanel .sessions-list {
+            #tradingSessionsPanel
+            .sessions-list {
 
-                display: flex;
+                display: grid;
 
-                align-items: center;
+                grid-template-columns:
+                    repeat(4, minmax(105px, 1fr));
 
-                gap: 5px;
+                gap: 6px;
 
-                min-width: 0;
+                flex: 1 1 auto;
 
-                flex: 0 1 auto;
+                min-width: 430px;
 
             }
 
 
             /* =================================================
-               MINI CARTES
+               CARTES SYDNEY / TOKYO / LONDRES / NEW YORK
                ================================================= */
 
             #tradingSessionsPanel
@@ -381,26 +447,31 @@
                 display: grid;
 
                 grid-template-columns:
-                    auto
-                    auto;
+                    auto 1fr;
+
+                align-content: center;
 
                 align-items: center;
 
                 column-gap: 6px;
 
-                row-gap: 1px;
+                row-gap: 3px;
 
-                min-width: 92px;
+                min-width: 105px;
 
-                padding: 5px 7px;
+                min-height: 58px;
 
-                border-radius: 9px;
+                padding: 7px 9px;
+
+                box-sizing: border-box;
+
+                border-radius: 10px;
 
                 border: 1px solid rgba(
                     255,
                     255,
                     255,
-                    0.07
+                    0.075
                 );
 
                 background: rgba(
@@ -423,7 +494,7 @@
             .session-mini-card:hover {
 
                 transform:
-                    translateY(-1px);
+                    translateY(-2px);
 
                 background: rgba(
                     255,
@@ -432,8 +503,19 @@
                     0.065
                 );
 
+                border-color: rgba(
+                    255,
+                    255,
+                    255,
+                    0.13
+                );
+
             }
 
+
+            /* =================================================
+               NOM SESSION
+               ================================================= */
 
             #tradingSessionsPanel
             .session-mini-title {
@@ -442,11 +524,13 @@
 
                 align-items: center;
 
-                gap: 4px;
+                gap: 5px;
 
                 grid-column: 1 / -1;
 
-                font-size: 9px;
+                font-size: 10px;
+
+                line-height: 1;
 
                 white-space: nowrap;
 
@@ -456,26 +540,36 @@
             #tradingSessionsPanel
             .session-mini-title strong {
 
-                font-size: 9px;
+                font-size: 10px;
 
                 font-weight: 800;
 
             }
 
 
+            /* =================================================
+               STATUT
+               ================================================= */
+
             #tradingSessionsPanel
             .session-mini-status {
 
-                font-size: 8px;
+                font-size: 9px;
 
                 font-weight: 700;
 
+                line-height: 1;
+
                 white-space: nowrap;
 
-                opacity: 0.70;
+                opacity: 0.72;
 
             }
 
+
+            /* =================================================
+               HEURES
+               ================================================= */
 
             #tradingSessionsPanel
             .session-mini-hours {
@@ -484,11 +578,15 @@
 
                 align-items: center;
 
-                gap: 3px;
+                justify-content: flex-end;
+
+                gap: 4px;
+
+                font-size: 8px;
+
+                line-height: 1;
 
                 white-space: nowrap;
-
-                font-size: 7px;
 
                 opacity: 0.52;
 
@@ -498,7 +596,7 @@
             #tradingSessionsPanel
             .session-mini-hours strong {
 
-                font-size: 8px;
+                font-size: 9px;
 
                 font-weight: 700;
 
@@ -518,7 +616,7 @@
                     34,
                     197,
                     94,
-                    0.32
+                    0.34
                 );
 
                 background: rgba(
@@ -529,7 +627,7 @@
                 );
 
                 box-shadow:
-                    0 0 12px rgba(
+                    0 0 16px rgba(
                         34,
                         197,
                         94,
@@ -564,60 +662,127 @@
                     15,
                     23,
                     42,
-                    0.10
+                    0.11
                 );
 
                 background:
                     linear-gradient(
                         135deg,
-                        rgba(255,255,255,0.92),
-                        rgba(248,250,252,0.90)
+                        rgba(255,255,255,0.96),
+                        rgba(248,250,252,0.92)
                     );
 
                 box-shadow:
-                    0 8px 24px rgba(
+                    0 10px 30px rgba(
                         15,
                         23,
                         42,
-                        0.10
+                        0.11
                     );
 
             }
 
 
             /* =================================================
-               PETITS ÉCRANS
+               ÉCRANS MOYENS
                ================================================= */
 
-            @media (max-width: 1100px) {
+            @media (max-width: 1250px) {
 
                 #tradingSessionsPanel {
 
-                    max-width: 600px;
+                    width: min(
+                        760px,
+                        calc(100% - 16px)
+                    );
+
+                }
+
+                #tradingSessionsPanel
+                .sessions-main {
+
+                    min-width: 350px;
+
+                }
+
+                #tradingSessionsPanel
+                .session-current,
+
+                #tradingSessionsPanel
+                .session-next {
+
+                    min-width: 165px;
+
+                    padding-left: 9px;
+
+                    padding-right: 9px;
 
                 }
 
                 #tradingSessionsPanel
                 .sessions-list {
 
-                    display: none;
+                    min-width: 380px;
+
+                }
+
+                #tradingSessionsPanel
+                .session-mini-card {
+
+                    min-width: 92px;
 
                 }
 
             }
 
 
+            /* =================================================
+               TABLETTE
+               ================================================= */
+
+            @media (max-width: 980px) {
+
+                #tradingSessionsPanel {
+
+                    max-width: 650px;
+
+                }
+
+                #tradingSessionsPanel
+                .sessions-list {
+
+                    grid-template-columns:
+                        repeat(4, minmax(82px, 1fr));
+
+                    min-width: 340px;
+
+                }
+
+                #tradingSessionsPanel
+                .session-mini-card {
+
+                    min-width: 82px;
+
+                    padding: 6px;
+
+                }
+
+            }
+
+
+            /* =================================================
+               PETIT ÉCRAN
+               ================================================= */
+
             @media (max-width: 760px) {
 
                 #tradingSessionsPanel {
 
-                    width: 100%;
+                    width: calc(100% - 12px);
 
                     max-width: none;
 
-                    margin: 8px 0;
-
-                    padding: 7px;
+                    margin: 8px auto;
 
                     flex-wrap: wrap;
 
@@ -630,6 +795,8 @@
                 .sessions-main {
 
                     width: 100%;
+
+                    min-width: 0;
 
                     justify-content: center;
 
@@ -644,20 +811,39 @@
 
                     flex: 1 1 0;
 
+                    min-width: 0;
+
                 }
 
 
                 #tradingSessionsPanel
-                .sessions-weekend {
+                .sessions-list {
 
-                    display: inline-flex;
+                    width: 100%;
+
+                    min-width: 0;
+
+                    grid-template-columns:
+                        repeat(4, 1fr);
+
+                }
+
+
+                #tradingSessionsPanel
+                .session-mini-card {
+
+                    min-width: 0;
 
                 }
 
             }
 
 
-            @media (max-width: 520px) {
+            /* =================================================
+               TRÈS PETIT ÉCRAN
+               ================================================= */
+
+            @media (max-width: 540px) {
 
                 #tradingSessionsPanel
                 .sessions-main {
@@ -679,7 +865,7 @@
                             255,
                             255,
                             255,
-                            0.08
+                            0.09
                         );
 
                 }
@@ -693,19 +879,16 @@
 
                     width: 100%;
 
-                    justify-content: center;
+                    min-width: 0;
 
                 }
 
 
                 #tradingSessionsPanel
-                .session-time-line {
+                .sessions-list {
 
-                    max-width: 150px;
-
-                    overflow: hidden;
-
-                    text-overflow: ellipsis;
+                    grid-template-columns:
+                        repeat(2, 1fr);
 
                 }
 
@@ -740,10 +923,13 @@
                 }
             );
 
+
         const parts =
             formatter.formatToParts(date);
 
+
         const result = {};
+
 
         parts.forEach(function (part) {
 
@@ -755,6 +941,7 @@
             }
 
         });
+
 
         return result;
 
@@ -796,6 +983,7 @@
                 }
             );
 
+
         return formatter.format(date);
 
     }
@@ -808,6 +996,7 @@
                 date,
                 MADAGASCAR_TIMEZONE
             );
+
 
         return (
             day === "Sat" ||
@@ -839,6 +1028,7 @@
                 second
             );
 
+
         let date =
             new Date(utcGuess);
 
@@ -851,13 +1041,16 @@
                     timezone
                 );
 
+
             const desiredMinutes =
                 hour * 60 +
                 minute;
 
+
             const actualMinutes =
                 actual.hour * 60 +
                 actual.minute;
+
 
             let difference =
                 desiredMinutes -
@@ -888,6 +1081,7 @@
 
         }
 
+
         return date;
 
     }
@@ -908,16 +1102,20 @@
                 session.timezone
             );
 
+
         const currentMinutes =
             parts.hour * 60 +
             parts.minute +
             parts.second / 60;
 
+
         const openMinutes =
             session.openHour * 60;
 
+
         const closeMinutes =
             session.closeHour * 60;
+
 
         const open =
             currentMinutes >= openMinutes &&
@@ -956,6 +1154,7 @@
                     session.timezone
                 );
 
+
             const candidateDate =
                 createDateFromParts(
                     parts,
@@ -991,7 +1190,7 @@
 
 
     /* =====================================================
-       FERMETURE D'UNE SESSION
+       FERMETURE
        ===================================================== */
 
     function getCloseDate(
@@ -1004,6 +1203,7 @@
                 now,
                 session.timezone
             );
+
 
         const closeDate =
             createDateFromParts(
@@ -1118,6 +1318,7 @@
 
             panel =
                 document.createElement("div");
+
 
             panel.id =
                 "tradingSessionsPanel";
@@ -1249,6 +1450,7 @@
             }
 
         }
+
         else if (
             !panel.parentElement
         ) {
@@ -1270,7 +1472,7 @@
 
 
     /* =====================================================
-       CRÉATION DES MINI CARTES
+       CRÉATION DES CARTES
        ===================================================== */
 
     function createSessionCards() {
@@ -1436,7 +1638,7 @@
 
 
         /* =================================================
-           SESSIONS OUVERTES
+           SESSION ACTUELLE
            ================================================= */
 
         let currentSessions =
