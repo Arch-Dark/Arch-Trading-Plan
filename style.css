@@ -272,39 +272,106 @@ button {
    =========================================================
 
    Le panneau est ajouté dynamiquement par session.js.
-   On le sort du système flex du header afin qu'il puisse
-   rester parfaitement centré sans être comprimé.
+
+   Il est placé légèrement à gauche du centre du header
+   afin de laisser un espace propre avec le bouton thème.
+
+   Les deux blocs :
+   - session actuelle
+   - prochaine session
+
+   sont séparés en deux colonnes afin d'empêcher les
+   textes de se rejoindre au centre.
    ========================================================= */
 
 #tradingSessionsPanel {
     position: absolute !important;
 
-    left: 50% !important;
-    top: 50% !important;
+    left:
+        calc(50% - 35px) !important;
+
+    top:
+        50% !important;
 
     transform:
         translate(-50%, -50%) !important;
 
-    z-index: 2;
+    z-index:
+        2;
 
-    width: max-content;
+    width:
+        min(720px, calc(100% - 430px));
 
     max-width:
-        min(
-            720px,
-            calc(100% - 430px)
-        );
+        720px;
 
     min-width:
-        430px;
+        520px;
 
-    margin: 0 !important;
+    margin:
+        0 !important;
+
+    padding:
+        10px 18px;
+
+    display:
+        grid !important;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    align-items:
+        center;
+
+    justify-content:
+        stretch;
+
+    gap:
+        30px;
 
     flex:
         none !important;
 
     flex-shrink:
         0 !important;
+
+    pointer-events:
+        auto;
+}
+
+
+/*
+   Protection générale des éléments internes.
+*/
+
+#tradingSessionsPanel * {
+    box-sizing:
+        border-box;
+
+    min-width:
+        0;
+}
+
+
+/*
+   Les deux zones principales du widget
+   occupent chacune leur propre espace.
+*/
+
+#tradingSessionsPanel .session-current,
+#tradingSessionsPanel .session-next {
+    min-width:
+        0 !important;
+
+    width:
+        100% !important;
+
+    justify-self:
+        stretch !important;
+
+    text-align:
+        left !important;
 
     display:
         flex;
@@ -313,38 +380,34 @@ button {
         center;
 
     justify-content:
-        center;
+        flex-start !important;
 
-    pointer-events:
-        auto;
+    gap:
+        8px;
+
+    white-space:
+        normal;
 }
 
 
 /*
-   Protection contre les règles flex héritées
-   des éléments internes du widget.
+   Les éléments internes restent alignés à gauche
+   au lieu de se concentrer vers le centre.
 */
 
-#tradingSessionsPanel * {
-    box-sizing:
-        border-box;
-}
-
-
-/*
-   Si le widget utilise une structure horizontale,
-   elle conserve une taille naturelle.
-*/
-
-#tradingSessionsPanel .session-current,
-#tradingSessionsPanel .session-next {
+#tradingSessionsPanel .session-current > *,
+#tradingSessionsPanel .session-next > * {
     min-width:
         0;
+
+    max-width:
+        100%;
 }
 
 
 /*
-   Évite que les textes longs forcent le header.
+   Empêche les textes de forcer une largeur
+   excessive dans le header.
 */
 
 #tradingSessionsPanel span,
@@ -2418,16 +2481,26 @@ body.light-theme #tradingSessionsPanel {
 
 
     /*
-       Le widget reste centré mais dispose de moins
-       d'espace sur les écrans moyens.
+       Sur écran moyen, on réduit légèrement
+       la largeur du widget tout en gardant
+       les deux zones séparées.
     */
 
     #tradingSessionsPanel {
+        left:
+            calc(50% - 20px) !important;
+
+        width:
+            min(650px, calc(100% - 360px));
+
         max-width:
-            calc(100% - 360px);
+            650px;
 
         min-width:
-            360px;
+            450px;
+
+        gap:
+            20px;
     }
 }
 
@@ -2472,8 +2545,7 @@ body.light-theme #tradingSessionsPanel {
 
 
     /*
-       À partir de 900px, on donne au widget
-       une zone plus confortable sous le header.
+       Sur tablette, le widget descend sous le titre.
     */
 
     .topbar {
@@ -2501,7 +2573,26 @@ body.light-theme #tradingSessionsPanel {
             680px;
 
         min-width:
-            0;
+            0 !important;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr);
+
+        gap:
+            18px;
+
+        padding:
+            8px 16px;
+    }
+
+    #tradingSessionsPanel .session-current,
+    #tradingSessionsPanel .session-next {
+        justify-content:
+            flex-start !important;
+
+        text-align:
+            left !important;
     }
 }
 
@@ -2513,7 +2604,7 @@ body.light-theme #tradingSessionsPanel {
             18px 4%;
 
         min-height:
-            190px;
+            205px;
 
         align-items:
             flex-start;
@@ -2533,8 +2624,8 @@ body.light-theme #tradingSessionsPanel {
 
 
     /*
-       Sur téléphone, le widget occupe toute la largeur
-       disponible sous le titre.
+       Sur téléphone, les deux sessions sont empilées
+       afin d'éviter tout chevauchement de texte.
     */
 
     #tradingSessionsPanel {
@@ -2559,8 +2650,30 @@ body.light-theme #tradingSessionsPanel {
         transform:
             none !important;
 
+        grid-template-columns:
+            1fr;
+
+        gap:
+            7px;
+
+        padding:
+            8px 12px;
+
         justify-content:
-            center;
+            stretch;
+    }
+
+
+    #tradingSessionsPanel .session-current,
+    #tradingSessionsPanel .session-next {
+        width:
+            100% !important;
+
+        justify-content:
+            flex-start !important;
+
+        text-align:
+            left !important;
     }
 
 
@@ -2702,7 +2815,7 @@ body.light-theme #tradingSessionsPanel {
 
     .topbar {
         min-height:
-            205px;
+            215px;
     }
 
 
