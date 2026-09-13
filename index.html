@@ -77,46 +77,46 @@ body[data-page="dashboard"] #historyCard {
 /* Analyses */
 
 body[data-page="analysis"] #analysisPageHeader {
-    display:block;
+    display: block;
 }
 
 body[data-page="analysis"] #v51FilterCard {
-    display:block !important;
+    display: block !important;
 }
 
 body[data-page="analysis"] #performanceSummaryCard {
-    display:none !important;
+    display: none !important;
 }
 
 
 /* Performances */
 
 body[data-page="performance"] #performancePageHeader {
-    display:block;
+    display: block;
 }
 
 body[data-page="performance"] #setupPerformanceCard,
 body[data-page="performance"] #assetPerformanceCard {
-    display:block;
+    display: block;
 }
 
 body[data-page="performance"] #performanceSummaryCard {
-    display:none !important;
+    display: none !important;
 }
 
 
 /* Archives */
 
 body[data-page="archives"] #archivesPageHeader {
-    display:block;
+    display: block;
 }
 
 body[data-page="archives"] #archivesCard {
-    display:block;
+    display: block;
 }
 
 body[data-page="archives"] #performanceSummaryCard {
-    display:none !important;
+    display: none !important;
 }
 
 
@@ -133,25 +133,25 @@ body[data-page="archives"] #performanceSummaryCard {
 #analysisPageHeader,
 #performancePageHeader,
 #archivesPageHeader {
-    display:none;
+    display: none;
 }
 
 
 /* V51 est créé dynamiquement */
 
 #v51FilterCard {
-    display:none;
+    display: none;
 }
 
 
 /* Bouton principal pour ouvrir le formulaire */
 
 .trade-launcher-card {
-    display:none;
+    display: none;
 }
 
 body[data-page="dashboard"] .trade-launcher-card {
-    display:block;
+    display: block;
 }
 
 .trade-launcher {
@@ -164,32 +164,36 @@ body[data-page="dashboard"] .trade-launcher-card {
     font-weight: 800;
     letter-spacing: .2px;
     padding: 20px;
-    background: linear-gradient(135deg, rgba(59,130,246,.20), rgba(34,197,94,.14));
+    background: linear-gradient(
+        135deg,
+        rgba(59,130,246,.20),
+        rgba(34,197,94,.14)
+    );
     box-shadow: 0 12px 32px rgba(0,0,0,.12);
 }
 
 .trade-launcher small {
-    display:block;
-    margin-top:6px;
-    opacity:.7;
-    font-weight:500;
+    display: block;
+    margin-top: 6px;
+    opacity: .7;
+    font-weight: 500;
 }
 
 
 /* Modal Trade */
 
 .modal.trade-modal {
-    display:none;
+    display: none;
 }
 
 .modal.trade-modal.open {
-    display:flex;
+    display: flex;
 }
 
 .trade-modal .modal-content {
-    width:min(1100px, 96vw);
-    max-height:92vh;
-    overflow:auto;
+    width: min(1100px, 96vw);
+    max-height: 92vh;
+    overflow: auto;
 }
 
 
@@ -204,8 +208,8 @@ body[data-page="dashboard"] .trade-launcher-card {
 
     .app-nav a {
         flex: 1 1 calc(50% - 6px);
-        justify-content:center;
-        font-size:.9rem;
+        justify-content: center;
+        font-size: .9rem;
     }
 
     .container {
@@ -227,7 +231,9 @@ body[data-page="dashboard"] .trade-launcher-card {
         <p>Journal & performance de trading</p>
     </div>
 
-    <button id="themeToggle" class="theme-btn">🌙</button>
+    <button id="themeToggle" class="theme-btn">
+        🌙
+    </button>
 
 </header>
 
@@ -289,7 +295,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     </div>
 
 
-    <!-- CAPITAL ACTIF -->
+    <!-- ======================================================
+         CAPITAL ACTIF
+         ====================================================== -->
 
     <section id="dashboardCapitalCard" class="card active-capital-card">
 
@@ -413,7 +421,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- GRAPHIQUE CAPITAL -->
+    <!-- ======================================================
+         GRAPHIQUE CAPITAL
+         ====================================================== -->
 
     <section id="dashboardChartCard" class="card chart-card">
 
@@ -445,7 +455,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- PERIODES -->
+    <!-- ======================================================
+         PERFORMANCE
+         ====================================================== -->
 
     <section id="performanceSummaryCard" class="card">
 
@@ -561,6 +573,140 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                 <span>
                     Meilleur setup
+                </span>
+
+                <strong id="statBestSetup">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Dernier trade
+                </span>
+
+                <strong id="statLastTrade">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Profit Factor
+                </span>
+
+                <strong id="statProfitFactor">
+                    0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Trade moyen
+                </span>
+
+                <strong id="statAverageTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Gain moyen
+                </span>
+
+                <strong id="statAverageWin">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Perte moyenne
+                </span>
+
+                <strong id="statAverageLoss">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Meilleur trade
+                </span>
+
+                <strong id="statBestTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Pire trade
+                </span>
+
+                <strong id="statWorstTrade">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Série max gagnante
+                </span>
+
+                <strong id="statMaxWinStreak">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Série max perdante
+                </span>
+
+                <strong id="statMaxLossStreak">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>
+                    Drawdown max
+                </span>
+
+                <strong id="statMaxDrawdown">
+                    $0.00
                 </strong>
 
             </div>
@@ -571,7 +717,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- AJOUT TRADE : OUVERTURE MODALE -->
+    <!-- ======================================================
+         AJOUT TRADE
+         ====================================================== -->
 
     <section id="dashboardTradeCard" class="card trade-launcher-card">
 
@@ -580,6 +728,7 @@ body[data-page="dashboard"] .trade-launcher-card {
             class="trade-launcher"
             type="button"
         >
+
             ➕ Ajouter un trade
 
             <small>
@@ -591,7 +740,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- PERFORMANCE DES SETUPS -->
+    <!-- ======================================================
+         PERFORMANCE DES SETUPS
+         ====================================================== -->
 
     <section id="setupPerformanceCard" class="card">
 
@@ -618,25 +769,11 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     <tr>
 
-                        <th>
-                            Setup
-                        </th>
-
-                        <th>
-                            Trades
-                        </th>
-
-                        <th>
-                            Gagnants
-                        </th>
-
-                        <th>
-                            Winrate
-                        </th>
-
-                        <th>
-                            Profit
-                        </th>
+                        <th>Setup</th>
+                        <th>Trades</th>
+                        <th>Gagnants</th>
+                        <th>Winrate</th>
+                        <th>Profit</th>
 
                     </tr>
 
@@ -653,7 +790,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- PERFORMANCE PAR ACTIF -->
+    <!-- ======================================================
+         PERFORMANCE PAR ACTIF
+         ====================================================== -->
 
     <section id="assetPerformanceCard" class="card">
 
@@ -680,45 +819,16 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     <tr>
 
-                        <th>
-                            Actif
-                        </th>
-
-                        <th>
-                            Trades
-                        </th>
-
-                        <th>
-                            Gagnants
-                        </th>
-
-                        <th>
-                            Perdants
-                        </th>
-
-                        <th>
-                            BE
-                        </th>
-
-                        <th>
-                            Winrate
-                        </th>
-
-                        <th>
-                            Profit
-                        </th>
-
-                        <th>
-                            RR moyen
-                        </th>
-
-                        <th>
-                            Meilleur
-                        </th>
-
-                        <th>
-                            Pire
-                        </th>
+                        <th>Actif</th>
+                        <th>Trades</th>
+                        <th>Gagnants</th>
+                        <th>Perdants</th>
+                        <th>BE</th>
+                        <th>Winrate</th>
+                        <th>Profit</th>
+                        <th>RR moyen</th>
+                        <th>Meilleur</th>
+                        <th>Pire</th>
 
                     </tr>
 
@@ -735,7 +845,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- HISTORIQUE -->
+    <!-- ======================================================
+         HISTORIQUE
+         ====================================================== -->
 
     <section id="historyCard" class="card">
 
@@ -795,7 +907,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
-    <!-- ARCHIVES -->
+    <!-- ======================================================
+         ARCHIVES
+         ====================================================== -->
 
     <section id="archivesCard" class="card">
 
@@ -823,7 +937,9 @@ body[data-page="dashboard"] .trade-launcher-card {
 </main>
 
 
-<!-- MODAL AJOUT TRADE -->
+<!-- =========================================================
+     MODAL AJOUT TRADE
+     ========================================================= -->
 
 <div id="tradeModal" class="modal trade-modal">
 
@@ -833,13 +949,16 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             <div>
 
-                <h2>➕ Ajouter un trade</h2>
+                <h2>
+                    ➕ Ajouter un trade
+                </h2>
 
                 <p>
                     Enregistrez votre trade manuellement
                 </p>
 
             </div>
+
 
             <button
                 id="closeTradeModalBtn"
@@ -858,8 +977,12 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                 <div class="form-grid">
 
+
                     <div>
-                        <label for="asset">Actif</label>
+
+                        <label for="asset">
+                            Actif
+                        </label>
 
                         <input
                             type="text"
@@ -867,24 +990,35 @@ body[data-page="dashboard"] .trade-launcher-card {
                             placeholder="XAUUSD"
                             required
                         >
+
                     </div>
 
 
                     <div>
-                        <label for="date">Date</label>
+
+                        <label for="date">
+                            Date
+                        </label>
 
                         <input
                             type="date"
                             id="date"
                             required
                         >
+
                     </div>
 
 
                     <div>
-                        <label for="direction">Position</label>
 
-                        <select id="direction" required>
+                        <label for="direction">
+                            Position
+                        </label>
+
+                        <select
+                            id="direction"
+                            required
+                        >
 
                             <option value="BUY">
                                 Buy
@@ -895,15 +1029,20 @@ body[data-page="dashboard"] .trade-launcher-card {
                             </option>
 
                         </select>
+
                     </div>
 
 
                     <div>
+
                         <label for="orderType">
                             Type d'ordre
                         </label>
 
-                        <select id="orderType" required>
+                        <select
+                            id="orderType"
+                            required
+                        >
 
                             <option value="Market">
                                 Immediat
@@ -918,11 +1057,15 @@ body[data-page="dashboard"] .trade-launcher-card {
                             </option>
 
                         </select>
+
                     </div>
 
 
                     <div>
-                        <label for="lot">Lot</label>
+
+                        <label for="lot">
+                            Lot
+                        </label>
 
                         <input
                             type="number"
@@ -932,11 +1075,15 @@ body[data-page="dashboard"] .trade-launcher-card {
                             placeholder="0.01"
                             required
                         >
+
                     </div>
 
 
                     <div>
-                        <label for="entry">Entry</label>
+
+                        <label for="entry">
+                            Entry
+                        </label>
 
                         <input
                             type="number"
@@ -945,11 +1092,15 @@ body[data-page="dashboard"] .trade-launcher-card {
                             placeholder="4450.00"
                             required
                         >
+
                     </div>
 
 
                     <div>
-                        <label for="sl">Stop Loss</label>
+
+                        <label for="sl">
+                            Stop Loss
+                        </label>
 
                         <input
                             type="number"
@@ -957,11 +1108,15 @@ body[data-page="dashboard"] .trade-launcher-card {
                             step="any"
                             placeholder="4445.00"
                         >
+
                     </div>
 
 
                     <div>
-                        <label for="tp">Take Profit</label>
+
+                        <label for="tp">
+                            Take Profit
+                        </label>
 
                         <input
                             type="number"
@@ -969,6 +1124,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                             step="any"
                             placeholder="4460.00"
                         >
+
                     </div>
 
 
@@ -978,7 +1134,10 @@ body[data-page="dashboard"] .trade-launcher-card {
                             RR du trade
                         </label>
 
-                        <select id="tradeRR" required>
+                        <select
+                            id="tradeRR"
+                            required
+                        >
 
                             <option value="2">RR 2</option>
                             <option value="3">RR 3</option>
@@ -1001,6 +1160,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                             <option value="20">RR 20</option>
 
                         </select>
+
 
                         <small style="display:block;margin-top:6px;opacity:.7;">
                             Le RR du capital sert de valeur par défaut. Vous pouvez l'adapter pour chaque trade.
@@ -1031,11 +1191,22 @@ body[data-page="dashboard"] .trade-launcher-card {
                             Résultat
                         </label>
 
-                        <select id="result" required>
+                        <select
+                            id="result"
+                            required
+                        >
 
-                            <option value="TP">TP</option>
-                            <option value="SL">SL</option>
-                            <option value="BE">BE</option>
+                            <option value="TP">
+                                TP
+                            </option>
+
+                            <option value="SL">
+                                SL
+                            </option>
+
+                            <option value="BE">
+                                BE
+                            </option>
 
                         </select>
 
@@ -1048,19 +1219,54 @@ body[data-page="dashboard"] .trade-launcher-card {
                             Setup
                         </label>
 
-                        <select id="setup" required>
+                        <select
+                            id="setup"
+                            required
+                        >
 
-                            <option value="LDP+QML">LDP+QML</option>
-                            <option value="LDP+FIBO 50">LDP+FIBO 50</option>
-                            <option value="OB">OB</option>
-                            <option value="BB">BB</option>
-                            <option value="ZS OA">ZS OA</option>
-                            <option value="SSM1">SSM1</option>
-                            <option value="SSM2">SSM2</option>
-                            <option value="SSM3">SSM3</option>
-                            <option value="SBM1">SBM1</option>
-                            <option value="SBM2">SBM2</option>
-                            <option value="SBM3">SBM3</option>
+                            <option value="LDP+QML">
+                                LDP+QML
+                            </option>
+
+                            <option value="LDP+FIBO 50">
+                                LDP+FIBO 50
+                            </option>
+
+                            <option value="OB">
+                                OB
+                            </option>
+
+                            <option value="BB">
+                                BB
+                            </option>
+
+                            <option value="ZS OA">
+                                ZS OA
+                            </option>
+
+                            <option value="SSM1">
+                                SSM1
+                            </option>
+
+                            <option value="SSM2">
+                                SSM2
+                            </option>
+
+                            <option value="SSM3">
+                                SSM3
+                            </option>
+
+                            <option value="SBM1">
+                                SBM1
+                            </option>
+
+                            <option value="SBM2">
+                                SBM2
+                            </option>
+
+                            <option value="SBM3">
+                                SBM3
+                            </option>
 
                         </select>
 
@@ -1082,6 +1288,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                         >
 
                     </div>
+
 
                 </div>
 
@@ -1147,6 +1354,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                 </div>
 
+
             </form>
 
         </div>
@@ -1156,7 +1364,9 @@ body[data-page="dashboard"] .trade-launcher-card {
 </div>
 
 
-<!-- MODAL NOUVEAU CAPITAL -->
+<!-- =========================================================
+     MODAL NOUVEAU CAPITAL
+     ========================================================= -->
 
 <div id="capitalModal" class="modal">
 
@@ -1175,6 +1385,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                 </p>
 
             </div>
+
 
             <button
                 id="cancelCapitalBtn"
@@ -1289,6 +1500,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                 Annuler
             </button>
 
+
             <button
                 id="saveCapitalBtn"
                 class="primary-btn"
@@ -1303,7 +1515,9 @@ body[data-page="dashboard"] .trade-launcher-card {
 </div>
 
 
-<!-- MODAL GRAPHIQUE ARCHIVE -->
+<!-- =========================================================
+     MODAL GRAPHIQUE ARCHIVE
+     ========================================================= -->
 
 <div id="archiveChartModal" class="modal">
 
@@ -1322,6 +1536,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                 </p>
 
             </div>
+
 
             <button
                 id="closeArchiveChartBtn"
