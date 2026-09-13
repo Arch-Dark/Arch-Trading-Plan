@@ -1,20 +1,25 @@
-```javascript
 /* =========================================================
    SESSION.JS
-   Gestion automatique des sessions de trading
-
-   Sessions :
-   - Sydney
-   - Tokyo
-   - Londres
-   - New York
-
-   Le système utilise les fuseaux horaires IANA.
-   Cela permet de suivre automatiquement les changements
-   hiver / été (DST) selon les pays.
+   PANNEAU DES SESSIONS DE TRADING
 
    IMPORTANT :
-   Ce fichier ne modifie AUCUN calcul de trading.
+   - Ce fichier ne touche PAS aux trades.
+   - Ce fichier ne touche PAS aux capitaux.
+   - Ce fichier ne touche PAS aux calculs.
+   - Ce fichier ne touche PAS au localStorage.
+   - Ce fichier sert uniquement à afficher les sessions.
+
+   Sessions :
+   Sydney
+   Tokyo
+   Londres
+   New York
+
+   Les fuseaux horaires IANA permettent de suivre
+   automatiquement les changements hiver / été.
+
+   Week-end :
+   Samedi et dimanche = marché fermé.
    ========================================================= */
 
 (function () {
@@ -23,88 +28,392 @@
 
 
     /* =========================================================
-       CONFIGURATION DES SESSIONS
+       CONFIGURATION
        ========================================================= */
 
-    const tradingSessions = [
+    const SESSIONS = [
 
         {
             id: "sydney",
             name: "Sydney",
             country: "Australie",
-            timezone: "Australia/Sydney",
             city: "Sydney",
-
-            // Horaires locaux de la session
-            openHour: 8,
-            closeHour: 17
+            timezone: "Australia/Sydney",
+            open: "08:00",
+            close: "17:00"
         },
 
         {
             id: "tokyo",
             name: "Tokyo",
             country: "Japon",
-            timezone: "Asia/Tokyo",
             city: "Tokyo",
-
-            openHour: 9,
-            closeHour: 18
+            timezone: "Asia/Tokyo",
+            open: "09:00",
+            close: "18:00"
         },
 
         {
             id: "london",
             name: "Londres",
             country: "Royaume-Uni",
-            timezone: "Europe/London",
             city: "Londres",
-
-            openHour: 8,
-            closeHour: 17
+            timezone: "Europe/London",
+            open: "08:00",
+            close: "17:00"
         },
 
         {
             id: "newyork",
             name: "New York",
             country: "États-Unis",
-            timezone: "America/New_York",
             city: "New York",
-
-            openHour: 8,
-            closeHour: 17
+            timezone: "America/New_York",
+            open: "08:00",
+            close: "17:00"
         }
 
     ];
 
 
     /* =========================================================
-       ÉLÉMENTS DU PANNEAU
+       OUTILS DATE / HEURE
        ========================================================= */
 
-    let currentSessionElement = null;
-    let nextSessionElement = null;
+    function getParts(date, timezone) {
+
+        const formatter = new Intl.DateTimeFormat(
+            "en-US",
+            {
+                timeZone: timezone,
+                weekday: "short",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+            }
+        );
+
+        const parts = formatter.formatToParts(date);
+
+        const result = {};
+
+        parts.forEach(function (part) {
+
+            if (part.type !== "literal") {
+                result[part.type] = part.value;
+            }
+
+        });
+
+        return result;
+    }
+
+
+    function getTime(date, timezone) {
+
+        const formatter = new Intl.DateTimeFormat(
+            "fr-FR",
+            {
+                timeZone: timezone,
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+            }
+        );
+
+        return formatter.format(date);
+    }
+
+
+    function getDate(date, timezone) {
+
+        const formatter = new Intl.DateTimeFormat(
+            "fr-FR",
+            {
+                timeZone: timezone,
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            }
+        );
+
+        return formatter.format(date);
+    }
+
+
+    /* =========================================================
+       WEEK-END
+       ========================================================= */
+
+    function isWeekend(date) {
+
+        /*
+         * On utilise Madagascar comme référence pour le
+         * fonctionnement général du panneau.
+         */
+
+        const parts = getParts(
+            date,
+            "Indian/Antananarivo"
+        );
+
+        return (
+            parts.weekday === "Sat" ||
+            parts.weekday === "Sun"
+        );
+    }
+
+
+    /* =========================================================
+       MINUTES
+       ========================================================= */
+
+    function timeToMinutes(time) {
+
+        const pieces = time.split(":");
+
+        return (
+            Number(pieces[0]) * 60 +
+            Number(pieces[1])
+        );
+    }
+
+
+    /* =========================================================
+       SESSION OUVERTE ?
+       ========================================================= */
+
+    function isSessionOpen(session, date) {
+
+        if (isWeekend(date)) {
+            return false;
+        }
+
+        const parts = getParts(
+            date,
+            session.timezone
+        );
+
+        const currentMinutes =
+            Number(parts.hour) * 60 +
+            Number(parts.minute);
+
+        const openMinutes =
+            timeToMinutes(session.open);
+
+        const closeMinutes =
+            timeToMinutes(session.close);
+
+        return (
+            currentMinutes >= openMinutes &&
+            currentMinutes < closeMinutes
+        );
+    }
+
+
+    /* =========================================================
+       SESSION ACTUELLE
+       ========================================================= */
+
+    function getCurrentSession(date) {
+
+        for (let i = 0; i < SESSIONS.length; i++) {
+
+            if (
+                isSessionOpen(
+                    SESSIONS[i],
+                    date
+                )
+            ) {
+
+                return SESSIONS[i];
+
+            }
+
+        }
+
+        return null;
+    }
+
+
+    /* =========================================================
+       PROCHAINE OUVERTURE
+       ========================================================= */
+
+    function getNextOpening(session, date) {
+
+        /*
+         * Recherche jusqu'à 7 jours dans le futur.
+         */
+
+        const maxMinutes =
+            7 * 24 * 60;
+
+
+        for (
+            let minute = 1;
+            minute <= maxMinutes;
+            minute++
+        ) {
+
+            const testDate =
+                new Date(
+                    date.getTime() +
+                    minute * 60 * 1000
+                );
+
+
+            /*
+             * On vérifie l'heure locale de la session.
+             */
+
+            const parts =
+                getParts(
+                    testDate,
+                    session.timezone
+                );
+
+
+            const currentHour =
+                Number(parts.hour);
+
+
+            const currentMinute =
+                Number(parts.minute);
+
+
+            const opening =
+                timeToMinutes(
+                    session.open
+                );
+
+
+            const current =
+                currentHour * 60 +
+                currentMinute;
+
+
+            if (
+                current === opening &&
+                !isWeekend(testDate)
+            ) {
+
+                return testDate;
+
+            }
+
+        }
+
+
+        return null;
+    }
+
+
+    /* =========================================================
+       PROCHAINE SESSION
+       ========================================================= */
+
+    function getNextSession(date) {
+
+        let result = null;
+
+
+        for (
+            let i = 0;
+            i < SESSIONS.length;
+            i++
+        ) {
+
+            const session =
+                SESSIONS[i];
+
+
+            const opening =
+                getNextOpening(
+                    session,
+                    date
+                );
+
+
+            if (!opening) {
+                continue;
+            }
+
+
+            if (
+                !result ||
+                opening.getTime() <
+                result.opening.getTime()
+            ) {
+
+                result = {
+                    session: session,
+                    opening: opening
+                };
+
+            }
+
+        }
+
+
+        return result;
+    }
 
 
     /* =========================================================
        CRÉATION DU PANNEAU
        ========================================================= */
 
-    function createSessionPanel() {
+    function createPanel() {
 
-        if (document.getElementById("tradingSessionPanel")) {
+        /*
+         * Si le panneau existe déjà,
+         * on ne le recrée pas.
+         */
+
+        if (
+            document.getElementById(
+                "tradingSessionPanel"
+            )
+        ) {
+
             return;
+
         }
 
 
-        const topbar = document.querySelector(".topbar");
+        const topbar =
+            document.querySelector(
+                ".topbar"
+            );
+
 
         if (!topbar) {
             return;
         }
 
 
-        const panel = document.createElement("div");
+        /*
+         * Recherche du bouton thème.
+         */
 
-        panel.id = "tradingSessionPanel";
+        const themeButton =
+            document.getElementById(
+                "themeToggle"
+            );
+
+
+        const panel =
+            document.createElement("div");
+
+
+        panel.id =
+            "tradingSessionPanel";
+
 
         panel.innerHTML = `
 
@@ -164,13 +473,11 @@
 
 
         /*
-         * Le panneau est placé entre le bloc texte du topbar
-         * et le bouton thème.
+         * Insertion du panneau dans le topbar.
+         *
+         * Aucun autre élément de l'application
+         * n'est modifié.
          */
-
-        const themeButton =
-            document.getElementById("themeToggle");
-
 
         if (themeButton) {
 
@@ -181,326 +488,20 @@
 
         } else {
 
-            topbar.appendChild(panel);
-
-        }
-
-
-        currentSessionElement =
-            document.getElementById("currentSessionName");
-
-
-        nextSessionElement =
-            document.getElementById("nextSessionName");
-
-    }
-
-
-    /* =========================================================
-       OBTENIR L'HEURE DANS UN FUSEAU
-       ========================================================= */
-
-    function getTimeInTimezone(timezone, date) {
-
-        return new Intl.DateTimeFormat(
-            "fr-FR",
-            {
-                timeZone: timezone,
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false
-            }
-        ).format(date);
-
-    }
-
-
-    /* =========================================================
-       OBTENIR DATE + HEURE DANS UN FUSEAU
-       ========================================================= */
-
-    function getDateParts(timezone, date) {
-
-        const formatter =
-            new Intl.DateTimeFormat(
-                "en-US",
-                {
-                    timeZone: timezone,
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: false
-                }
+            topbar.appendChild(
+                panel
             );
 
-
-        const parts =
-            formatter.formatToParts(date);
-
-
-        const result = {};
-
-
-        parts.forEach(function (part) {
-
-            if (part.type !== "literal") {
-                result[part.type] = part.value;
-            }
-
-        });
-
-
-        return result;
-
-    }
-
-
-    /* =========================================================
-       VÉRIFIER SI UNE SESSION EST OUVERTE
-       ========================================================= */
-
-    function isSessionOpen(session, date) {
-
-        const parts =
-            getDateParts(
-                session.timezone,
-                date
-            );
-
-
-        const hour =
-            Number(parts.hour);
-
-
-        const minute =
-            Number(parts.minute);
-
-
-        const currentMinutes =
-            hour * 60 + minute;
-
-
-        const openMinutes =
-            session.openHour * 60;
-
-
-        const closeMinutes =
-            session.closeHour * 60;
-
-
-        return (
-            currentMinutes >= openMinutes &&
-            currentMinutes < closeMinutes
-        );
-
-    }
-
-
-    /* =========================================================
-       FORMATER L'HEURE
-       ========================================================= */
-
-    function formatHour(hour) {
-
-        return String(hour).padStart(2, "0") + ":00";
-
-    }
-
-
-    /* =========================================================
-       OBTENIR L'HEURE DE MADAGASCAR
-       ========================================================= */
-
-    function getMadagascarTime(date) {
-
-        return getTimeInTimezone(
-            "Indian/Antananarivo",
-            date
-        );
-
-    }
-
-
-    /* =========================================================
-       OBTENIR LA DATE DU JOUR À MADAGASCAR
-       ========================================================= */
-
-    function getMadagascarDateParts(date) {
-
-        return getDateParts(
-            "Indian/Antananarivo",
-            date
-        );
-
-    }
-
-
-    /* =========================================================
-       CALCUL DE LA PROCHAINE OUVERTURE
-       ========================================================= */
-
-    function getNextOpening(session, now) {
-
-        /*
-         * On cherche minute par minute à partir de maintenant.
-         *
-         * Cela permet de respecter correctement les changements
-         * de jour et les fuseaux horaires.
-         */
-
-        const maxMinutes = 60 * 48;
-
-
-        for (
-            let i = 0;
-            i <= maxMinutes;
-            i++
-        ) {
-
-            const testDate =
-                new Date(
-                    now.getTime() +
-                    i * 60 * 1000
-                );
-
-
-            const parts =
-                getDateParts(
-                    session.timezone,
-                    testDate
-                );
-
-
-            const hour =
-                Number(parts.hour);
-
-
-            const minute =
-                Number(parts.minute);
-
-
-            if (
-                hour === session.openHour &&
-                minute === 0
-            ) {
-
-                if (
-                    testDate.getTime() >
-                    now.getTime()
-                ) {
-
-                    return testDate;
-
-                }
-
-            }
-
         }
 
-
-        return null;
-
     }
 
 
     /* =========================================================
-       TROUVER SESSION ACTUELLE
+       AFFICHAGE SESSION ACTUELLE
        ========================================================= */
 
-    function getCurrentSession(now) {
-
-        const openedSessions =
-            tradingSessions.filter(
-                function (session) {
-
-                    return isSessionOpen(
-                        session,
-                        now
-                    );
-
-                }
-            );
-
-
-        /*
-         * Plusieurs sessions peuvent être ouvertes
-         * simultanément pendant les périodes de chevauchement.
-         *
-         * On conserve la première selon l'ordre :
-         * Sydney → Tokyo → Londres → New York.
-         */
-
-        if (openedSessions.length > 0) {
-            return openedSessions[0];
-        }
-
-
-        return null;
-
-    }
-
-
-    /* =========================================================
-       TROUVER PROCHAINE SESSION
-       ========================================================= */
-
-    function getNextSession(now) {
-
-        let nextSession = null;
-        let nextOpening = null;
-
-
-        tradingSessions.forEach(
-            function (session) {
-
-                const opening =
-                    getNextOpening(
-                        session,
-                        now
-                    );
-
-
-                if (!opening) {
-                    return;
-                }
-
-
-                if (
-                    !nextOpening ||
-                    opening.getTime() <
-                    nextOpening.getTime()
-                ) {
-
-                    nextOpening = opening;
-                    nextSession = session;
-
-                }
-
-            }
-        );
-
-
-        if (!nextSession) {
-            return null;
-        }
-
-
-        return {
-            session: nextSession,
-            opening: nextOpening
-        };
-
-    }
-
-
-    /* =========================================================
-       TEXTE SESSION ACTUELLE
-       ========================================================= */
-
-    function updateCurrentSession(session, now) {
+    function updateCurrentSession(date) {
 
         const name =
             document.getElementById(
@@ -519,18 +520,62 @@
         }
 
 
-        if (!session) {
+        /*
+         * WEEK-END
+         */
+
+        if (isWeekend(date)) {
 
             name.textContent =
-                "Aucune session principale";
+                "🔴 Marchés fermés";
+
 
             name.classList.remove(
                 "session-open"
             );
 
 
-            times.textContent =
-                "Marché entre deux sessions";
+            times.innerHTML =
+                "🇲🇬 Madagascar : <strong>" +
+                getTime(
+                    date,
+                    "Indian/Antananarivo"
+                ) +
+                "</strong>";
+
+
+            return;
+
+        }
+
+
+        /*
+         * SESSION NORMALE
+         */
+
+        const session =
+            getCurrentSession(date);
+
+
+        if (!session) {
+
+            name.textContent =
+                "⏸️ Entre deux sessions";
+
+
+            name.classList.remove(
+                "session-open"
+            );
+
+
+            times.innerHTML =
+                "🇲🇬 Madagascar : <strong>" +
+                getTime(
+                    date,
+                    "Indian/Antananarivo"
+                ) +
+                "</strong>";
+
 
             return;
 
@@ -546,36 +591,42 @@
         );
 
 
-        const sessionLocalTime =
-            getTimeInTimezone(
-                session.timezone,
-                now
+        const localTime =
+            getTime(
+                date,
+                session.timezone
             );
 
 
-        const madaTime =
-            getMadagascarTime(now);
+        const madagascarTime =
+            getTime(
+                date,
+                "Indian/Antananarivo"
+            );
 
 
         times.innerHTML =
+
             "🌍 " +
             session.city +
             " : <strong>" +
-            sessionLocalTime +
+            localTime +
             "</strong>" +
+
             " &nbsp;|&nbsp; " +
+
             "🇲🇬 Madagascar : <strong>" +
-            madaTime +
+            madagascarTime +
             "</strong>";
 
     }
 
 
     /* =========================================================
-       TEXTE PROCHAINE SESSION
+       AFFICHAGE PROCHAINE SESSION
        ========================================================= */
 
-    function updateNextSession(nextData, now) {
+    function updateNextSession(date) {
 
         const name =
             document.getElementById(
@@ -594,13 +645,19 @@
         }
 
 
-        if (!nextData) {
+        const next =
+            getNextSession(date);
+
+
+        if (!next) {
 
             name.textContent =
                 "—";
 
+
             times.textContent =
                 "—";
+
 
             return;
 
@@ -608,69 +665,82 @@
 
 
         const session =
-            nextData.session;
+            next.session;
 
 
         const opening =
-            nextData.opening;
+            next.opening;
 
 
         name.textContent =
             "⏭️ " + session.name;
 
 
-        const sessionOpeningTime =
-            getTimeInTimezone(
-                session.timezone,
-                opening
+        const sessionOpening =
+            getTime(
+                opening,
+                session.timezone
             );
 
 
-        const madaOpeningTime =
-            getMadagascarTime(
-                opening
+        const madagascarOpening =
+            getTime(
+                opening,
+                "Indian/Antananarivo"
+            );
+
+
+        const sessionDate =
+            getDate(
+                opening,
+                session.timezone
+            );
+
+
+        const madagascarDate =
+            getDate(
+                opening,
+                "Indian/Antananarivo"
             );
 
 
         times.innerHTML =
-            "🌍 Ouverture " +
+
+            "🌍 " +
             session.city +
             " : <strong>" +
-            sessionOpeningTime +
-            "</strong>" +
+            sessionOpening +
+            "</strong> (" +
+            sessionDate +
+            ")" +
+
             " &nbsp;|&nbsp; " +
+
             "🇲🇬 Madagascar : <strong>" +
-            madaOpeningTime +
-            "</strong>";
+            madagascarOpening +
+            "</strong> (" +
+            madagascarDate +
+            ")";
 
     }
 
 
     /* =========================================================
-       MISE À JOUR GÉNÉRALE
+       MISE À JOUR
        ========================================================= */
 
-    function updateSessions() {
+    function updatePanel() {
 
-        const now = new Date();
-
-
-        const currentSession =
-            getCurrentSession(now);
-
-
-        const nextSession =
-            getNextSession(now);
+        const now =
+            new Date();
 
 
         updateCurrentSession(
-            currentSession,
             now
         );
 
 
         updateNextSession(
-            nextSession,
             now
         );
 
@@ -681,19 +751,19 @@
        INITIALISATION
        ========================================================= */
 
-    function initSessionSystem() {
+    function init() {
 
-        createSessionPanel();
+        createPanel();
 
-        updateSessions();
+        updatePanel();
 
 
         /*
          * Mise à jour toutes les 30 secondes.
          */
 
-        setInterval(
-            updateSessions,
+        window.setInterval(
+            updatePanel,
             30000
         );
 
@@ -701,7 +771,7 @@
 
 
     /* =========================================================
-       LANCEMENT APRÈS CHARGEMENT DE LA PAGE
+       LANCEMENT
        ========================================================= */
 
     if (
@@ -711,23 +781,23 @@
 
         document.addEventListener(
             "DOMContentLoaded",
-            initSessionSystem
+            init
         );
 
     } else {
 
-        initSessionSystem();
+        init();
 
     }
 
 
     /* =========================================================
-       EXPOSITION OPTIONNELLE
+       API OPTIONNELLE
        ========================================================= */
 
     window.TradingSessions = {
 
-        update: updateSessions,
+        update: updatePanel,
 
         getCurrent: function () {
 
@@ -747,5 +817,5 @@
 
     };
 
+
 })();
-```
