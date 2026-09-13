@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Trading Dashboard</title>
-
     <link rel="stylesheet" href="style.css">
 
 <style>
-
 /* ============================================================
    NAVIGATION MULTI-PAGES
    ============================================================ */
@@ -18,16 +15,12 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-
     padding: 12px 20px;
-
     background: rgba(15, 23, 42, 0.94);
     backdrop-filter: blur(12px);
-
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
@@ -35,16 +28,11 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-
     padding: 10px 14px;
-
     border-radius: 10px;
-
     text-decoration: none;
     color: inherit;
-
     font-weight: 600;
-
     transition: .2s ease;
 }
 
@@ -54,15 +42,8 @@
 
 .app-nav a.active {
     background: rgba(59,130,246,.18);
-
-    box-shadow:
-        inset 0 0 0 1px rgba(96,165,250,.28);
+    box-shadow: inset 0 0 0 1px rgba(96,165,250,.28);
 }
-
-
-/* ============================================================
-   PAGE TITLES
-   ============================================================ */
 
 .page-title {
     margin: 8px 0 18px;
@@ -82,9 +63,7 @@
 }
 
 
-/* ============================================================
-   DASHBOARD
-   ============================================================ */
+/* Dashboard */
 
 body[data-page="dashboard"] #dashboardCapitalCard,
 body[data-page="dashboard"] #dashboardChartCard,
@@ -95,61 +74,53 @@ body[data-page="dashboard"] #historyCard {
 }
 
 
-/* ============================================================
-   ANALYSES
-   ============================================================ */
+/* Analyses */
 
 body[data-page="analysis"] #analysisPageHeader {
-    display: block;
+    display:block;
 }
 
 body[data-page="analysis"] #v51FilterCard {
-    display: block !important;
+    display:block !important;
 }
 
 body[data-page="analysis"] #performanceSummaryCard {
-    display: none !important;
+    display:none !important;
 }
 
 
-/* ============================================================
-   PERFORMANCES
-   ============================================================ */
+/* Performances */
 
 body[data-page="performance"] #performancePageHeader {
-    display: block;
+    display:block;
 }
 
 body[data-page="performance"] #setupPerformanceCard,
 body[data-page="performance"] #assetPerformanceCard {
-    display: block;
+    display:block;
 }
 
 body[data-page="performance"] #performanceSummaryCard {
-    display: none !important;
+    display:none !important;
 }
 
 
-/* ============================================================
-   ARCHIVES
-   ============================================================ */
+/* Archives */
 
 body[data-page="archives"] #archivesPageHeader {
-    display: block;
+    display:block;
 }
 
 body[data-page="archives"] #archivesCard {
-    display: block;
+    display:block;
 }
 
 body[data-page="archives"] #performanceSummaryCard {
-    display: none !important;
+    display:none !important;
 }
 
 
-/* ============================================================
-   SECTIONS MASQUÉES PAR DÉFAUT
-   ============================================================ */
+/* Sections masquées par défaut puis activées selon la vue */
 
 #dashboardCapitalCard,
 #dashboardChartCard,
@@ -162,410 +133,67 @@ body[data-page="archives"] #performanceSummaryCard {
 #analysisPageHeader,
 #performancePageHeader,
 #archivesPageHeader {
-    display: none;
+    display:none;
 }
 
 
-/* ============================================================
-   V51
-   ============================================================ */
+/* V51 est créé dynamiquement */
 
 #v51FilterCard {
-    display: none;
+    display:none;
 }
 
 
-/* ============================================================
-   BOUTON AJOUTER TRADE
-   ============================================================ */
+/* Bouton principal pour ouvrir le formulaire */
 
 .trade-launcher-card {
-    display: none;
+    display:none;
 }
 
 body[data-page="dashboard"] .trade-launcher-card {
-    display: block;
+    display:block;
 }
 
 .trade-launcher {
     width: 100%;
     min-height: 96px;
-
     border: 0;
     border-radius: 16px;
-
     cursor: pointer;
-
     font-size: 1.05rem;
     font-weight: 800;
-
     letter-spacing: .2px;
-
     padding: 20px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(59,130,246,.20),
-            rgba(34,197,94,.14)
-        );
-
-    box-shadow:
-        0 12px 32px rgba(0,0,0,.12);
+    background: linear-gradient(135deg, rgba(59,130,246,.20), rgba(34,197,94,.14));
+    box-shadow: 0 12px 32px rgba(0,0,0,.12);
 }
 
 .trade-launcher small {
-    display: block;
-
-    margin-top: 6px;
-
-    opacity: .7;
-
-    font-weight: 500;
+    display:block;
+    margin-top:6px;
+    opacity:.7;
+    font-weight:500;
 }
 
 
-/* ============================================================
-   MODAL TRADE
-   ============================================================ */
+/* Modal Trade */
 
 .modal.trade-modal {
-    display: none;
+    display:none;
 }
 
 .modal.trade-modal.open {
-    display: flex;
+    display:flex;
 }
 
 .trade-modal .modal-content {
-    width: min(1100px, 96vw);
-
-    max-height: 92vh;
-
-    overflow: auto;
+    width:min(1100px, 96vw);
+    max-height:92vh;
+    overflow:auto;
 }
 
 
-/* ============================================================
-   ============================================================
-   PANNEAU SESSIONS DE TRADING
-   ============================================================
-   ============================================================ */
-
-.session-panel {
-
-    flex: 1;
-
-    min-width: 420px;
-    max-width: 850px;
-
-    display: flex;
-
-    align-items: stretch;
-
-    gap: 10px;
-
-    padding: 8px 10px;
-
-    border: 1px solid rgba(96,165,250,.18);
-
-    border-radius: 16px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(15,23,42,.88),
-            rgba(20,30,48,.72)
-        );
-
-    box-shadow:
-        0 0 25px rgba(59,130,246,.08),
-        inset 0 0 25px rgba(59,130,246,.025);
-
-    backdrop-filter: blur(14px);
-
-    overflow: hidden;
-
-    position: relative;
-
-}
-
-
-/* Lueur animée */
-
-.session-panel::before {
-
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: -120%;
-
-    width: 80%;
-    height: 100%;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(96,165,250,.08),
-            transparent
-        );
-
-    transform: skewX(-20deg);
-
-    animation:
-        sessionSweep 6s linear infinite;
-
-    pointer-events: none;
-}
-
-@keyframes sessionSweep {
-
-    0% {
-        left: -120%;
-    }
-
-    100% {
-        left: 150%;
-    }
-
-}
-
-
-/* Bloc */
-
-.session-current,
-.session-next {
-
-    position: relative;
-
-    flex: 1;
-
-    min-width: 0;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    padding: 8px 12px;
-
-    border-radius: 11px;
-
-    background:
-        rgba(255,255,255,.025);
-
-    border: 1px solid rgba(255,255,255,.05);
-
-}
-
-
-/* Séparateur */
-
-.session-current {
-
-    border-color:
-        rgba(34,197,94,.16);
-
-}
-
-
-/* Petit titre */
-
-.session-label {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    margin-bottom: 3px;
-
-    font-size: 10px;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-
-    color: #8c99aa;
-
-}
-
-
-/* Point animé */
-
-.session-dot {
-
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background: #22c55e;
-
-    box-shadow:
-        0 0 8px rgba(34,197,94,.8);
-
-    animation:
-        sessionPulse 1.8s ease-in-out infinite;
-
-}
-
-@keyframes sessionPulse {
-
-    0%,
-    100% {
-        opacity: .5;
-        transform: scale(.85);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.15);
-    }
-
-}
-
-
-/* Nom session */
-
-.session-name {
-
-    font-size: 15px;
-
-    font-weight: 800;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-}
-
-
-/* Horaires */
-
-.session-times {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    margin-top: 3px;
-
-    font-size: 11px;
-
-    color: #8c99aa;
-
-}
-
-
-/* Heure locale */
-
-.session-origin {
-
-    color: #e8eef7;
-
-    font-weight: 700;
-
-}
-
-
-/* Heure Mada */
-
-.session-mada {
-
-    color: #60a5fa;
-
-    font-weight: 700;
-
-}
-
-
-/* Temps */
-
-.session-countdown {
-
-    margin-top: 3px;
-
-    font-size: 11px;
-
-    font-weight: 700;
-
-    color: #22c55e;
-
-}
-
-
-/* Prochaine session */
-
-.session-next .session-dot {
-
-    background: #3b82f6;
-
-    box-shadow:
-        0 0 8px rgba(59,130,246,.8);
-
-}
-
-.session-next .session-countdown {
-
-    color: #60a5fa;
-
-}
-
-
-/* ============================================================
-   RESPONSIVE SESSION PANEL
-   ============================================================ */
-
-@media (max-width: 1050px) {
-
-    .session-panel {
-
-        min-width: 300px;
-
-    }
-
-}
-
-
-@media (max-width: 760px) {
-
-    .session-panel {
-
-        order: 3;
-
-        width: 100%;
-
-        max-width: none;
-
-        min-width: 0;
-
-        flex-direction: column;
-
-    }
-
-    .session-current,
-    .session-next {
-
-        min-height: 58px;
-
-    }
-
-}
-
-
-/* ============================================================
-   MOBILE NAVIGATION
-   ============================================================ */
+/* Navigation / mobile */
 
 @media (max-width: 760px) {
 
@@ -576,10 +204,8 @@ body[data-page="dashboard"] .trade-launcher-card {
 
     .app-nav a {
         flex: 1 1 calc(50% - 6px);
-
-        justify-content: center;
-
-        font-size: .9rem;
+        justify-content:center;
+        font-size:.9rem;
     }
 
     .container {
@@ -588,357 +214,90 @@ body[data-page="dashboard"] .trade-launcher-card {
     }
 
 }
-
-
-/* ============================================================
-   HEADER RESPONSIVE
-   ============================================================ */
-
-@media (max-width: 900px) {
-
-    .topbar {
-
-        flex-wrap: wrap;
-
-    }
-
-}
-
-
-/* ============================================================
-   HEADER SESSION PANEL
-   ============================================================ */
-
-.topbar {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 18px;
-
-}
-
-.topbar > div:first-child {
-
-    flex-shrink: 0;
-
-}
-
-
-/* ============================================================
-   MODE MOBILE
-   ============================================================ */
-
-@media (max-width: 600px) {
-
-    .topbar {
-
-        padding: 18px 4%;
-
-        gap: 12px;
-
-    }
-
-    .topbar > div:first-child {
-
-        width: calc(100% - 60px);
-
-    }
-
-    .session-panel {
-
-        margin-top: 2px;
-
-    }
-
-}
-
 </style>
+
 </head>
 
-
 <body>
-
-
-<!-- ============================================================
-     HEADER
-     ============================================================ -->
 
 <header class="topbar">
 
     <div>
-
         <h1>Trading Dashboard</h1>
-
-        <p>
-            Journal &amp; performance de trading
-        </p>
-
+        <p>Journal & performance de trading</p>
     </div>
 
-
-    <!-- ========================================================
-         PANNEAU SESSION
-         ======================================================== -->
-
-    <div
-        id="sessionPanel"
-        class="session-panel"
-        aria-label="Sessions de trading"
-    >
-
-        <!-- SESSION ACTUELLE -->
-
-        <div class="session-current">
-
-            <div class="session-label">
-
-                <span class="session-dot"></span>
-
-                Session actuelle
-
-            </div>
-
-
-            <div
-                id="currentSessionName"
-                class="session-name"
-            >
-                Chargement...
-            </div>
-
-
-            <div class="session-times">
-
-                <span
-                    id="currentSessionOrigin"
-                    class="session-origin"
-                >
-                    --:--
-                </span>
-
-                <span>•</span>
-
-                <span
-                    id="currentSessionMada"
-                    class="session-mada"
-                >
-                    🇲🇬 --:--
-                </span>
-
-            </div>
-
-
-            <div
-                id="currentSessionCountdown"
-                class="session-countdown"
-            >
-                --
-            </div>
-
-        </div>
-
-
-        <!-- PROCHAINE SESSION -->
-
-        <div class="session-next">
-
-            <div class="session-label">
-
-                <span class="session-dot"></span>
-
-                Prochaine ouverture
-
-            </div>
-
-
-            <div
-                id="nextSessionName"
-                class="session-name"
-            >
-                Chargement...
-            </div>
-
-
-            <div class="session-times">
-
-                <span
-                    id="nextSessionOrigin"
-                    class="session-origin"
-                >
-                    --:--
-                </span>
-
-                <span>•</span>
-
-                <span
-                    id="nextSessionMada"
-                    class="session-mada"
-                >
-                    🇲🇬 --:--
-                </span>
-
-            </div>
-
-
-            <div
-                id="nextSessionCountdown"
-                class="session-countdown"
-            >
-                --
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- BOUTON JOUR / NUIT -->
-
-    <button
-        id="themeToggle"
-        class="theme-btn"
-        aria-label="Changer le thème"
-    >
-        🌙
-    </button>
+    <button id="themeToggle" class="theme-btn">🌙</button>
 
 </header>
 
 
+<nav class="app-nav" aria-label="Navigation principale">
 
-<!-- ============================================================
-     NAVIGATION
-     ============================================================ -->
-
-<nav
-    class="app-nav"
-    aria-label="Navigation principale"
->
-
-    <a
-        href="index.html?page=dashboard"
-        data-page-link="dashboard"
-    >
+    <a href="index.html?page=dashboard" data-page-link="dashboard">
         🏠 Dashboard
     </a>
 
-
-    <a
-        href="index.html?page=analysis"
-        data-page-link="analysis"
-    >
-        📊 Analyses &amp; Risque
+    <a href="index.html?page=analysis" data-page-link="analysis">
+        📊 Analyses & Risque
     </a>
 
-
-    <a
-        href="index.html?page=performance"
-        data-page-link="performance"
-    >
+    <a href="index.html?page=performance" data-page-link="performance">
         🎯 Performances
     </a>
 
-
-    <a
-        href="index.html?page=archives"
-        data-page-link="archives"
-    >
+    <a href="index.html?page=archives" data-page-link="archives">
         🗄️ Archives
     </a>
 
 </nav>
 
 
-
-<!-- ============================================================
-     CONTENU PRINCIPAL
-     ============================================================ -->
-
 <main class="container">
 
 
-    <!-- ========================================================
-         TITRE ANALYSE
-         ======================================================== -->
+    <div id="analysisPageHeader" class="page-title">
 
-    <div
-        id="analysisPageHeader"
-        class="page-title"
-    >
-
-        <h2>
-            📊 Analyses &amp; Risque
-        </h2>
+        <h2>📊 Analyses & Risque</h2>
 
         <p>
-            Analyse filtrée, régularité du risque,
-            calendrier et recommandations.
+            Analyse filtrée, régularité du risque, calendrier et recommandations.
         </p>
 
     </div>
 
 
-    <!-- ========================================================
-         TITRE PERFORMANCE
-         ======================================================== -->
+    <div id="performancePageHeader" class="page-title">
 
-    <div
-        id="performancePageHeader"
-        class="page-title"
-    >
-
-        <h2>
-            🎯 Performances
-        </h2>
+        <h2>🎯 Performances</h2>
 
         <p>
-            Comparez vos setups et vos actifs
-            pour identifier vos meilleures performances.
+            Comparez vos setups et vos actifs pour identifier vos meilleures performances.
         </p>
 
     </div>
 
 
-    <!-- ========================================================
-         TITRE ARCHIVES
-         ======================================================== -->
+    <div id="archivesPageHeader" class="page-title">
 
-    <div
-        id="archivesPageHeader"
-        class="page-title"
-    >
-
-        <h2>
-            🗄️ Archives des capitaux
-        </h2>
+        <h2>🗄️ Archives des capitaux</h2>
 
         <p>
-            Chaque capital conserve son historique
-            et son évolution indépendamment.
+            Chaque capital conserve son historique et son évolution indépendamment.
         </p>
 
     </div>
 
 
+    <!-- CAPITAL ACTIF -->
 
-    <!-- ========================================================
-         CAPITAL ACTIF
-         ======================================================== -->
-
-    <section
-        id="dashboardCapitalCard"
-        class="card active-capital-card"
-    >
+    <section id="dashboardCapitalCard" class="card active-capital-card">
 
         <div class="section-header">
 
             <div>
 
-                <h2>
-                    💰 Capital actif
-                </h2>
+                <h2>💰 Capital actif</h2>
 
                 <p id="activeCapitalName">
                     Capital 1
@@ -949,26 +308,15 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             <div class="capital-actions">
 
-                <button
-                    id="changeCapitalBtn"
-                    class="secondary-btn"
-                >
+                <button id="changeCapitalBtn" class="secondary-btn">
                     Modifier
                 </button>
 
-
-                <button
-                    id="archiveCapitalBtn"
-                    class="warning-btn"
-                >
+                <button id="archiveCapitalBtn" class="warning-btn">
                     Archiver
                 </button>
 
-
-                <button
-                    id="newCapitalBtn"
-                    class="primary-btn"
-                >
+                <button id="newCapitalBtn" class="primary-btn">
                     Nouveau capital
                 </button>
 
@@ -1022,23 +370,15 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
+    <!-- GRAPHIQUE CAPITAL -->
 
-    <!-- ========================================================
-         GRAPHIQUE CAPITAL
-         ======================================================== -->
-
-    <section
-        id="dashboardChartCard"
-        class="card chart-card"
-    >
+    <section id="dashboardChartCard" class="card chart-card">
 
         <div class="section-header">
 
             <div>
 
-                <h2>
-                    📈 Évolution du capital
-                </h2>
+                <h2>📈 Évolution du capital</h2>
 
                 <p>
                     Évolution du solde après chaque trade
@@ -1053,11 +393,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             <canvas id="capitalChart"></canvas>
 
-
-            <div
-                id="emptyChartMessage"
-                class="empty-chart-message"
-            >
+            <div id="emptyChartMessage" class="empty-chart-message">
                 Aucun trade enregistré pour afficher le graphique.
             </div>
 
@@ -1066,23 +402,15 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
+    <!-- PERIODES -->
 
-    <!-- ========================================================
-         PERFORMANCE
-         ======================================================== -->
-
-    <section
-        id="performanceSummaryCard"
-        class="card"
-    >
+    <section id="performanceSummaryCard" class="card">
 
         <div class="section-header">
 
             <div>
 
-                <h2>
-                    📊 Performance
-                </h2>
+                <h2>📊 Performance</h2>
 
                 <p>
                     Analyse de vos résultats
@@ -1095,42 +423,23 @@ body[data-page="dashboard"] .trade-launcher-card {
 
         <div class="period-buttons">
 
-            <button
-                class="period-btn active"
-                data-period="today"
-            >
+            <button class="period-btn active" data-period="today">
                 Aujourd'hui
             </button>
 
-
-            <button
-                class="period-btn"
-                data-period="week"
-            >
+            <button class="period-btn" data-period="week">
                 Cette semaine
             </button>
 
-
-            <button
-                class="period-btn"
-                data-period="month"
-            >
+            <button class="period-btn" data-period="month">
                 Ce mois
             </button>
 
-
-            <button
-                class="period-btn"
-                data-period="year"
-            >
+            <button class="period-btn" data-period="year">
                 Cette année
             </button>
 
-
-            <button
-                class="period-btn"
-                data-period="all"
-            >
+            <button class="period-btn" data-period="all">
                 Tout l'historique
             </button>
 
@@ -1217,27 +526,21 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             </div>
 
+
         </div>
 
     </section>
 
 
+    <!-- AJOUT TRADE : OUVERTURE MODALE -->
 
-    <!-- ========================================================
-         AJOUT TRADE
-         ======================================================== -->
-
-    <section
-        id="dashboardTradeCard"
-        class="card trade-launcher-card"
-    >
+    <section id="dashboardTradeCard" class="card trade-launcher-card">
 
         <button
             id="openTradeModalBtn"
             class="trade-launcher"
             type="button"
         >
-
             ➕ Ajouter un trade
 
             <small>
@@ -1249,23 +552,15 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
+    <!-- PERFORMANCE DES SETUPS -->
 
-    <!-- ========================================================
-         PERFORMANCE SETUPS
-         ======================================================== -->
-
-    <section
-        id="setupPerformanceCard"
-        class="card"
-    >
+    <section id="setupPerformanceCard" class="card">
 
         <div class="section-header">
 
             <div>
 
-                <h2>
-                    🎯 Performance des setups
-                </h2>
+                <h2>🎯 Performance des setups</h2>
 
                 <p>
                     Résultats par stratégie
@@ -1284,11 +579,25 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     <tr>
 
-                        <th>Setup</th>
-                        <th>Trades</th>
-                        <th>Gagnants</th>
-                        <th>Winrate</th>
-                        <th>Profit</th>
+                        <th>
+                            Setup
+                        </th>
+
+                        <th>
+                            Trades
+                        </th>
+
+                        <th>
+                            Gagnants
+                        </th>
+
+                        <th>
+                            Winrate
+                        </th>
+
+                        <th>
+                            Profit
+                        </th>
 
                     </tr>
 
@@ -1305,23 +614,15 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
+    <!-- PERFORMANCE PAR ACTIF -->
 
-    <!-- ========================================================
-         PERFORMANCE PAR ACTIF
-         ======================================================== -->
-
-    <section
-        id="assetPerformanceCard"
-        class="card"
-    >
+    <section id="assetPerformanceCard" class="card">
 
         <div class="section-header">
 
             <div>
 
-                <h2>
-                    📈 Performance par actif
-                </h2>
+                <h2>📈 Performance par actif</h2>
 
                 <p>
                     Résultats détaillés pour chaque actif.
@@ -1340,16 +641,45 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     <tr>
 
-                        <th>Actif</th>
-                        <th>Trades</th>
-                        <th>Gagnants</th>
-                        <th>Perdants</th>
-                        <th>BE</th>
-                        <th>Winrate</th>
-                        <th>Profit</th>
-                        <th>RR moyen</th>
-                        <th>Meilleur</th>
-                        <th>Pire</th>
+                        <th>
+                            Actif
+                        </th>
+
+                        <th>
+                            Trades
+                        </th>
+
+                        <th>
+                            Gagnants
+                        </th>
+
+                        <th>
+                            Perdants
+                        </th>
+
+                        <th>
+                            BE
+                        </th>
+
+                        <th>
+                            Winrate
+                        </th>
+
+                        <th>
+                            Profit
+                        </th>
+
+                        <th>
+                            RR moyen
+                        </th>
+
+                        <th>
+                            Meilleur
+                        </th>
+
+                        <th>
+                            Pire
+                        </th>
 
                     </tr>
 
@@ -1366,23 +696,15 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
+    <!-- HISTORIQUE -->
 
-    <!-- ========================================================
-         HISTORIQUE
-         ======================================================== -->
-
-    <section
-        id="historyCard"
-        class="card"
-    >
+    <section id="historyCard" class="card">
 
         <div class="section-header">
 
             <div>
 
-                <h2>
-                    📜 Historique des trades
-                </h2>
+                <h2>📜 Historique des trades</h2>
 
                 <p>
                     Tous les trades du capital actif
@@ -1391,10 +713,7 @@ body[data-page="dashboard"] .trade-launcher-card {
             </div>
 
 
-            <button
-                id="clearBtn"
-                class="danger-btn"
-            >
+            <button id="clearBtn" class="danger-btn">
                 Effacer les trades
             </button>
 
@@ -1409,18 +728,53 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     <tr>
 
-                        <th>Date</th>
-                        <th>Actif</th>
-                        <th>Position</th>
-                        <th>Lot</th>
-                        <th>Entry</th>
-                        <th>SL</th>
-                        <th>TP</th>
-                        <th>RR</th>
-                        <th>Setup</th>
-                        <th>Résultat</th>
-                        <th>P/L</th>
-                        <th>Action</th>
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Actif
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Lot
+                        </th>
+
+                        <th>
+                            Entry
+                        </th>
+
+                        <th>
+                            SL
+                        </th>
+
+                        <th>
+                            TP
+                        </th>
+
+                        <th>
+                            RR
+                        </th>
+
+                        <th>
+                            Setup
+                        </th>
+
+                        <th>
+                            Résultat
+                        </th>
+
+                        <th>
+                            P/L
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
 
                     </tr>
 
@@ -1437,23 +791,15 @@ body[data-page="dashboard"] .trade-launcher-card {
     </section>
 
 
+    <!-- ARCHIVES -->
 
-    <!-- ========================================================
-         ARCHIVES
-         ======================================================== -->
-
-    <section
-        id="archivesCard"
-        class="card"
-    >
+    <section id="archivesCard" class="card">
 
         <div class="section-header">
 
             <div>
 
-                <h2>
-                    🗄️ Archives des capitaux
-                </h2>
+                <h2>🗄️ Archives des capitaux</h2>
 
                 <p>
                     Historique indépendant de chaque capital
@@ -1464,28 +810,21 @@ body[data-page="dashboard"] .trade-launcher-card {
         </div>
 
 
-        <div
-            id="archivesList"
-            class="archives-list"
-        >
+        <div id="archivesList" class="archives-list">
         </div>
 
     </section>
 
+
 </main>
 
 
+<!-- MODAL AJOUT TRADE -->
 
-<!-- ============================================================
-     MODAL TRADE
-     ============================================================ -->
-
-<div
-    id="tradeModal"
-    class="modal trade-modal"
->
+<div id="tradeModal" class="modal trade-modal">
 
     <div class="modal-content">
+
 
         <div class="modal-header">
 
@@ -1516,6 +855,7 @@ body[data-page="dashboard"] .trade-launcher-card {
         <div class="modal-body">
 
             <form id="tradeForm">
+
 
                 <div class="form-grid">
 
@@ -1681,38 +1021,87 @@ body[data-page="dashboard"] .trade-launcher-card {
                             required
                         >
 
-                            <option value="2">RR 2</option>
-                            <option value="3">RR 3</option>
-                            <option value="4">RR 4</option>
-                            <option value="5">RR 5</option>
-                            <option value="6">RR 6</option>
-                            <option value="7">RR 7</option>
-                            <option value="8">RR 8</option>
-                            <option value="9">RR 9</option>
-                            <option value="10">RR 10</option>
-                            <option value="11">RR 11</option>
-                            <option value="12">RR 12</option>
-                            <option value="13">RR 13</option>
-                            <option value="14">RR 14</option>
-                            <option value="15">RR 15</option>
-                            <option value="16">RR 16</option>
-                            <option value="17">RR 17</option>
-                            <option value="18">RR 18</option>
-                            <option value="19">RR 19</option>
-                            <option value="20">RR 20</option>
+                            <option value="2">
+                                RR 2
+                            </option>
+
+                            <option value="3">
+                                RR 3
+                            </option>
+
+                            <option value="4">
+                                RR 4
+                            </option>
+
+                            <option value="5">
+                                RR 5
+                            </option>
+
+                            <option value="6">
+                                RR 6
+                            </option>
+
+                            <option value="7">
+                                RR 7
+                            </option>
+
+                            <option value="8">
+                                RR 8
+                            </option>
+
+                            <option value="9">
+                                RR 9
+                            </option>
+
+                            <option value="10">
+                                RR 10
+                            </option>
+
+                            <option value="11">
+                                RR 11
+                            </option>
+
+                            <option value="12">
+                                RR 12
+                            </option>
+
+                            <option value="13">
+                                RR 13
+                            </option>
+
+                            <option value="14">
+                                RR 14
+                            </option>
+
+                            <option value="15">
+                                RR 15
+                            </option>
+
+                            <option value="16">
+                                RR 16
+                            </option>
+
+                            <option value="17">
+                                RR 17
+                            </option>
+
+                            <option value="18">
+                                RR 18
+                            </option>
+
+                            <option value="19">
+                                RR 19
+                            </option>
+
+                            <option value="20">
+                                RR 20
+                            </option>
 
                         </select>
 
 
-                        <small
-                            style="
-                                display:block;
-                                margin-top:6px;
-                                opacity:.7;
-                            "
-                        >
-                            Le RR du capital sert de valeur par défaut.
-                            Vous pouvez l'adapter pour chaque trade.
+                        <small style="display:block;margin-top:6px;opacity:.7;">
+                            Le RR du capital sert de valeur par défaut. Vous pouvez l'adapter pour chaque trade.
                         </small>
 
                     </div>
@@ -1824,10 +1213,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     <div>
 
-                        <label
-                            id="profitLabel"
-                            for="profit"
-                        >
+                        <label id="profitLabel" for="profit">
                             P/L automatique
                         </label>
 
@@ -1841,6 +1227,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                     </div>
 
+
                 </div>
 
 
@@ -1848,8 +1235,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                     id="tradeMMInfo"
                     class="form-full"
                     aria-live="polite"
-                >
-                </div>
+                ></div>
 
 
                 <div
@@ -1896,7 +1282,6 @@ body[data-page="dashboard"] .trade-launcher-card {
                         Enregistrer le trade
                     </button>
 
-
                     <button
                         id="cancelTradeModalBtn"
                         type="button"
@@ -1907,6 +1292,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                 </div>
 
+
             </form>
 
         </div>
@@ -1916,17 +1302,12 @@ body[data-page="dashboard"] .trade-launcher-card {
 </div>
 
 
+<!-- MODAL NOUVEAU CAPITAL -->
 
-<!-- ============================================================
-     MODAL NOUVEAU CAPITAL
-     ============================================================ -->
-
-<div
-    id="capitalModal"
-    class="modal"
->
+<div id="capitalModal" class="modal">
 
     <div class="modal-content">
+
 
         <div class="modal-header">
 
@@ -2002,11 +1383,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
                 <small
                     id="capitalAmountHelp"
-                    style="
-                        display:block;
-                        margin-top:6px;
-                        opacity:.7;
-                    "
+                    style="display:block;margin-top:6px;opacity:.7;"
                 ></small>
 
             </div>
@@ -2026,13 +1403,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                     placeholder="2.00"
                 >
 
-                <small
-                    style="
-                        display:block;
-                        margin-top:6px;
-                        opacity:.7;
-                    "
-                >
+                <small style="display:block;margin-top:6px;opacity:.7;">
                     Minimum autorisé : 2.00
                 </small>
 
@@ -2051,11 +1422,10 @@ body[data-page="dashboard"] .trade-launcher-card {
                     style="margin-bottom:6px;"
                 ></div>
 
-                <strong
-                    id="capitalModalObjective"
-                ></strong>
+                <strong id="capitalModalObjective"></strong>
 
             </div>
+
 
         </div>
 
@@ -2079,22 +1449,18 @@ body[data-page="dashboard"] .trade-launcher-card {
 
         </div>
 
+
     </div>
 
 </div>
 
 
+<!-- MODAL GRAPHIQUE ARCHIVE -->
 
-<!-- ============================================================
-     MODAL GRAPHIQUE ARCHIVE
-     ============================================================ -->
-
-<div
-    id="archiveChartModal"
-    class="modal"
->
+<div id="archiveChartModal" class="modal">
 
     <div class="modal-content archive-chart-modal-content">
+
 
         <div class="modal-header">
 
@@ -2162,6 +1528,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
             </div>
 
+
         </div>
 
 
@@ -2171,30 +1538,23 @@ body[data-page="dashboard"] .trade-launcher-card {
 
         </div>
 
+
     </div>
 
 </div>
 
 
-
-<!-- ============================================================
-     SCRIPTS PRINCIPAUX
-     
-     IMPORTANT :
-     
-     Les calculs restent entièrement dans app.js.
-     v51-filters.js reste inchangé.
-     ============================================================ -->
+<!-- =========================================================
+     SCRIPTS
+     ========================================================= -->
 
 <script src="app.js"></script>
 
 <script src="v51-filters.js"></script>
 
+<!-- Sessions de trading : affichage uniquement -->
+<script src="session.js"></script>
 
-
-<!-- ============================================================
-     NAVIGATION
-     ============================================================ -->
 
 <script>
 
@@ -2207,16 +1567,13 @@ body[data-page="dashboard"] .trade-launcher-card {
         "archives"
     ];
 
-
     const params =
         new URLSearchParams(
             window.location.search
         );
 
-
     const requested =
         params.get("page");
-
 
     const page =
         allowedPages.includes(requested)
@@ -2229,9 +1586,7 @@ body[data-page="dashboard"] .trade-launcher-card {
 
 
     document
-        .querySelectorAll(
-            "[data-page-link]"
-        )
+        .querySelectorAll("[data-page-link]")
         .forEach(link => {
 
             link.classList.toggle(
@@ -2245,24 +1600,14 @@ body[data-page="dashboard"] .trade-launcher-card {
     function openTradeModal() {
 
         const modal =
-            document.getElementById(
-                "tradeModal"
-            );
+            document.getElementById("tradeModal");
 
+        if (!modal) return;
 
-        if (!modal) {
-            return;
-        }
-
-
-        modal.classList.add(
-            "open"
-        );
-
+        modal.classList.add("open");
 
         modal.style.display =
             "flex";
-
 
         document.body.classList.add(
             "modal-open"
@@ -2274,24 +1619,14 @@ body[data-page="dashboard"] .trade-launcher-card {
     function closeTradeModal() {
 
         const modal =
-            document.getElementById(
-                "tradeModal"
-            );
+            document.getElementById("tradeModal");
 
+        if (!modal) return;
 
-        if (!modal) {
-            return;
-        }
-
-
-        modal.classList.remove(
-            "open"
-        );
-
+        modal.classList.remove("open");
 
         modal.style.display =
             "none";
-
 
         document.body.classList.remove(
             "modal-open"
@@ -2309,10 +1644,7 @@ body[data-page="dashboard"] .trade-launcher-card {
                     "#openTradeModalBtn, #closeTradeModalBtn, #cancelTradeModalBtn"
                 );
 
-
-            if (!target) {
-                return;
-            }
+            if (!target) return;
 
 
             if (
@@ -2376,6 +1708,9 @@ body[data-page="dashboard"] .trade-launcher-card {
     );
 
 
+    // Si app.js ferme ou réinitialise le formulaire après enregistrement,
+    // on referme automatiquement la fenêtre.
+
     const tradeForm =
         document.getElementById(
             "tradeForm"
@@ -2399,830 +1734,6 @@ body[data-page="dashboard"] .trade-launcher-card {
 
     }
 
-})();
-
-</script>
-
-
-
-<!-- ============================================================
-     SYSTÈME DES SESSIONS DE TRADING
-     
-     IMPORTANT :
-     
-     Ce système est totalement indépendant
-     des calculs de trading.
-
-     Il utilise les fuseaux horaires IANA
-     afin de suivre automatiquement les changements
-     été / hiver.
-     ============================================================ -->
-
-<script>
-
-(function () {
-
-
-    /* =========================================================
-       CONFIGURATION DES SESSIONS
-       ========================================================= */
-
-    const sessions = [
-
-        {
-            name: "Sydney",
-            flag: "🇦🇺",
-            timezone: "Australia/Sydney",
-
-            openHour: 8,
-            openMinute: 0,
-
-            closeHour: 17,
-            closeMinute: 0
-        },
-
-
-        {
-            name: "Tokyo",
-            flag: "🇯🇵",
-            timezone: "Asia/Tokyo",
-
-            openHour: 9,
-            openMinute: 0,
-
-            closeHour: 18,
-            closeMinute: 0
-        },
-
-
-        {
-            name: "Londres",
-            flag: "🇬🇧",
-            timezone: "Europe/London",
-
-            openHour: 8,
-            openMinute: 0,
-
-            closeHour: 17,
-            closeMinute: 0
-        },
-
-
-        {
-            name: "New York",
-            flag: "🇺🇸",
-            timezone: "America/New_York",
-
-            openHour: 8,
-            openMinute: 0,
-
-            closeHour: 17,
-            closeMinute: 0
-        }
-
-    ];
-
-
-    /* =========================================================
-       FUSEAU MADAGASCAR
-       ========================================================= */
-
-    const MADAGASCAR_TIMEZONE =
-        "Indian/Antananarivo";
-
-
-    /* =========================================================
-       FORMAT HEURE
-       ========================================================= */
-
-    function formatTime(
-        date,
-        timezone
-    ) {
-
-        return new Intl.DateTimeFormat(
-            "fr-FR",
-            {
-                timeZone: timezone,
-
-                hour: "2-digit",
-                minute: "2-digit",
-
-                hour12: false
-            }
-        ).format(date);
-
-    }
-
-
-    /* =========================================================
-       OBTENIR L'HEURE D'UNE ZONE
-       ========================================================= */
-
-    function getTimeParts(
-        date,
-        timezone
-    ) {
-
-        const parts =
-            new Intl.DateTimeFormat(
-                "en-US",
-                {
-                    timeZone: timezone,
-
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-
-                    hour12: false
-                }
-            ).formatToParts(date);
-
-
-        const result = {};
-
-
-        parts.forEach(
-            part => {
-
-                if (
-                    part.type !==
-                    "literal"
-                ) {
-
-                    result[part.type] =
-                        Number(
-                            part.value
-                        );
-
-                }
-
-            }
-        );
-
-
-        return result;
-
-    }
-
-
-    /* =========================================================
-       MINUTES DEPUIS MINUIT
-       ========================================================= */
-
-    function minutesSinceMidnight(
-        parts
-    ) {
-
-        return (
-            parts.hour * 60 +
-            parts.minute +
-            parts.second / 60
-        );
-
-    }
-
-
-    /* =========================================================
-       SESSION OUVERTE ?
-       ========================================================= */
-
-    function isSessionOpen(
-        session,
-        now
-    ) {
-
-        const parts =
-            getTimeParts(
-                now,
-                session.timezone
-            );
-
-
-        const current =
-            minutesSinceMidnight(
-                parts
-            );
-
-
-        const open =
-            session.openHour * 60 +
-            session.openMinute;
-
-
-        const close =
-            session.closeHour * 60 +
-            session.closeMinute;
-
-
-        return (
-            current >= open &&
-            current < close
-        );
-
-    }
-
-
-    /* =========================================================
-       PROCHAINE OUVERTURE
-       ========================================================= */
-
-    function getNextOpening(
-        session,
-        now
-    ) {
-
-        const parts =
-            getTimeParts(
-                now,
-                session.timezone
-            );
-
-
-        const current =
-            minutesSinceMidnight(
-                parts
-            );
-
-
-        const open =
-            session.openHour * 60 +
-            session.openMinute;
-
-
-        let daysAhead = 0;
-
-
-        if (
-            current >= open
-        ) {
-
-            daysAhead = 1;
-
-        }
-
-
-        return {
-            session,
-            daysAhead
-        };
-
-    }
-
-
-    /* =========================================================
-       DÉCALAGE TEMPOREL ENTRE DEUX INSTANTS
-       ========================================================= */
-
-    function differenceInSeconds(
-        target,
-        now
-    ) {
-
-        return Math.max(
-            0,
-            Math.floor(
-                (
-                    target.getTime() -
-                    now.getTime()
-                ) / 1000
-            )
-        );
-
-    }
-
-
-    /* =========================================================
-       CONSTRUIRE UN INSTANT RÉEL
-       
-       Cette méthode utilise la différence UTC
-       afin de fonctionner correctement avec DST.
-       ========================================================= */
-
-    function getFutureInstant(
-        timezone,
-        hour,
-        minute,
-        daysAhead
-    ) {
-
-        const now =
-            new Date();
-
-
-        const currentParts =
-            getTimeParts(
-                now,
-                timezone
-            );
-
-
-        const desiredDate =
-            new Date(
-                Date.UTC(
-                    currentParts.year,
-                    currentParts.month - 1,
-                    currentParts.day + daysAhead,
-                    hour,
-                    minute,
-                    0
-                )
-            );
-
-
-        /*
-         * Première approximation.
-         */
-
-        let utc =
-            desiredDate.getTime();
-
-
-        /*
-         * Correction selon le décalage
-         * réel du fuseau.
-         */
-
-        for (
-            let i = 0;
-            i < 3;
-            i++
-        ) {
-
-            const check =
-                new Date(
-                    utc
-                );
-
-
-            const checkParts =
-                getTimeParts(
-                    check,
-                    timezone
-                );
-
-
-            const desiredUTC =
-                Date.UTC(
-                    currentParts.year,
-                    currentParts.month - 1,
-                    currentParts.day + daysAhead,
-                    hour,
-                    minute,
-                    0
-                );
-
-
-            const actualUTC =
-                Date.UTC(
-                    checkParts.year,
-                    checkParts.month - 1,
-                    checkParts.day,
-                    checkParts.hour,
-                    checkParts.minute,
-                    checkParts.second
-                );
-
-
-            utc +=
-                desiredUTC -
-                actualUTC;
-
-        }
-
-
-        return new Date(
-            utc
-        );
-
-    }
-
-
-    /* =========================================================
-       FORMAT COMPTE À REBOURS
-       ========================================================= */
-
-    function formatCountdown(
-        seconds
-    ) {
-
-        seconds =
-            Math.max(
-                0,
-                Math.floor(seconds)
-            );
-
-
-        const hours =
-            Math.floor(
-                seconds / 3600
-            );
-
-
-        const minutes =
-            Math.floor(
-                (
-                    seconds % 3600
-                ) / 60
-            );
-
-
-        const secs =
-            seconds % 60;
-
-
-        if (
-            hours > 0
-        ) {
-
-            return (
-                "⏱️ " +
-                hours +
-                "h " +
-                String(
-                    minutes
-                ).padStart(
-                    2,
-                    "0"
-                ) +
-                "m"
-            );
-
-        }
-
-
-        return (
-            "⏱️ " +
-            minutes +
-            "m " +
-            String(
-                secs
-            ).padStart(
-                2,
-                "0"
-            ) +
-            "s"
-        );
-
-    }
-
-
-    /* =========================================================
-       TROUVER LA SESSION ACTUELLE
-       ========================================================= */
-
-    function getCurrentSession(
-        now
-    ) {
-
-        return sessions.find(
-            session =>
-                isSessionOpen(
-                    session,
-                    now
-                )
-        );
-
-    }
-
-
-    /* =========================================================
-       TROUVER LA PROCHAINE SESSION
-       ========================================================= */
-
-    function getNextSession(
-        now,
-        currentSession
-    ) {
-
-        const candidates =
-            sessions.map(
-                session => {
-
-                    const opening =
-                        getNextOpening(
-                            session,
-                            now
-                        );
-
-
-                    const target =
-                        getFutureInstant(
-                            session.timezone,
-
-                            session.openHour,
-                            session.openMinute,
-
-                            opening.daysAhead
-                        );
-
-
-                    return {
-                        session,
-                        target
-                    };
-
-                }
-            );
-
-
-        candidates.sort(
-            (a, b) =>
-                a.target.getTime() -
-                b.target.getTime()
-        );
-
-
-        /*
-         * Si une session est actuellement ouverte,
-         * on cherche la prochaine autre session.
-         */
-
-        if (
-            currentSession &&
-            candidates.length > 1
-        ) {
-
-            const filtered =
-                candidates.filter(
-                    item =>
-                        item.session.name !==
-                        currentSession.name
-                );
-
-
-            if (
-                filtered.length
-            ) {
-
-                return filtered[0];
-
-            }
-
-        }
-
-
-        return candidates[0];
-
-    }
-
-
-    /* =========================================================
-       MISE À JOUR DU PANNEAU
-       ========================================================= */
-
-    function updateSessions() {
-
-        const now =
-            new Date();
-
-
-        const current =
-            getCurrentSession(
-                now
-            );
-
-
-        const next =
-            getNextSession(
-                now,
-                current
-            );
-
-
-        const currentName =
-            document.getElementById(
-                "currentSessionName"
-            );
-
-
-        const currentOrigin =
-            document.getElementById(
-                "currentSessionOrigin"
-            );
-
-
-        const currentMada =
-            document.getElementById(
-                "currentSessionMada"
-            );
-
-
-        const currentCountdown =
-            document.getElementById(
-                "currentSessionCountdown"
-            );
-
-
-        const nextName =
-            document.getElementById(
-                "nextSessionName"
-            );
-
-
-        const nextOrigin =
-            document.getElementById(
-                "nextSessionOrigin"
-            );
-
-
-        const nextMada =
-            document.getElementById(
-                "nextSessionMada"
-            );
-
-
-        const nextCountdown =
-            document.getElementById(
-                "nextSessionCountdown"
-            );
-
-
-        /* =====================================================
-           SESSION ACTUELLE
-           ===================================================== */
-
-        if (
-            current
-        ) {
-
-            currentName.textContent =
-                current.flag +
-                " " +
-                current.name;
-
-
-            currentOrigin.textContent =
-                formatTime(
-                    now,
-                    current.timezone
-                );
-
-
-            currentMada.textContent =
-                "🇲🇬 " +
-                formatTime(
-                    now,
-                    MADAGASCAR_TIMEZONE
-                );
-
-
-            const closeTarget =
-                getFutureInstant(
-                    current.timezone,
-
-                    current.closeHour,
-                    current.closeMinute,
-
-                    0
-                );
-
-
-            /*
-             * Si la fermeture est déjà passée
-             * à cause d'un problème de calcul,
-             * on prend le lendemain.
-             */
-
-            let closeTime =
-                closeTarget;
-
-
-            if (
-                closeTime.getTime() <=
-                now.getTime()
-            ) {
-
-                closeTime =
-                    getFutureInstant(
-                        current.timezone,
-
-                        current.closeHour,
-                        current.closeMinute,
-
-                        1
-                    );
-
-            }
-
-
-            currentCountdown.textContent =
-                "Fermeture dans " +
-                formatCountdown(
-                    differenceInSeconds(
-                        closeTime,
-                        now
-                    )
-                );
-
-        } else {
-
-            currentName.textContent =
-                "🌙 Marché Forex hors session";
-
-
-            currentOrigin.textContent =
-                "—";
-
-
-            currentMada.textContent =
-                "🇲🇬 " +
-                formatTime(
-                    now,
-                    MADAGASCAR_TIMEZONE
-                );
-
-
-            currentCountdown.textContent =
-                "En attente de la prochaine ouverture";
-
-        }
-
-
-        /* =====================================================
-           PROCHAINE SESSION
-           ===================================================== */
-
-        if (
-            next
-        ) {
-
-            const nextSession =
-                next.session;
-
-
-            nextName.textContent =
-                nextSession.flag +
-                " " +
-                nextSession.name;
-
-
-            nextOrigin.textContent =
-                "Ouverture " +
-                formatTime(
-                    next.target,
-                    nextSession.timezone
-                );
-
-
-            nextMada.textContent =
-                "🇲🇬 " +
-                formatTime(
-                    next.target,
-                    MADAGASCAR_TIMEZONE
-                );
-
-
-            nextCountdown.textContent =
-                "Dans " +
-                formatCountdown(
-                    differenceInSeconds(
-                        next.target,
-                        now
-                    )
-                );
-
-        }
-
-    }
-
-
-    /* =========================================================
-       LANCEMENT
-       ========================================================= */
-
-    function startSessionClock() {
-
-        updateSessions();
-
-
-        setInterval(
-            updateSessions,
-            1000
-        );
-
-    }
-
-
-    if (
-        document.readyState ===
-        "loading"
-    ) {
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            startSessionClock
-        );
-
-    } else {
-
-        startSessionClock();
-
-    }
 
 })();
 
