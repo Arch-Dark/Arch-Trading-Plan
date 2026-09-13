@@ -13,6 +13,7 @@
    - Week-end = marché fermé
    - Prochaine session
    - Compte à rebours
+   - Affichage compact et esthétique
    ========================================================= */
 
 (function () {
@@ -76,6 +77,649 @@
 
 
     /* =====================================================
+       STYLE DU PANNEAU
+       ===================================================== */
+
+    function injectSessionStyles() {
+
+        if (
+            document.getElementById(
+                "tradingSessionStyles"
+            )
+        ) {
+            return;
+        }
+
+
+        const style =
+            document.createElement("style");
+
+
+        style.id =
+            "tradingSessionStyles";
+
+
+        style.textContent = `
+
+            /* =================================================
+               CONTENEUR PRINCIPAL
+               ================================================= */
+
+            #tradingSessionsPanel {
+
+                position: relative;
+
+                display: flex;
+
+                align-items: center;
+
+                gap: 12px;
+
+                width: auto;
+
+                max-width: 760px;
+
+                min-width: 0;
+
+                margin: 0 auto;
+
+                padding: 8px 10px;
+
+                border: 1px solid rgba(
+                    255,
+                    255,
+                    255,
+                    0.10
+                );
+
+                border-radius: 14px;
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        rgba(255,255,255,0.075),
+                        rgba(255,255,255,0.025)
+                    );
+
+                box-shadow:
+                    0 8px 24px rgba(0,0,0,0.18),
+                    inset 0 1px 0 rgba(
+                        255,
+                        255,
+                        255,
+                        0.05
+                    );
+
+                backdrop-filter: blur(12px);
+
+                -webkit-backdrop-filter: blur(12px);
+
+                box-sizing: border-box;
+
+                flex: 0 1 auto !important;
+
+                overflow: hidden;
+
+            }
+
+
+            /* =================================================
+               ZONE ACTUELLE / PROCHAINE
+               ================================================= */
+
+            #tradingSessionsPanel .sessions-main {
+
+                display: flex;
+
+                align-items: stretch;
+
+                gap: 0;
+
+                min-width: 0;
+
+                flex: 0 1 auto;
+
+            }
+
+
+            #tradingSessionsPanel .session-current,
+
+            #tradingSessionsPanel .session-next {
+
+                display: grid;
+
+                grid-template-columns:
+                    auto
+                    auto
+                    auto;
+
+                align-items: center;
+
+                gap: 5px 8px;
+
+                min-width: 0;
+
+                padding: 3px 11px;
+
+            }
+
+
+            #tradingSessionsPanel .session-current {
+
+                border-right:
+                    1px solid rgba(
+                        255,
+                        255,
+                        255,
+                        0.10
+                    );
+
+            }
+
+
+            #tradingSessionsPanel .session-label {
+
+                grid-column: 1 / -1;
+
+                font-size: 8px;
+
+                font-weight: 800;
+
+                letter-spacing: 1px;
+
+                text-transform: uppercase;
+
+                opacity: 0.55;
+
+                white-space: nowrap;
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-current-name,
+
+            #tradingSessionsPanel
+            .session-next-name {
+
+                font-size: 12px;
+
+                font-weight: 800;
+
+                white-space: nowrap;
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-status {
+
+                font-size: 10px;
+
+                font-weight: 700;
+
+                white-space: nowrap;
+
+                opacity: 0.78;
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-countdown {
+
+                font-size: 10px;
+
+                font-weight: 800;
+
+                white-space: nowrap;
+
+                padding: 3px 7px;
+
+                border-radius: 7px;
+
+                background: rgba(
+                    255,
+                    255,
+                    255,
+                    0.07
+                );
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-countdown.small {
+
+                color: #7dd3fc;
+
+                background: rgba(
+                    56,
+                    189,
+                    248,
+                    0.10
+                );
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-time-line {
+
+                font-size: 9px;
+
+                opacity: 0.68;
+
+                white-space: nowrap;
+
+            }
+
+
+            /* =================================================
+               WEEK-END
+               ================================================= */
+
+            #tradingSessionsPanel .sessions-weekend {
+
+                display: inline-flex;
+
+                align-items: center;
+
+                white-space: nowrap;
+
+                font-size: 9px;
+
+                font-weight: 700;
+
+                padding: 4px 8px;
+
+                border-radius: 7px;
+
+                background: rgba(
+                    239,
+                    68,
+                    68,
+                    0.10
+                );
+
+                border: 1px solid rgba(
+                    239,
+                    68,
+                    68,
+                    0.16
+                );
+
+            }
+
+
+            /* =================================================
+               LISTE DES SESSIONS
+               ================================================= */
+
+            #tradingSessionsPanel .sessions-list {
+
+                display: flex;
+
+                align-items: center;
+
+                gap: 5px;
+
+                min-width: 0;
+
+                flex: 0 1 auto;
+
+            }
+
+
+            /* =================================================
+               MINI CARTES
+               ================================================= */
+
+            #tradingSessionsPanel
+            .session-mini-card {
+
+                display: grid;
+
+                grid-template-columns:
+                    auto
+                    auto;
+
+                align-items: center;
+
+                column-gap: 6px;
+
+                row-gap: 1px;
+
+                min-width: 92px;
+
+                padding: 5px 7px;
+
+                border-radius: 9px;
+
+                border: 1px solid rgba(
+                    255,
+                    255,
+                    255,
+                    0.07
+                );
+
+                background: rgba(
+                    255,
+                    255,
+                    255,
+                    0.035
+                );
+
+                transition:
+                    transform 0.2s ease,
+                    background 0.2s ease,
+                    border-color 0.2s ease,
+                    box-shadow 0.2s ease;
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-mini-card:hover {
+
+                transform:
+                    translateY(-1px);
+
+                background: rgba(
+                    255,
+                    255,
+                    255,
+                    0.065
+                );
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-mini-title {
+
+                display: flex;
+
+                align-items: center;
+
+                gap: 4px;
+
+                grid-column: 1 / -1;
+
+                font-size: 9px;
+
+                white-space: nowrap;
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-mini-title strong {
+
+                font-size: 9px;
+
+                font-weight: 800;
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-mini-status {
+
+                font-size: 8px;
+
+                font-weight: 700;
+
+                white-space: nowrap;
+
+                opacity: 0.70;
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-mini-hours {
+
+                display: flex;
+
+                align-items: center;
+
+                gap: 3px;
+
+                white-space: nowrap;
+
+                font-size: 7px;
+
+                opacity: 0.52;
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-mini-hours strong {
+
+                font-size: 8px;
+
+                font-weight: 700;
+
+                opacity: 1;
+
+            }
+
+
+            /* =================================================
+               SESSION OUVERTE
+               ================================================= */
+
+            #tradingSessionsPanel
+            .session-mini-card.session-open {
+
+                border-color: rgba(
+                    34,
+                    197,
+                    94,
+                    0.32
+                );
+
+                background: rgba(
+                    34,
+                    197,
+                    94,
+                    0.08
+                );
+
+                box-shadow:
+                    0 0 12px rgba(
+                        34,
+                        197,
+                        94,
+                        0.08
+                    );
+
+            }
+
+
+            #tradingSessionsPanel
+            .session-mini-card.session-open
+            .session-mini-status {
+
+                color: #4ade80;
+
+                opacity: 1;
+
+            }
+
+
+            /* =================================================
+               MODE CLAIR
+               ================================================= */
+
+            body.light-theme
+            #tradingSessionsPanel,
+
+            body.light
+            #tradingSessionsPanel {
+
+                border-color: rgba(
+                    15,
+                    23,
+                    42,
+                    0.10
+                );
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        rgba(255,255,255,0.92),
+                        rgba(248,250,252,0.90)
+                    );
+
+                box-shadow:
+                    0 8px 24px rgba(
+                        15,
+                        23,
+                        42,
+                        0.10
+                    );
+
+            }
+
+
+            /* =================================================
+               PETITS ÉCRANS
+               ================================================= */
+
+            @media (max-width: 1100px) {
+
+                #tradingSessionsPanel {
+
+                    max-width: 600px;
+
+                }
+
+                #tradingSessionsPanel
+                .sessions-list {
+
+                    display: none;
+
+                }
+
+            }
+
+
+            @media (max-width: 760px) {
+
+                #tradingSessionsPanel {
+
+                    width: 100%;
+
+                    max-width: none;
+
+                    margin: 8px 0;
+
+                    padding: 7px;
+
+                    flex-wrap: wrap;
+
+                    justify-content: center;
+
+                }
+
+
+                #tradingSessionsPanel
+                .sessions-main {
+
+                    width: 100%;
+
+                    justify-content: center;
+
+                }
+
+
+                #tradingSessionsPanel
+                .session-current,
+
+                #tradingSessionsPanel
+                .session-next {
+
+                    flex: 1 1 0;
+
+                }
+
+
+                #tradingSessionsPanel
+                .sessions-weekend {
+
+                    display: inline-flex;
+
+                }
+
+            }
+
+
+            @media (max-width: 520px) {
+
+                #tradingSessionsPanel
+                .sessions-main {
+
+                    flex-direction: column;
+
+                    gap: 4px;
+
+                }
+
+
+                #tradingSessionsPanel
+                .session-current {
+
+                    border-right: none;
+
+                    border-bottom:
+                        1px solid rgba(
+                            255,
+                            255,
+                            255,
+                            0.08
+                        );
+
+                }
+
+
+                #tradingSessionsPanel
+                .session-current,
+
+                #tradingSessionsPanel
+                .session-next {
+
+                    width: 100%;
+
+                    justify-content: center;
+
+                }
+
+
+                #tradingSessionsPanel
+                .session-time-line {
+
+                    max-width: 150px;
+
+                    overflow: hidden;
+
+                    text-overflow: ellipsis;
+
+                }
+
+            }
+
+        `;
+
+
+        document.head.appendChild(style);
+
+    }
+
+
+    /* =====================================================
        OUTILS DATE / HEURE
        ===================================================== */
 
@@ -113,6 +757,7 @@
         });
 
         return result;
+
     }
 
 
@@ -469,11 +1114,6 @@
             );
 
 
-        /*
-         * Si un panneau existe déjà dans le HTML,
-         * on l'utilise.
-         */
-
         if (!panel) {
 
             panel =
@@ -554,7 +1194,7 @@
                     class="sessions-weekend"
                     style="display:none;"
                 >
-                    🛑 Marché fermé — week-end
+                    🛑 Week-end
                 </div>
 
 
@@ -567,21 +1207,6 @@
 
         }
 
-
-        /*
-         * -------------------------------------------------
-         * POSITIONNEMENT
-         * -------------------------------------------------
-         *
-         * Le panneau est placé dans le header,
-         * mais avant le bouton thème.
-         *
-         * On ne fait PLUS :
-         *
-         * topbar.appendChild(panel)
-         *
-         * systématiquement.
-         */
 
         const topbar =
             document.querySelector(
@@ -635,19 +1260,11 @@
         }
 
 
-        /*
-         * Style de positionnement.
-         */
+        panel.style.flex =
+            "0 1 auto";
 
-        if (panel) {
-
-            panel.style.flex =
-                "1 1 auto";
-
-            panel.style.minWidth =
-                "0";
-
-        }
+        panel.style.minWidth =
+            "0";
 
     }
 
@@ -728,7 +1345,7 @@
                     <div class="session-mini-hours">
 
                         <span>
-                            Madagascar
+                            MG
                         </span>
 
                         <strong data-mada>
@@ -774,15 +1391,15 @@
 
             weekendElement.style.display =
                 weekend
-                    ? "block"
+                    ? "inline-flex"
                     : "none";
 
         }
 
 
-        /*
-         * Heure Madagascar
-         */
+        /* =================================================
+           HEURE MADAGASCAR
+           ================================================= */
 
         const madaParts =
             getParts(
@@ -797,9 +1414,9 @@
             );
 
 
-        /*
-         * États
-         */
+        /* =================================================
+           ÉTATS
+           ================================================= */
 
         const states =
             SESSIONS.map(
@@ -818,9 +1435,9 @@
             );
 
 
-        /*
-         * Sessions ouvertes
-         */
+        /* =================================================
+           SESSIONS OUVERTES
+           ================================================= */
 
         let currentSessions =
             states.filter(
@@ -878,7 +1495,7 @@
 
 
                 currentStatus.textContent =
-                    "🟢 Session ouverte";
+                    "🟢 Ouverte";
 
 
                 const closeDate =
@@ -889,19 +1506,20 @@
 
 
                 currentCountdown.textContent =
-                    "Fermeture dans " +
+                    "Fermeture " +
                     formatCountdown(
                         closeDate.getTime() -
                         now.getTime()
                     );
 
             }
+
             else {
 
                 currentName.textContent =
                     weekend
                         ? "🛑 Marché fermé"
-                        : "Aucune session ouverte";
+                        : "Aucune session";
 
 
                 currentStatus.textContent =
@@ -911,8 +1529,8 @@
 
 
                 currentCountdown.textContent =
-                    madaTime +
-                    " — heure Madagascar";
+                    "🇲🇬 " +
+                    madaTime;
 
             }
 
@@ -1042,7 +1660,6 @@
 
 
                 nextTime.textContent =
-                    "Ouverture : " +
                     getTimeString(
                         localParts
                     ) +
@@ -1052,17 +1669,18 @@
                     getTimeString(
                         nextMadaParts
                     ) +
-                    " Madagascar";
+                    " MG";
 
 
                 nextCountdown.textContent =
-                    "Dans " +
+                    "⏱ " +
                     formatCountdown(
                         next.date.getTime() -
                         now.getTime()
                     );
 
             }
+
             else {
 
                 nextName.textContent =
@@ -1165,6 +1783,7 @@
                     }
 
                 }
+
                 else {
 
                     card.classList.remove(
@@ -1194,6 +1813,8 @@
        ===================================================== */
 
     function init() {
+
+        injectSessionStyles();
 
         createPanel();
 
@@ -1235,6 +1856,7 @@
         );
 
     }
+
     else {
 
         init();
