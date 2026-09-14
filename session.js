@@ -1,65 +1,613 @@
-/* =========================================================
-   SESSION.JS
-   Trading Sessions — Madagascar Time
-   ========================================================= */
+/* ============================================================
+   TRADING SESSIONS — HEURE MADAGASCAR
+   ============================================================ */
 
 (function () {
+
     "use strict";
 
 
-    /* =====================================================
+    /* ============================================================
        CONFIGURATION
-       ===================================================== */
+       ============================================================ */
 
     const MADAGASCAR_TIMEZONE =
         "Indian/Antananarivo";
 
 
     const SESSIONS = [
+
         {
-            id: "sydney",
             name: "Sydney",
-            open: "22:00",
-            close: "07:00"
+            short: "Sydney",
+            emoji: "🌏",
+            startUTC: 22,
+            endUTC: 7
         },
 
         {
-            id: "tokyo",
             name: "Tokyo",
-            open: "00:00",
-            close: "09:00"
+            short: "Tokyo",
+            emoji: "🇯🇵",
+            startUTC: 0,
+            endUTC: 9
         },
 
         {
-            id: "london",
             name: "Londres",
-            open: "08:00",
-            close: "17:00"
+            short: "Londres",
+            emoji: "🇬🇧",
+            startUTC: 8,
+            endUTC: 17
         },
 
         {
-            id: "newyork",
             name: "New York",
-            open: "13:00",
-            close: "22:00"
+            short: "New York",
+            emoji: "🇺🇸",
+            startUTC: 13,
+            endUTC: 22
         }
+
     ];
 
 
-    /* =====================================================
-       UTILITAIRES
-       ===================================================== */
+    /* ============================================================
+       STYLE DU PANNEAU
+       ============================================================ */
 
-    function pad(value) {
-        return String(value).padStart(2, "0");
+    function injectSessionStyles() {
+
+        const existing =
+            document.getElementById(
+                "tradingSessionStyles"
+            );
+
+
+        if (existing) {
+            existing.remove();
+        }
+
+
+        const style =
+            document.createElement("style");
+
+
+        style.id =
+            "tradingSessionStyles";
+
+
+        style.textContent = `
+
+            /* ====================================================
+               PANNEAU PRINCIPAL
+               ==================================================== */
+
+            #tradingSessionsPanel {
+
+                position: absolute !important;
+
+                /*
+                 * CENTRAGE EXACT DU PANNEAU
+                 */
+                left: 50% !important;
+
+                top: 50% !important;
+
+                transform:
+                    translate(-50%, -50%) !important;
+
+                z-index: 2 !important;
+
+                box-sizing: border-box !important;
+
+                width:
+                    min(
+                        720px,
+                        calc(100% - 430px)
+                    ) !important;
+
+                min-width:
+                    520px !important;
+
+                max-width:
+                    720px !important;
+
+                margin:
+                    0 !important;
+
+                padding:
+                    9px 16px !important;
+
+                display:
+                    block !important;
+
+                border-radius:
+                    14px !important;
+
+                border:
+                    1px solid
+                    rgba(255,255,255,0.12) !important;
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        rgba(255,255,255,0.09),
+                        rgba(255,255,255,0.035)
+                    ) !important;
+
+                box-shadow:
+                    0 8px 28px
+                    rgba(0,0,0,0.18) !important;
+
+                backdrop-filter:
+                    blur(14px) !important;
+
+                -webkit-backdrop-filter:
+                    blur(14px) !important;
+
+                color:
+                    inherit !important;
+
+                overflow:
+                    hidden !important;
+
+                box-sizing:
+                    border-box !important;
+            }
+
+
+            /* ====================================================
+               CONTENU PRINCIPAL
+               ==================================================== */
+
+            #tradingSessionsPanel .sessions-main {
+
+                display:
+                    grid !important;
+
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    1px
+                    minmax(0, 1fr) !important;
+
+                align-items:
+                    center !important;
+
+                width:
+                    100% !important;
+
+                min-width:
+                    0 !important;
+
+                gap:
+                    0 !important;
+            }
+
+
+            /* ====================================================
+               SESSION ACTUELLE + SESSION SUIVANTE
+               ==================================================== */
+
+            #tradingSessionsPanel .session-current,
+            #tradingSessionsPanel .session-next {
+
+                display:
+                    flex !important;
+
+                align-items:
+                    center !important;
+
+                justify-content:
+                    flex-start !important;
+
+                gap:
+                    9px !important;
+
+                min-width:
+                    0 !important;
+
+                width:
+                    100% !important;
+
+                box-sizing:
+                    border-box !important;
+
+                padding:
+                    2px 14px !important;
+
+                white-space:
+                    nowrap !important;
+
+                text-align:
+                    left !important;
+
+                overflow:
+                    hidden !important;
+            }
+
+
+            /* ====================================================
+               SÉPARATEUR
+               ==================================================== */
+
+            #tradingSessionsPanel .session-divider {
+
+                width:
+                    1px !important;
+
+                height:
+                    30px !important;
+
+                background:
+                    rgba(255,255,255,0.12) !important;
+
+                flex:
+                    0 0 1px !important;
+            }
+
+
+            /* ====================================================
+               TEXTES
+               ==================================================== */
+
+            #tradingSessionsPanel span,
+            #tradingSessionsPanel strong,
+            #tradingSessionsPanel div {
+
+                box-sizing:
+                    border-box !important;
+            }
+
+
+            #tradingSessionsPanel .session-icon {
+
+                flex:
+                    0 0 auto !important;
+
+                font-size:
+                    1.05rem !important;
+
+                line-height:
+                    1 !important;
+            }
+
+
+            #tradingSessionsPanel .session-label {
+
+                display:
+                    flex !important;
+
+                flex-direction:
+                    column !important;
+
+                justify-content:
+                    center !important;
+
+                align-items:
+                    flex-start !important;
+
+                min-width:
+                    0 !important;
+
+                line-height:
+                    1.15 !important;
+            }
+
+
+            #tradingSessionsPanel .session-title {
+
+                font-size:
+                    0.82rem !important;
+
+                font-weight:
+                    800 !important;
+
+                white-space:
+                    nowrap !important;
+            }
+
+
+            #tradingSessionsPanel .session-info {
+
+                margin-top:
+                    2px !important;
+
+                font-size:
+                    0.70rem !important;
+
+                opacity:
+                    0.72 !important;
+
+                white-space:
+                    nowrap !important;
+            }
+
+
+            #tradingSessionsPanel .session-countdown {
+
+                margin-left:
+                    auto !important;
+
+                flex:
+                    0 0 auto !important;
+
+                font-size:
+                    0.72rem !important;
+
+                font-weight:
+                    700 !important;
+
+                opacity:
+                    0.82 !important;
+
+                white-space:
+                    nowrap !important;
+            }
+
+
+            /* ====================================================
+               WEEK-END
+               ==================================================== */
+
+            #tradingSessionsPanel .sessions-weekend {
+
+                display:
+                    none !important;
+
+                width:
+                    100% !important;
+
+                text-align:
+                    center !important;
+
+                font-size:
+                    0.76rem !important;
+
+                opacity:
+                    0.78 !important;
+
+                padding:
+                    3px 0 0 !important;
+            }
+
+
+            #tradingSessionsPanel.weekend
+            .sessions-main {
+
+                display:
+                    none !important;
+            }
+
+
+            #tradingSessionsPanel.weekend
+            .sessions-weekend {
+
+                display:
+                    block !important;
+            }
+
+
+            /* ====================================================
+               ÉTAT ACTIF
+               ==================================================== */
+
+            #tradingSessionsPanel .active-dot {
+
+                width:
+                    7px !important;
+
+                height:
+                    7px !important;
+
+                border-radius:
+                    50% !important;
+
+                background:
+                    #22c55e !important;
+
+                box-shadow:
+                    0 0 8px
+                    rgba(34,197,94,0.65) !important;
+
+                flex:
+                    0 0 7px !important;
+            }
+
+
+            /* ====================================================
+               RESPONSIVE TABLETTE
+               ==================================================== */
+
+            @media (max-width: 1100px) {
+
+                #tradingSessionsPanel {
+
+                    width:
+                        calc(100% - 360px) !important;
+
+                    min-width:
+                        360px !important;
+
+                    max-width:
+                        680px !important;
+                }
+
+            }
+
+
+            /* ====================================================
+               RESPONSIVE MOBILE LARGE
+               ==================================================== */
+
+            @media (max-width: 900px) {
+
+                .topbar {
+
+                    min-height:
+                        150px !important;
+                }
+
+
+                #tradingSessionsPanel {
+
+                    left:
+                        50% !important;
+
+                    top:
+                        auto !important;
+
+                    bottom:
+                        14px !important;
+
+                    transform:
+                        translateX(-50%) !important;
+
+                    width:
+                        calc(100% - 40px) !important;
+
+                    max-width:
+                        680px !important;
+
+                    min-width:
+                        0 !important;
+                }
+
+            }
+
+
+            /* ====================================================
+               MOBILE
+               ==================================================== */
+
+            @media (max-width: 700px) {
+
+                .topbar {
+
+                    padding:
+                        18px 4% !important;
+
+                    min-height:
+                        190px !important;
+
+                    align-items:
+                        flex-start !important;
+                }
+
+
+                #tradingSessionsPanel {
+
+                    left:
+                        4% !important;
+
+                    right:
+                        4% !important;
+
+                    bottom:
+                        12px !important;
+
+                    width:
+                        auto !important;
+
+                    max-width:
+                        none !important;
+
+                    min-width:
+                        0 !important;
+
+                    transform:
+                        none !important;
+
+                    padding:
+                        8px 10px !important;
+                }
+
+
+                #tradingSessionsPanel
+                .session-current,
+                #tradingSessionsPanel
+                .session-next {
+
+                    padding:
+                        2px 7px !important;
+
+                    gap:
+                        6px !important;
+                }
+
+
+                #tradingSessionsPanel
+                .session-title {
+
+                    font-size:
+                        0.76rem !important;
+                }
+
+
+                #tradingSessionsPanel
+                .session-info {
+
+                    font-size:
+                        0.64rem !important;
+                }
+
+
+                #tradingSessionsPanel
+                .session-countdown {
+
+                    font-size:
+                        0.64rem !important;
+                }
+
+            }
+
+
+            /* ====================================================
+               PETIT MOBILE
+               ==================================================== */
+
+            @media (max-width: 500px) {
+
+                #tradingSessionsPanel
+                .sessions-main {
+
+                    grid-template-columns:
+                        minmax(0, 1fr)
+                        1px
+                        minmax(0, 1fr) !important;
+                }
+
+
+                #tradingSessionsPanel
+                .session-countdown {
+
+                    display:
+                        none !important;
+                }
+
+            }
+
+        `;
+
+
+        document.head.appendChild(style);
+
     }
 
 
-    function getMadagascarParts(date) {
+    /* ============================================================
+       UTILITAIRES TEMPS
+       ============================================================ */
 
-        const formatter =
+    function getMadagascarDate() {
+
+        const now =
+            new Date();
+
+
+        const parts =
             new Intl.DateTimeFormat(
-                "en-GB",
+                "en-US",
                 {
                     timeZone:
                         MADAGASCAR_TIMEZONE,
@@ -85,14 +633,10 @@
                     hourCycle:
                         "h23"
                 }
-            );
+            ).formatToParts(now);
 
 
-        const parts =
-            formatter.formatToParts(date);
-
-
-        const result = {};
+        const values = {};
 
 
         parts.forEach(
@@ -102,59 +646,73 @@
                     part.type !==
                     "literal"
                 ) {
-                    result[part.type] =
-                        part.value;
+
+                    values[part.type] =
+                        Number(part.value);
+
                 }
+
             }
         );
 
 
         return {
+
             year:
-                Number(result.year),
+                values.year,
 
             month:
-                Number(result.month),
+                values.month,
 
             day:
-                Number(result.day),
+                values.day,
 
             hour:
-                Number(result.hour),
+                values.hour,
 
             minute:
-                Number(result.minute),
+                values.minute,
 
             second:
-                Number(result.second)
+                values.second
         };
+
     }
 
 
-    function minutesFromMidnight(
+    function getUTCDateForMadagascar() {
+
+        const madagascar =
+            getMadagascarDate();
+
+
+        return new Date(
+            Date.UTC(
+                madagascar.year,
+                madagascar.month - 1,
+                madagascar.day,
+                madagascar.hour,
+                madagascar.minute,
+                madagascar.second
+            )
+        );
+
+    }
+
+
+    function formatTime(
         hour,
         minute
     ) {
 
         return (
-            Number(hour) * 60 +
-            Number(minute)
+            String(hour).padStart(2, "0")
+            +
+            ":"
+            +
+            String(minute).padStart(2, "0")
         );
-    }
 
-
-    function timeToMinutes(
-        time
-    ) {
-
-        const parts =
-            String(time).split(":");
-
-
-        return (
-            Number(parts[0]) * 60 +
-            Number(parts[1])
-        );
     }
 
 
@@ -163,18 +721,11 @@
     ) {
 
         if (
-            !Number.isFinite(
-                milliseconds
-            )
+            milliseconds <= 0
         ) {
-            return "--:--:--";
-        }
 
+            return "00:00:00";
 
-        if (
-            milliseconds < 0
-        ) {
-            milliseconds = 0;
         }
 
 
@@ -192,8 +743,7 @@
 
         const minutes =
             Math.floor(
-                (totalSeconds % 3600) /
-                60
+                (totalSeconds % 3600) / 60
             );
 
 
@@ -202,1234 +752,277 @@
 
 
         return (
-            pad(hours) +
-            ":" +
-            pad(minutes) +
-            ":" +
-            pad(seconds)
+            String(hours).padStart(2, "0")
+            +
+            ":"
+            +
+            String(minutes).padStart(2, "0")
+            +
+            ":"
+            +
+            String(seconds).padStart(2, "0")
         );
+
     }
 
 
-    /* =====================================================
-       CRÉATION D'UNE DATE MADAGASCAR
-       ===================================================== */
-
-    function createMadagascarDate(
-        year,
-        month,
-        day,
-        hour,
-        minute,
-        second
-    ) {
-
-        const target =
-            Date.UTC(
-                year,
-                month - 1,
-                day,
-                hour,
-                minute,
-                second || 0
-            );
-
-
-        /*
-         * Madagascar est UTC+3.
-         * On convertit ici l'heure locale
-         * de Madagascar vers un timestamp UTC.
-         */
-
-        return new Date(
-            target -
-            (3 * 60 * 60 * 1000)
-        );
-    }
-
-
-    /* =====================================================
-       CALCUL D'UNE SESSION
-       ===================================================== */
+    /* ============================================================
+       CONVERSION SESSION
+       ============================================================ */
 
     function getSessionWindow(
         session,
-        currentDate
+        referenceDate
     ) {
 
-        const parts =
-            getMadagascarParts(
-                currentDate
+        const year =
+            referenceDate.getUTCFullYear();
+
+
+        const month =
+            referenceDate.getUTCMonth();
+
+
+        const day =
+            referenceDate.getUTCDate();
+
+
+        let start =
+            new Date(
+                Date.UTC(
+                    year,
+                    month,
+                    day,
+                    session.startUTC,
+                    0,
+                    0
+                )
             );
 
 
-        const currentMinutes =
-            minutesFromMidnight(
-                parts.hour,
-                parts.minute
+        let end =
+            new Date(
+                Date.UTC(
+                    year,
+                    month,
+                    day,
+                    session.endUTC,
+                    0,
+                    0
+                )
             );
-
-
-        const openMinutes =
-            timeToMinutes(
-                session.open
-            );
-
-
-        const closeMinutes =
-            timeToMinutes(
-                session.close
-            );
-
-
-        let isOpen =
-            false;
 
 
         /*
-         * Session normale :
-         * 08:00 -> 17:00
+         * Les sessions Sydney et autres pouvant
+         * traverser minuit UTC.
          */
-
         if (
-            openMinutes <
-            closeMinutes
+            session.endUTC <=
+            session.startUTC
         ) {
 
-            isOpen =
-                currentMinutes >=
-                openMinutes &&
-                currentMinutes <
-                closeMinutes;
+            end.setUTCDate(
+                end.getUTCDate() + 1
+            );
 
-        } else {
-
-            /*
-             * Session qui traverse minuit :
-             * 22:00 -> 07:00
-             */
-
-            isOpen =
-                currentMinutes >=
-                openMinutes ||
-                currentMinutes <
-                closeMinutes;
-        }
-
-
-        let openDate;
-        let closeDate;
-
-
-        if (
-            openMinutes <
-            closeMinutes
-        ) {
-
-            openDate =
-                createMadagascarDate(
-                    parts.year,
-                    parts.month,
-                    parts.day,
-                    Number(
-                        session.open
-                            .split(":")[0]
-                    ),
-                    Number(
-                        session.open
-                            .split(":")[1]
-                    ),
-                    0
-                );
-
-
-            closeDate =
-                createMadagascarDate(
-                    parts.year,
-                    parts.month,
-                    parts.day,
-                    Number(
-                        session.close
-                            .split(":")[0]
-                    ),
-                    Number(
-                        session.close
-                            .split(":")[1]
-                    ),
-                    0
-                );
-
-        } else {
-
-            if (
-                currentMinutes <
-                closeMinutes
-            ) {
-
-                const previousDay =
-                    new Date(
-                        createMadagascarDate(
-                            parts.year,
-                            parts.month,
-                            parts.day,
-                            0,
-                            0,
-                            0
-                        ).getTime()
-                    );
-
-
-                previousDay.setUTCDate(
-                    previousDay.getUTCDate() -
-                    1
-                );
-
-
-                const previousParts =
-                    getMadagascarParts(
-                        previousDay
-                    );
-
-
-                openDate =
-                    createMadagascarDate(
-                        previousParts.year,
-                        previousParts.month,
-                        previousParts.day,
-                        Number(
-                            session.open
-                                .split(":")[0]
-                        ),
-                        Number(
-                            session.open
-                                .split(":")[1]
-                        ),
-                        0
-                    );
-
-
-                closeDate =
-                    createMadagascarDate(
-                        parts.year,
-                        parts.month,
-                        parts.day,
-                        Number(
-                            session.close
-                                .split(":")[0]
-                        ),
-                        Number(
-                            session.close
-                                .split(":")[1]
-                        ),
-                        0
-                    );
-
-            } else {
-
-                openDate =
-                    createMadagascarDate(
-                        parts.year,
-                        parts.month,
-                        parts.day,
-                        Number(
-                            session.open
-                                .split(":")[0]
-                        ),
-                        Number(
-                            session.open
-                                .split(":")[1]
-                        ),
-                        0
-                    );
-
-
-                const nextDay =
-                    new Date(
-                        openDate.getTime()
-                    );
-
-
-                nextDay.setUTCDate(
-                    nextDay.getUTCDate() +
-                    1
-                );
-
-
-                const nextParts =
-                    getMadagascarParts(
-                        nextDay
-                    );
-
-
-                closeDate =
-                    createMadagascarDate(
-                        nextParts.year,
-                        nextParts.month,
-                        nextParts.day,
-                        Number(
-                            session.close
-                                .split(":")[0]
-                        ),
-                        Number(
-                            session.close
-                                .split(":")[1]
-                        ),
-                        0
-                    );
-            }
         }
 
 
         return {
-            session:
-                session,
-
-            isOpen:
-                isOpen,
-
-            openDate:
-                openDate,
-
-            closeDate:
-                closeDate
+            start,
+            end
         };
+
     }
 
 
-    /* =====================================================
+    /* ============================================================
        SESSION ACTUELLE
-       ===================================================== */
+       ============================================================ */
 
     function getCurrentSession(
         now
     ) {
 
-        const activeSessions =
-            [];
-
-
-        SESSIONS.forEach(
-            function (session) {
-
-                const window =
-                    getSessionWindow(
-                        session,
-                        now
-                    );
-
-
-                if (
-                    window.isOpen
-                ) {
-
-                    activeSessions.push(
-                        window
-                    );
-                }
-            }
-        );
-
-
-        if (
-            activeSessions.length === 0
+        for (
+            let i = 0;
+            i < SESSIONS.length;
+            i++
         ) {
-            return null;
+
+            const session =
+                SESSIONS[i];
+
+
+            const window =
+                getSessionWindow(
+                    session,
+                    now
+                );
+
+
+            if (
+                now >= window.start &&
+                now < window.end
+            ) {
+
+                return {
+                    session,
+                    start:
+                        window.start,
+                    end:
+                        window.end,
+                    index:
+                        i
+                };
+
+            }
+
         }
 
 
         /*
-         * Si plusieurs sessions sont
-         * ouvertes simultanément,
-         * on garde celle qui a commencé
-         * le plus récemment.
+         * Cas où une session commencée
+         * la veille traverse minuit.
          */
+        const yesterday =
+            new Date(now);
 
-        activeSessions.sort(
-            function (a, b) {
 
-                return (
-                    b.openDate.getTime() -
-                    a.openDate.getTime()
-                );
-            }
+        yesterday.setUTCDate(
+            yesterday.getUTCDate() - 1
         );
 
 
-        return activeSessions[0];
+        for (
+            let i = 0;
+            i < SESSIONS.length;
+            i++
+        ) {
+
+            const session =
+                SESSIONS[i];
+
+
+            const window =
+                getSessionWindow(
+                    session,
+                    yesterday
+                );
+
+
+            if (
+                now >= window.start &&
+                now < window.end
+            ) {
+
+                return {
+                    session,
+                    start:
+                        window.start,
+                    end:
+                        window.end,
+                    index:
+                        i
+                };
+
+            }
+
+        }
+
+
+        return null;
+
     }
 
 
-    /* =====================================================
-       PROCHAINE SESSION
-       ===================================================== */
+    /* ============================================================
+       SESSION SUIVANTE
+       ============================================================ */
 
     function getNextSession(
         now
     ) {
 
-        const candidates =
-            [];
+        let best =
+            null;
 
 
-        const nowParts =
-            getMadagascarParts(
-                now
+        for (
+            let dayOffset = 0;
+            dayOffset <= 2;
+            dayOffset++
+        ) {
+
+            const reference =
+                new Date(now);
+
+
+            reference.setUTCDate(
+                reference.getUTCDate()
+                +
+                dayOffset
             );
 
 
-        SESSIONS.forEach(
-            function (session) {
+            for (
+                let i = 0;
+                i < SESSIONS.length;
+                i++
+            ) {
 
-                const openMinutes =
-                    timeToMinutes(
-                        session.open
-                    );
+                const session =
+                    SESSIONS[i];
 
 
-                let candidate =
-                    createMadagascarDate(
-                        nowParts.year,
-                        nowParts.month,
-                        nowParts.day,
-                        Number(
-                            session.open
-                                .split(":")[0]
-                        ),
-                        Number(
-                            session.open
-                                .split(":")[1]
-                        ),
-                        0
+                const window =
+                    getSessionWindow(
+                        session,
+                        reference
                     );
 
 
                 if (
-                    candidate.getTime() <=
-                    now.getTime()
+                    window.start <= now
                 ) {
 
-                    candidate.setUTCDate(
-                        candidate.getUTCDate() +
-                        1
-                    );
+                    continue;
+
                 }
 
 
-                candidates.push({
-                    session:
+                if (
+                    !best ||
+                    window.start <
+                    best.start
+                ) {
+
+                    best = {
                         session,
+                        start:
+                            window.start,
+                        end:
+                            window.end,
+                        index:
+                            i
+                    };
 
-                    date:
-                        candidate,
+                }
 
-                    minutes:
-                        openMinutes
-                });
             }
-        );
 
-
-        candidates.sort(
-            function (a, b) {
-
-                return (
-                    a.date.getTime() -
-                    b.date.getTime()
-                );
-            }
-        );
-
-
-        return (
-            candidates.length
-                ? candidates[0]
-                : null
-        );
-    }
-
-
-    /* =====================================================
-       WEEK-END
-       ===================================================== */
-
-    function isWeekend(
-        date
-    ) {
-
-        const parts =
-            getMadagascarParts(
-                date
-            );
-
-
-        const localDate =
-            createMadagascarDate(
-                parts.year,
-                parts.month,
-                parts.day,
-                12,
-                0,
-                0
-            );
-
-
-        const day =
-            localDate.getUTCDay();
-
-
-        return (
-            day === 0 ||
-            day === 6
-        );
-    }
-
-
-    /* =====================================================
-       INJECTION DU CSS
-       ===================================================== */
-
-    function injectSessionStyles() {
-
-        const existing =
-            document.getElementById(
-                "tradingSessionStyles"
-            );
-
-
-        if (existing) {
-            existing.remove();
         }
 
 
-        const style =
-            document.createElement(
-                "style"
-            );
+        return best;
 
-
-        style.id =
-            "tradingSessionStyles";
-
-
-        style.textContent = `
-
-/* =====================================================
-   SESSION PANEL
-   ===================================================== */
-
-#tradingSessionsPanel {
-
-    position: absolute !important;
-
-    left: calc(50% - 35px) !important;
-
-    top: 50% !important;
-
-    transform:
-        translate(-50%, -50%) !important;
-
-    z-index: 2 !important;
-
-    width:
-        min(
-            720px,
-            calc(100% - 430px)
-        ) !important;
-
-    min-width:
-        520px !important;
-
-    max-width:
-        720px !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        9px 16px !important;
-
-    display:
-        block !important;
-
-    box-sizing:
-        border-box !important;
-
-    flex:
-        none !important;
-
-    flex-shrink:
-        0 !important;
-
-    border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            0.12
-        ) !important;
-
-    border-radius:
-        14px !important;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                255,
-                255,
-                255,
-                0.09
-            ),
-            rgba(
-                255,
-                255,
-                255,
-                0.035
-            )
-        ) !important;
-
-    box-shadow:
-        0 7px 24px
-        rgba(
-            0,
-            0,
-            0,
-            0.18
-        ),
-        inset 0 1px 0
-        rgba(
-            255,
-            255,
-            255,
-            0.06
-        ) !important;
-
-    backdrop-filter:
-        blur(14px) !important;
-
-    -webkit-backdrop-filter:
-        blur(14px) !important;
-
-    overflow:
-        visible !important;
-
-    pointer-events:
-        auto !important;
-}
-
-
-/* =====================================================
-   CONTENU PRINCIPAL
-   ===================================================== */
-
-#tradingSessionsPanel .sessions-main {
-
-    display:
-        grid !important;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        1px
-        minmax(0, 1fr) !important;
-
-    align-items:
-        center !important;
-
-    width:
-        100% !important;
-
-    min-width:
-        0 !important;
-
-    gap:
-        0 !important;
-}
-
-
-/* =====================================================
-   SESSION ACTUELLE / PROCHAINE
-   ===================================================== */
-
-#tradingSessionsPanel .session-current,
-#tradingSessionsPanel .session-next {
-
-    display:
-        flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        flex-start !important;
-
-    gap:
-        9px !important;
-
-    min-width:
-        0 !important;
-
-    width:
-        100% !important;
-
-    padding:
-        3px 16px !important;
-
-    box-sizing:
-        border-box !important;
-
-    text-align:
-        left !important;
-
-    white-space:
-        nowrap !important;
-}
-
-
-#tradingSessionsPanel .session-current {
-
-    grid-column:
-        1 !important;
-
-    grid-row:
-        1 !important;
-
-    padding-right:
-        28px !important;
-}
-
-
-#tradingSessionsPanel .session-next {
-
-    grid-column:
-        3 !important;
-
-    grid-row:
-        1 !important;
-
-    padding-left:
-        28px !important;
-}
-
-
-/* =====================================================
-   SÉPARATEUR
-   ===================================================== */
-
-#tradingSessionsPanel .sessions-main::after {
-
-    content:
-        "" !important;
-
-    grid-column:
-        2 !important;
-
-    grid-row:
-        1 !important;
-
-    width:
-        1px !important;
-
-    height:
-        30px !important;
-
-    justify-self:
-        center !important;
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            0.14
-        ) !important;
-}
-
-
-/* =====================================================
-   LABELS
-   ===================================================== */
-
-#tradingSessionsPanel .session-label {
-
-    display:
-        inline-block !important;
-
-    flex:
-        0 0 auto !important;
-
-    font-size:
-        8px !important;
-
-    font-weight:
-        800 !important;
-
-    letter-spacing:
-        0.8px !important;
-
-    text-transform:
-        uppercase !important;
-
-    opacity:
-        0.48 !important;
-
-    white-space:
-        nowrap !important;
-}
-
-
-/* =====================================================
-   NOMS
-   ===================================================== */
-
-#tradingSessionsPanel .session-current-name,
-#tradingSessionsPanel .session-next-name {
-
-    display:
-        inline-block !important;
-
-    flex:
-        0 0 auto !important;
-
-    font-size:
-        12px !important;
-
-    font-weight:
-        800 !important;
-
-    line-height:
-        1.2 !important;
-
-    white-space:
-        nowrap !important;
-}
-
-
-#tradingSessionsPanel .session-current-name.open {
-
-    color:
-        #4ade80 !important;
-}
-
-
-/* =====================================================
-   STATUT
-   ===================================================== */
-
-#tradingSessionsPanel .session-status {
-
-    display:
-        inline-block !important;
-
-    flex:
-        0 0 auto !important;
-
-    font-size:
-        9px !important;
-
-    font-weight:
-        700 !important;
-
-    opacity:
-        0.70 !important;
-
-    white-space:
-        nowrap !important;
-}
-
-
-/* =====================================================
-   HEURE
-   ===================================================== */
-
-#tradingSessionsPanel .session-time-line {
-
-    display:
-        inline-block !important;
-
-    flex:
-        0 0 auto !important;
-
-    font-size:
-        9px !important;
-
-    font-weight:
-        600 !important;
-
-    opacity:
-        0.68 !important;
-
-    white-space:
-        nowrap !important;
-}
-
-
-/* =====================================================
-   COUNTDOWN
-   ===================================================== */
-
-#tradingSessionsPanel .session-countdown {
-
-    display:
-        inline-flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    flex:
-        0 0 auto !important;
-
-    min-width:
-        max-content !important;
-
-    padding:
-        5px 8px !important;
-
-    border-radius:
-        7px !important;
-
-    font-size:
-        9px !important;
-
-    font-weight:
-        800 !important;
-
-    line-height:
-        1 !important;
-
-    white-space:
-        nowrap !important;
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            0.07
-        ) !important;
-
-    border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            0.06
-        ) !important;
-}
-
-
-#tradingSessionsPanel .session-countdown.small {
-
-    color:
-        #7dd3fc !important;
-
-    background:
-        rgba(
-            56,
-            189,
-            248,
-            0.10
-        ) !important;
-
-    border-color:
-        rgba(
-            56,
-            189,
-            248,
-            0.16
-        ) !important;
-}
-
-
-/* =====================================================
-   WEEK-END
-   ===================================================== */
-
-#tradingSessionsPanel .sessions-weekend {
-
-    display:
-        inline-flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    width:
-        100% !important;
-
-    box-sizing:
-        border-box !important;
-
-    margin-top:
-        6px !important;
-
-    padding:
-        4px 8px !important;
-
-    border-radius:
-        7px !important;
-
-    font-size:
-        8px !important;
-
-    font-weight:
-        800 !important;
-
-    white-space:
-        nowrap !important;
-
-    color:
-        #fca5a5 !important;
-
-    background:
-        rgba(
-            239,
-            68,
-            68,
-            0.09
-        ) !important;
-
-    border:
-        1px solid
-        rgba(
-            239,
-            68,
-            68,
-            0.14
-        ) !important;
-}
-
-
-/* =====================================================
-   TABLETTE
-   ===================================================== */
-
-@media (max-width: 1100px) {
-
-    #tradingSessionsPanel {
-
-        left:
-            calc(
-                50% - 20px
-            ) !important;
-
-        width:
-            min(
-                620px,
-                calc(100% - 360px)
-            ) !important;
-
-        min-width:
-            440px !important;
-
-        max-width:
-            620px !important;
     }
 
 
-    #tradingSessionsPanel
-    .session-current {
-
-        padding-right:
-            18px !important;
-    }
-
-
-    #tradingSessionsPanel
-    .session-next {
-
-        padding-left:
-            18px !important;
-    }
-
-
-    #tradingSessionsPanel
-    .session-label {
-
-        display:
-            none !important;
-    }
-}
-
-
-/* =====================================================
-   TABLETTE / PETIT ÉCRAN
-   ===================================================== */
-
-@media (max-width: 900px) {
-
-    #tradingSessionsPanel {
-
-        top:
-            auto !important;
-
-        bottom:
-            14px !important;
-
-        left:
-            50% !important;
-
-        transform:
-            translateX(-50%) !important;
-
-        width:
-            calc(
-                100% - 40px
-            ) !important;
-
-        max-width:
-            680px !important;
-
-        min-width:
-            0 !important;
-    }
-}
-
-
-/* =====================================================
-   MOBILE
-   ===================================================== */
-
-@media (max-width: 700px) {
-
-    #tradingSessionsPanel {
-
-        left:
-            4% !important;
-
-        right:
-            4% !important;
-
-        bottom:
-            12px !important;
-
-        width:
-            auto !important;
-
-        max-width:
-            none !important;
-
-        min-width:
-            0 !important;
-
-        transform:
-            none !important;
-
-        padding:
-            8px 12px !important;
-    }
-
-
-    #tradingSessionsPanel
-    .sessions-main {
-
-        grid-template-columns:
-            1fr !important;
-
-        gap:
-            8px !important;
-    }
-
-
-    #tradingSessionsPanel
-    .session-current,
-    #tradingSessionsPanel
-    .session-next {
-
-        grid-column:
-            1 !important;
-
-        grid-row:
-            auto !important;
-
-        width:
-            100% !important;
-
-        justify-content:
-            flex-start !important;
-
-        padding:
-            4px 8px !important;
-
-        flex-wrap:
-            wrap !important;
-
-        white-space:
-            normal !important;
-    }
-
-
-    #tradingSessionsPanel
-    .session-next {
-
-        padding-top:
-            9px !important;
-
-        border-top:
-            1px solid
-            rgba(
-                255,
-                255,
-                255,
-                0.09
-            );
-    }
-
-
-    #tradingSessionsPanel
-    .sessions-main::after {
-
-        display:
-            none !important;
-    }
-
-
-    #tradingSessionsPanel
-    .session-time-line {
-
-        white-space:
-            normal !important;
-
-        text-align:
-            left !important;
-    }
-}
-
-
-/* =====================================================
-   TRÈS PETIT MOBILE
-   ===================================================== */
-
-@media (max-width: 430px) {
-
-    #tradingSessionsPanel
-    .session-current,
-    #tradingSessionsPanel
-    .session-next {
-
-        gap:
-            6px !important;
-    }
-}
-
-        `;
-
-
-        document.head.appendChild(
-            style
-        );
-    }
-
-
-    /* =====================================================
+    /* ============================================================
        CRÉATION DU PANNEAU
-       ===================================================== */
+       ============================================================ */
 
     function createPanel() {
 
@@ -1442,88 +1035,46 @@
         if (!panel) {
 
             panel =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
+
 
             panel.id =
                 "tradingSessionsPanel";
+
+
+            panel.innerHTML = `
+
+                <div class="sessions-main">
+
+                    <div
+                        class="session-current"
+                        id="sessionCurrent"
+                    ></div>
+
+
+                    <div
+                        class="session-divider"
+                    ></div>
+
+
+                    <div
+                        class="session-next"
+                        id="sessionNext"
+                    ></div>
+
+                </div>
+
+
+                <div
+                    class="sessions-weekend"
+                    id="sessionsWeekend"
+                >
+                    💤 Marché fermé — reprise prochaine session
+                </div>
+
+            `;
+
         }
-
-
-        panel.innerHTML = `
-
-            <div class="sessions-main">
-
-                <div class="session-current">
-
-                    <span class="session-label">
-                        SESSION ACTUELLE
-                    </span>
-
-                    <strong
-                        class="session-current-name"
-                        id="currentSessionName"
-                    >
-                        —
-                    </strong>
-
-                    <span
-                        class="session-status"
-                        id="currentSessionStatus"
-                    >
-                        —
-                    </span>
-
-                    <span
-                        class="session-countdown"
-                        id="currentSessionCountdown"
-                    >
-                        —
-                    </span>
-
-                </div>
-
-
-                <div class="session-next">
-
-                    <span class="session-label">
-                        PROCHAINE
-                    </span>
-
-                    <strong
-                        class="session-next-name"
-                        id="nextSessionName"
-                    >
-                        —
-                    </strong>
-
-                    <span
-                        class="session-time-line"
-                        id="nextSessionTime"
-                    >
-                        —
-                    </span>
-
-                    <span
-                        class="session-countdown small"
-                        id="nextSessionCountdown"
-                    >
-                        —
-                    </span>
-
-                </div>
-
-            </div>
-
-            <div
-                class="sessions-weekend"
-                id="sessionsWeekend"
-                style="display:none;"
-            >
-                Marché fermé — Week-end
-            </div>
-        `;
 
 
         const topbar =
@@ -1556,23 +1107,29 @@
                         themeButton
                     );
 
-                } else {
+                }
+
+                else {
 
                     topbar.appendChild(
                         panel
                     );
+
                 }
+
             }
+
         }
 
 
         return panel;
+
     }
 
 
-    /* =====================================================
+    /* ============================================================
        MISE À JOUR DU PANNEAU
-       ===================================================== */
+       ============================================================ */
 
     function updatePanel() {
 
@@ -1587,13 +1144,15 @@
         }
 
 
-        const now =
-            new Date();
+        const currentElement =
+            document.getElementById(
+                "sessionCurrent"
+            );
 
 
-        const weekend =
-            isWeekend(
-                now
+        const nextElement =
+            document.getElementById(
+                "sessionNext"
             );
 
 
@@ -1603,148 +1162,68 @@
             );
 
 
-        const currentName =
-            document.getElementById(
-                "currentSessionName"
-            );
+        if (
+            !currentElement ||
+            !nextElement
+        ) {
+
+            return;
+
+        }
 
 
-        const currentStatus =
-            document.getElementById(
-                "currentSessionStatus"
-            );
+        const now =
+            getUTCDateForMadagascar();
 
 
-        const currentCountdown =
-            document.getElementById(
-                "currentSessionCountdown"
-            );
-
-
-        const nextName =
-            document.getElementById(
-                "nextSessionName"
-            );
-
-
-        const nextTime =
-            document.getElementById(
-                "nextSessionTime"
-            );
-
-
-        const nextCountdown =
-            document.getElementById(
-                "nextSessionCountdown"
-            );
+        const madagascarNow =
+            getMadagascarDate();
 
 
         /*
-         * WEEK-END
+         * Samedi = 6
+         * Dimanche = 0
          */
+        const day =
+            new Date(
+                Date.UTC(
+                    madagascarNow.year,
+                    madagascarNow.month - 1,
+                    madagascarNow.day
+                )
+            ).getUTCDay();
 
-        if (weekend) {
+
+        /*
+         * Fermeture du marché durant le week-end.
+         */
+        if (
+            day === 0 ||
+            day === 6
+        ) {
+
+            panel.classList.add(
+                "weekend"
+            );
+
 
             if (weekendElement) {
-                weekendElement.style.display =
-                    "inline-flex";
-            }
 
+                weekendElement.textContent =
+                    "💤 Marché fermé — reprise des sessions lundi";
 
-            if (currentName) {
-                currentName.textContent =
-                    "Marché fermé";
-            }
-
-
-            if (currentStatus) {
-                currentStatus.textContent =
-                    "";
-            }
-
-
-            if (currentCountdown) {
-                currentCountdown.textContent =
-                    "WEEK-END";
-            }
-
-
-            if (nextName) {
-                nextName.textContent =
-                    "Sydney";
-            }
-
-
-            if (nextTime) {
-                nextTime.textContent =
-                    "Ouverture lundi";
-            }
-
-
-            if (nextCountdown) {
-
-                /*
-                 * Recherche de la prochaine
-                 * ouverture après le week-end.
-                 */
-
-                const next =
-                    getNextSession(
-                        now
-                    );
-
-
-                if (next) {
-
-                    let nextDate =
-                        next.date;
-
-
-                    /*
-                     * Si le candidat tombe
-                     * pendant le week-end,
-                     * on avance jusqu'à lundi.
-                     */
-
-                    while (
-                        isWeekend(
-                            nextDate
-                        )
-                    ) {
-
-                        nextDate =
-                            new Date(
-                                nextDate.getTime() +
-                                24 *
-                                60 *
-                                60 *
-                                1000
-                            );
-                    }
-
-
-                    nextCountdown.textContent =
-                        formatCountdown(
-                            nextDate.getTime() -
-                            now.getTime()
-                        );
-                }
             }
 
 
             return;
+
         }
 
 
-        if (weekendElement) {
-            weekendElement.style.display =
-                "none";
-        }
+        panel.classList.remove(
+            "weekend"
+        );
 
-
-        /*
-         * SESSION ACTUELLE
-         */
 
         const current =
             getCurrentSession(
@@ -1752,108 +1231,234 @@
             );
 
 
-        if (current) {
-
-            if (currentName) {
-
-                currentName.textContent =
-                    current.session.name;
-
-                currentName.classList.add(
-                    "open"
-                );
-            }
-
-
-            if (currentStatus) {
-
-                currentStatus.textContent =
-                    "OUVERTE";
-            }
-
-
-            if (currentCountdown) {
-
-                currentCountdown.textContent =
-                    formatCountdown(
-                        current.closeDate.getTime() -
-                        now.getTime()
-                    );
-            }
-
-        } else {
-
-            if (currentName) {
-
-                currentName.textContent =
-                    "Aucune";
-
-                currentName.classList.remove(
-                    "open"
-                );
-            }
-
-
-            if (currentStatus) {
-
-                currentStatus.textContent =
-                    "FERMÉE";
-            }
-
-
-            if (currentCountdown) {
-
-                currentCountdown.textContent =
-                    "—";
-            }
-        }
-
-
-        /*
-         * PROCHAINE SESSION
-         */
-
         const next =
             getNextSession(
                 now
             );
 
 
+        /* ========================================================
+           SESSION ACTUELLE
+           ======================================================== */
+
+        if (current) {
+
+            const remaining =
+                current.end.getTime()
+                -
+                now.getTime();
+
+
+            currentElement.innerHTML = `
+
+                <span class="session-icon">
+                    ${current.session.emoji}
+                </span>
+
+                <span class="active-dot"></span>
+
+                <span class="session-label">
+
+                    <strong class="session-title">
+                        ${current.session.short}
+                    </strong>
+
+                    <span class="session-info">
+                        Active ·
+                        ${formatSessionTime(
+                            current.session,
+                            current.start
+                        )}
+                    </span>
+
+                </span>
+
+                <span class="session-countdown">
+                    ${formatCountdown(remaining)}
+                </span>
+
+            `;
+
+        }
+
+        else {
+
+            currentElement.innerHTML = `
+
+                <span class="session-icon">
+                    🌙
+                </span>
+
+                <span class="session-label">
+
+                    <strong class="session-title">
+                        Aucune session
+                    </strong>
+
+                    <span class="session-info">
+                        Marché entre deux sessions
+                    </span>
+
+                </span>
+
+            `;
+
+        }
+
+
+        /* ========================================================
+           SESSION SUIVANTE
+           ======================================================== */
+
         if (next) {
 
-            if (nextName) {
-
-                nextName.textContent =
-                    next.session.name;
-            }
-
-
-            if (nextTime) {
-
-                nextTime.textContent =
-                    next.session.open +
-                    " → " +
-                    next.session.close;
-            }
+            const untilNext =
+                next.start.getTime()
+                -
+                now.getTime();
 
 
-            if (nextCountdown) {
+            nextElement.innerHTML = `
 
-                nextCountdown.textContent =
-                    formatCountdown(
-                        next.date.getTime() -
-                        now.getTime()
-                    );
-            }
+                <span class="session-icon">
+                    ${next.session.emoji}
+                </span>
+
+                <span class="session-label">
+
+                    <strong class="session-title">
+                        ${next.session.short}
+                    </strong>
+
+                    <span class="session-info">
+                        Prochaine ·
+                        ${formatSessionTime(
+                            next.session,
+                            next.start
+                        )}
+                    </span>
+
+                </span>
+
+                <span class="session-countdown">
+                    ${formatCountdown(untilNext)}
+                </span>
+
+            `;
+
         }
+
+        else {
+
+            nextElement.innerHTML = `
+
+                <span class="session-icon">
+                    🌙
+                </span>
+
+                <span class="session-label">
+
+                    <strong class="session-title">
+                        Prochaine session
+                    </strong>
+
+                    <span class="session-info">
+                        Calcul en cours...
+                    </span>
+
+                </span>
+
+            `;
+
+        }
+
     }
 
 
-    /* =====================================================
-       INITIALISATION
-       ===================================================== */
+    /* ============================================================
+       AFFICHAGE DES HORAIRES EN HEURE MADAGASCAR
+       ============================================================ */
 
-    function init() {
+    function formatSessionTime(
+        session,
+        utcDate
+    ) {
+
+        const parts =
+            new Intl.DateTimeFormat(
+                "fr-FR",
+                {
+                    timeZone:
+                        MADAGASCAR_TIMEZONE,
+
+                    hour:
+                        "2-digit",
+
+                    minute:
+                        "2-digit",
+
+                    hourCycle:
+                        "h23"
+                }
+            ).formatToParts(
+                utcDate
+            );
+
+
+        let hour =
+            "00";
+
+
+        let minute =
+            "00";
+
+
+        parts.forEach(
+            function (part) {
+
+                if (
+                    part.type ===
+                    "hour"
+                ) {
+
+                    hour =
+                        part.value;
+
+                }
+
+
+                if (
+                    part.type ===
+                    "minute"
+                ) {
+
+                    minute =
+                        part.value;
+
+                }
+
+            }
+        );
+
+
+        return (
+            hour
+            +
+            ":"
+            +
+            minute
+            +
+            " Mada"
+        );
+
+    }
+
+
+    /* ============================================================
+       INITIALISATION
+       ============================================================ */
+
+    function initialize() {
 
         injectSessionStyles();
 
@@ -1866,12 +1471,13 @@
             updatePanel,
             1000
         );
+
     }
 
 
-    /* =====================================================
-       DÉMARRAGE
-       ===================================================== */
+    /* ============================================================
+       ATTENDRE QUE LE DOM SOIT PRÊT
+       ============================================================ */
 
     if (
         document.readyState ===
@@ -1880,12 +1486,15 @@
 
         document.addEventListener(
             "DOMContentLoaded",
-            init
+            initialize
         );
 
-    } else {
+    }
 
-        init();
+    else {
+
+        initialize();
+
     }
 
 })();
