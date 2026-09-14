@@ -16,9 +16,11 @@
 
 
     const SESSIONS = [
+
         {
             id: "sydney",
             name: "Sydney",
+            flag: "🇦🇺",
             open: "22:00",
             close: "07:00"
         },
@@ -26,6 +28,7 @@
         {
             id: "tokyo",
             name: "Tokyo",
+            flag: "🇯🇵",
             open: "00:00",
             close: "09:00"
         },
@@ -33,6 +36,7 @@
         {
             id: "london",
             name: "Londres",
+            flag: "🇬🇧",
             open: "08:00",
             close: "17:00"
         },
@@ -40,9 +44,46 @@
         {
             id: "newyork",
             name: "New York",
+            flag: "🇺🇸",
             open: "13:00",
             close: "22:00"
         }
+
+    ];
+
+
+    /* =====================================================
+       JOURS DE LA SEMAINE
+       ===================================================== */
+
+    const DAYS_FR = [
+
+        "Dimanche",
+        "Lundi",
+        "Mardi",
+        "Mercredi",
+        "Jeudi",
+        "Vendredi",
+        "Samedi"
+
+    ];
+
+
+    const MONTHS_FR = [
+
+        "Janvier",
+        "Février",
+        "Mars",
+        "Avril",
+        "Mai",
+        "Juin",
+        "Juillet",
+        "Août",
+        "Septembre",
+        "Octobre",
+        "Novembre",
+        "Décembre"
+
     ];
 
 
@@ -51,7 +92,9 @@
        ===================================================== */
 
     function pad(value) {
+
         return String(value).padStart(2, "0");
+
     }
 
 
@@ -82,6 +125,9 @@
                     second:
                         "2-digit",
 
+                    weekday:
+                        "long",
+
                     hourCycle:
                         "h23"
                 }
@@ -102,14 +148,18 @@
                     part.type !==
                     "literal"
                 ) {
+
                     result[part.type] =
                         part.value;
+
                 }
+
             }
         );
 
 
         return {
+
             year:
                 Number(result.year),
 
@@ -127,9 +177,67 @@
 
             second:
                 Number(result.second)
+
         };
+
     }
 
+
+    /* =====================================================
+       DATE COMPLÈTE — MADAGASCAR
+       ===================================================== */
+
+    function getFullMadagascarDate(
+        date
+    ) {
+
+        const parts =
+            getMadagascarParts(
+                date
+            );
+
+
+        const localDate =
+            createMadagascarDate(
+                parts.year,
+                parts.month,
+                parts.day,
+                12,
+                0,
+                0
+            );
+
+
+        const day =
+            localDate.getUTCDay();
+
+
+        const dayName =
+            DAYS_FR[day];
+
+
+        const monthName =
+            MONTHS_FR[
+                parts.month - 1
+            ];
+
+
+        return (
+            dayName +
+            " " +
+            parts.day +
+            " " +
+            monthName +
+            " " +
+            parts.year
+        );
+
+    }
+
+
+    /* =====================================================
+       MINUTES DEPUIS MINUIT
+       ===================================================== */
 
     function minutesFromMidnight(
         hour,
@@ -140,8 +248,13 @@
             Number(hour) * 60 +
             Number(minute)
         );
+
     }
 
+
+    /* =====================================================
+       CONVERSION HEURE → MINUTES
+       ===================================================== */
 
     function timeToMinutes(
         time
@@ -155,8 +268,13 @@
             Number(parts[0]) * 60 +
             Number(parts[1])
         );
+
     }
 
+
+    /* =====================================================
+       FORMAT COMPTE À REBOURS
+       ===================================================== */
 
     function formatCountdown(
         milliseconds
@@ -167,14 +285,18 @@
                 milliseconds
             )
         ) {
+
             return "--:--:--";
+
         }
 
 
         if (
             milliseconds < 0
         ) {
+
             milliseconds = 0;
+
         }
 
 
@@ -208,11 +330,12 @@
             ":" +
             pad(seconds)
         );
+
     }
 
 
     /* =====================================================
-       CRÉATION D'UNE DATE MADAGASCAR
+       CRÉATION DATE MADAGASCAR
        ===================================================== */
 
     function createMadagascarDate(
@@ -236,15 +359,19 @@
 
 
         /*
-         * Madagascar est UTC+3.
-         * On convertit ici l'heure locale
-         * de Madagascar vers un timestamp UTC.
+         * Madagascar = UTC+3
          */
 
         return new Date(
             target -
-            (3 * 60 * 60 * 1000)
+            (
+                3 *
+                60 *
+                60 *
+                1000
+            )
         );
+
     }
 
 
@@ -287,8 +414,7 @@
 
 
         /*
-         * Session normale :
-         * 08:00 -> 17:00
+         * SESSION NORMALE
          */
 
         if (
@@ -302,24 +428,30 @@
                 currentMinutes <
                 closeMinutes;
 
-        } else {
+        }
 
-            /*
-             * Session qui traverse minuit :
-             * 22:00 -> 07:00
-             */
+        /*
+         * SESSION TRAVERSANT MINUIT
+         */
+
+        else {
 
             isOpen =
                 currentMinutes >=
                 openMinutes ||
                 currentMinutes <
                 closeMinutes;
+
         }
 
 
         let openDate;
         let closeDate;
 
+
+        /*
+         * SESSION NORMALE
+         */
 
         if (
             openMinutes <
@@ -359,7 +491,13 @@
                     0
                 );
 
-        } else {
+        }
+
+        /*
+         * SESSION TRAVERSANT MINUIT
+         */
+
+        else {
 
             if (
                 currentMinutes <
@@ -424,7 +562,9 @@
                         0
                     );
 
-            } else {
+            }
+
+            else {
 
                 openDate =
                     createMadagascarDate(
@@ -476,11 +616,14 @@
                         ),
                         0
                     );
+
             }
+
         }
 
 
         return {
+
             session:
                 session,
 
@@ -492,7 +635,9 @@
 
             closeDate:
                 closeDate
+
         };
+
     }
 
 
@@ -525,7 +670,9 @@
                     activeSessions.push(
                         window
                     );
+
                 }
+
             }
         );
 
@@ -533,15 +680,16 @@
         if (
             activeSessions.length === 0
         ) {
+
             return null;
+
         }
 
 
         /*
          * Si plusieurs sessions sont
-         * ouvertes simultanément,
-         * on garde celle qui a commencé
-         * le plus récemment.
+         * ouvertes, on garde celle
+         * qui a commencé le plus récemment.
          */
 
         activeSessions.sort(
@@ -551,11 +699,13 @@
                     b.openDate.getTime() -
                     a.openDate.getTime()
                 );
+
             }
         );
 
 
         return activeSessions[0];
+
     }
 
 
@@ -612,10 +762,12 @@
                         candidate.getUTCDate() +
                         1
                     );
+
                 }
 
 
                 candidates.push({
+
                     session:
                         session,
 
@@ -624,7 +776,9 @@
 
                     minutes:
                         openMinutes
+
                 });
+
             }
         );
 
@@ -636,6 +790,7 @@
                     a.date.getTime() -
                     b.date.getTime()
                 );
+
             }
         );
 
@@ -645,6 +800,7 @@
                 ? candidates[0]
                 : null
         );
+
     }
 
 
@@ -681,6 +837,7 @@
             day === 0 ||
             day === 6
         );
+
     }
 
 
@@ -697,7 +854,9 @@
 
 
         if (existing) {
+
             existing.remove();
+
         }
 
 
@@ -719,46 +878,34 @@
 
 #tradingSessionsPanel {
 
-    position: absolute !important;
+    position: relative !important;
 
-    left: calc(50% - 35px) !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
 
-    top: 50% !important;
+    transform: none !important;
 
-    transform:
-        translate(-50%, -50%) !important;
+    z-index: 5 !important;
 
-    z-index: 2 !important;
+    width: 100% !important;
 
-    width:
-        min(
-            720px,
-            calc(100% - 430px)
-        ) !important;
+    min-width: 0 !important;
 
-    min-width:
-        520px !important;
+    max-width: none !important;
 
-    max-width:
-        720px !important;
+    margin: 0 !important;
 
-    margin:
-        0 !important;
+    padding: 9px 14px !important;
 
-    padding:
-        9px 16px !important;
+    display: block !important;
 
-    display:
-        block !important;
+    box-sizing: border-box !important;
 
-    box-sizing:
-        border-box !important;
+    flex: none !important;
 
-    flex:
-        none !important;
-
-    flex-shrink:
-        0 !important;
+    flex-shrink: 1 !important;
 
     border:
         1px solid
@@ -820,6 +967,44 @@
 
 
 /* =====================================================
+   DATE
+   ===================================================== */
+
+#tradingSessionsPanel .sessions-date {
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    width:
+        100% !important;
+
+    margin:
+        0 0 7px 0 !important;
+
+    font-size:
+        10px !important;
+
+    font-weight:
+        800 !important;
+
+    letter-spacing:
+        0.25px !important;
+
+    opacity:
+        0.82 !important;
+
+    white-space:
+        nowrap !important;
+}
+
+
+/* =====================================================
    CONTENU PRINCIPAL
    ===================================================== */
 
@@ -864,7 +1049,7 @@
         flex-start !important;
 
     gap:
-        9px !important;
+        8px !important;
 
     min-width:
         0 !important;
@@ -873,7 +1058,7 @@
         100% !important;
 
     padding:
-        3px 16px !important;
+        3px 12px !important;
 
     box-sizing:
         border-box !important;
@@ -895,7 +1080,7 @@
         1 !important;
 
     padding-right:
-        28px !important;
+        24px !important;
 }
 
 
@@ -908,7 +1093,7 @@
         1 !important;
 
     padding-left:
-        28px !important;
+        24px !important;
 }
 
 
@@ -965,7 +1150,7 @@
         800 !important;
 
     letter-spacing:
-        0.8px !important;
+        0.7px !important;
 
     text-transform:
         uppercase !important;
@@ -979,7 +1164,7 @@
 
 
 /* =====================================================
-   NOMS
+   NOMS DES SESSIONS
    ===================================================== */
 
 #tradingSessionsPanel .session-current-name,
@@ -1152,7 +1337,7 @@
 #tradingSessionsPanel .sessions-weekend {
 
     display:
-        inline-flex !important;
+        flex !important;
 
     align-items:
         center !important;
@@ -1170,13 +1355,13 @@
         6px !important;
 
     padding:
-        4px 8px !important;
+        5px 8px !important;
 
     border-radius:
         7px !important;
 
     font-size:
-        8px !important;
+        9px !important;
 
     font-weight:
         800 !important;
@@ -1212,24 +1397,11 @@
 
 @media (max-width: 1100px) {
 
-    #tradingSessionsPanel {
+    #tradingSessionsPanel
+    .session-label {
 
-        left:
-            calc(
-                50% - 20px
-            ) !important;
-
-        width:
-            min(
-                620px,
-                calc(100% - 360px)
-            ) !important;
-
-        min-width:
-            440px !important;
-
-        max-width:
-            620px !important;
+        display:
+            none !important;
     }
 
 
@@ -1237,7 +1409,7 @@
     .session-current {
 
         padding-right:
-            18px !important;
+            16px !important;
     }
 
 
@@ -1245,50 +1417,30 @@
     .session-next {
 
         padding-left:
-            18px !important;
+            16px !important;
     }
 
-
-    #tradingSessionsPanel
-    .session-label {
-
-        display:
-            none !important;
-    }
 }
 
 
 /* =====================================================
-   TABLETTE / PETIT ÉCRAN
+   PETIT ÉCRAN
    ===================================================== */
 
 @media (max-width: 900px) {
 
     #tradingSessionsPanel {
 
-        top:
-            auto !important;
-
-        bottom:
-            14px !important;
-
-        left:
-            50% !important;
-
-        transform:
-            translateX(-50%) !important;
-
         width:
-            calc(
-                100% - 40px
-            ) !important;
-
-        max-width:
-            680px !important;
+            100% !important;
 
         min-width:
             0 !important;
+
+        max-width:
+            100% !important;
     }
+
 }
 
 
@@ -1300,29 +1452,18 @@
 
     #tradingSessionsPanel {
 
-        left:
-            4% !important;
-
-        right:
-            4% !important;
-
-        bottom:
-            12px !important;
-
-        width:
-            auto !important;
-
-        max-width:
-            none !important;
-
-        min-width:
-            0 !important;
-
-        transform:
-            none !important;
-
         padding:
-            8px 12px !important;
+            8px 10px !important;
+    }
+
+
+    #tradingSessionsPanel .sessions-date {
+
+        font-size:
+            9px !important;
+
+        margin-bottom:
+            6px !important;
     }
 
 
@@ -1333,7 +1474,7 @@
             1fr !important;
 
         gap:
-            8px !important;
+            7px !important;
     }
 
 
@@ -1351,11 +1492,8 @@
         width:
             100% !important;
 
-        justify-content:
-            flex-start !important;
-
         padding:
-            4px 8px !important;
+            4px 6px !important;
 
         flex-wrap:
             wrap !important;
@@ -1369,7 +1507,7 @@
     .session-next {
 
         padding-top:
-            9px !important;
+            8px !important;
 
         border-top:
             1px solid
@@ -1378,7 +1516,7 @@
                 255,
                 255,
                 0.09
-            );
+            ) !important;
     }
 
 
@@ -1399,6 +1537,7 @@
         text-align:
             left !important;
     }
+
 }
 
 
@@ -1416,6 +1555,28 @@
         gap:
             6px !important;
     }
+
+
+    #tradingSessionsPanel
+    .session-current-name,
+    #tradingSessionsPanel
+    .session-next-name {
+
+        font-size:
+            11px !important;
+    }
+
+
+    #tradingSessionsPanel
+    .session-countdown {
+
+        font-size:
+            8px !important;
+
+        padding:
+            4px 6px !important;
+    }
+
 }
 
         `;
@@ -1424,6 +1585,7 @@
         document.head.appendChild(
             style
         );
+
     }
 
 
@@ -1448,10 +1610,19 @@
 
             panel.id =
                 "tradingSessionsPanel";
+
         }
 
 
         panel.innerHTML = `
+
+            <div
+                class="sessions-date"
+                id="sessionsDate"
+            >
+                —
+            </div>
+
 
             <div class="sessions-main">
 
@@ -1516,13 +1687,15 @@
 
             </div>
 
+
             <div
                 class="sessions-weekend"
                 id="sessionsWeekend"
                 style="display:none;"
             >
-                Marché fermé — Week-end
+                🔴 Marché fermé — Week-end
             </div>
+
         `;
 
 
@@ -1556,17 +1729,23 @@
                         themeButton
                     );
 
-                } else {
+                }
+
+                else {
 
                     topbar.appendChild(
                         panel
                     );
+
                 }
+
             }
+
         }
 
 
         return panel;
+
     }
 
 
@@ -1583,7 +1762,9 @@
 
 
         if (!panel) {
+
             return;
+
         }
 
 
@@ -1596,6 +1777,31 @@
                 now
             );
 
+
+        /* =================================================
+           DATE
+           ================================================= */
+
+        const dateElement =
+            document.getElementById(
+                "sessionsDate"
+            );
+
+
+        if (dateElement) {
+
+            dateElement.textContent =
+                "📅 " +
+                getFullMadagascarDate(
+                    now
+                );
+
+        }
+
+
+        /* =================================================
+           ÉLÉMENTS
+           ================================================= */
 
         const weekendElement =
             document.getElementById(
@@ -1639,54 +1845,65 @@
             );
 
 
-        /*
-         * WEEK-END
-         */
+        /* =================================================
+           WEEK-END
+           ================================================= */
 
         if (weekend) {
 
             if (weekendElement) {
+
                 weekendElement.style.display =
-                    "inline-flex";
+                    "flex";
+
             }
 
 
             if (currentName) {
+
                 currentName.textContent =
                     "Marché fermé";
+
+                currentName.classList.remove(
+                    "open"
+                );
+
             }
 
 
             if (currentStatus) {
+
                 currentStatus.textContent =
                     "";
+
             }
 
 
             if (currentCountdown) {
+
                 currentCountdown.textContent =
                     "WEEK-END";
+
             }
 
 
             if (nextName) {
+
                 nextName.textContent =
-                    "Sydney";
+                    "🇦🇺 Sydney";
+
             }
 
 
             if (nextTime) {
+
                 nextTime.textContent =
-                    "Ouverture lundi";
+                    "Ouverture lundi 22:00";
+
             }
 
 
             if (nextCountdown) {
-
-                /*
-                 * Recherche de la prochaine
-                 * ouverture après le week-end.
-                 */
 
                 const next =
                     getNextSession(
@@ -1700,12 +1917,6 @@
                         next.date;
 
 
-                    /*
-                     * Si le candidat tombe
-                     * pendant le week-end,
-                     * on avance jusqu'à lundi.
-                     */
-
                     while (
                         isWeekend(
                             nextDate
@@ -1715,11 +1926,14 @@
                         nextDate =
                             new Date(
                                 nextDate.getTime() +
-                                24 *
-                                60 *
-                                60 *
-                                1000
+                                (
+                                    24 *
+                                    60 *
+                                    60 *
+                                    1000
+                                )
                             );
+
                     }
 
 
@@ -1728,23 +1942,32 @@
                             nextDate.getTime() -
                             now.getTime()
                         );
+
                 }
+
             }
 
 
             return;
+
         }
 
+
+        /* =================================================
+           JOUR OUVRABLE
+           ================================================= */
 
         if (weekendElement) {
+
             weekendElement.style.display =
                 "none";
+
         }
 
 
-        /*
-         * SESSION ACTUELLE
-         */
+        /* =================================================
+           SESSION ACTUELLE
+           ================================================= */
 
         const current =
             getCurrentSession(
@@ -1757,11 +1980,14 @@
             if (currentName) {
 
                 currentName.textContent =
+                    current.session.flag +
+                    " " +
                     current.session.name;
 
                 currentName.classList.add(
                     "open"
                 );
+
             }
 
 
@@ -1769,6 +1995,7 @@
 
                 currentStatus.textContent =
                     "OUVERTE";
+
             }
 
 
@@ -1779,9 +2006,12 @@
                         current.closeDate.getTime() -
                         now.getTime()
                     );
+
             }
 
-        } else {
+        }
+
+        else {
 
             if (currentName) {
 
@@ -1791,6 +2021,7 @@
                 currentName.classList.remove(
                     "open"
                 );
+
             }
 
 
@@ -1798,6 +2029,7 @@
 
                 currentStatus.textContent =
                     "FERMÉE";
+
             }
 
 
@@ -1805,13 +2037,15 @@
 
                 currentCountdown.textContent =
                     "—";
+
             }
+
         }
 
 
-        /*
-         * PROCHAINE SESSION
-         */
+        /* =================================================
+           PROCHAINE SESSION
+           ================================================= */
 
         const next =
             getNextSession(
@@ -1824,7 +2058,10 @@
             if (nextName) {
 
                 nextName.textContent =
+                    next.session.flag +
+                    " " +
                     next.session.name;
+
             }
 
 
@@ -1834,6 +2071,7 @@
                     next.session.open +
                     " → " +
                     next.session.close;
+
             }
 
 
@@ -1844,8 +2082,11 @@
                         next.date.getTime() -
                         now.getTime()
                     );
+
             }
+
         }
+
     }
 
 
@@ -1866,6 +2107,7 @@
             updatePanel,
             1000
         );
+
     }
 
 
@@ -1883,9 +2125,13 @@
             init
         );
 
-    } else {
+    }
+
+    else {
 
         init();
+
     }
+
 
 })();
